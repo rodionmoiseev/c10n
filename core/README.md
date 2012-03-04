@@ -122,8 +122,8 @@ class EnglishButtons implements Buttons{
 }
 
 class RussianButtons implements Buttons{
-  String ok(){ return "„D„p"; }
-  String cancel(){ return "„O„„„}„u„~„p"; }
+  String ok(){ return "Ð”Ð°"; }
+  String cancel(){ return "ÐžÑ‚Ð¼ÐµÐ½Ð°"; }
 }
 ```
 
@@ -161,8 +161,8 @@ Create a resource bundle with the translations (Russian in our case):
 
 ```
 -- src/resources/org/mycompany/myapp/Resources_ru.properties
-org.mycompany.myapp.Buttons.ok=„D„p
-org.mycompany.myapp.Buttons.cancel=„O„„„}„u„~„p
+org.mycompany.myapp.Buttons.ok=Ð”Ð°
+org.mycompany.myapp.Buttons.cancel=ÐžÑ‚Ð¼ÐµÐ½Ð°
 ```
 
 Tell c10n to look for messages in our bundle:
