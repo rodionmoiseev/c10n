@@ -1,7 +1,7 @@
 Cosmopolitan -- C10N
 ====================
 
-A Java library, focused on making internatiolisation more modular, easier
+A Java library, focused on making internationalisation more modular, easier
 to evolve and maintain, robust-to-change and IDE-friendly without excess of
 external tools.
 
@@ -104,7 +104,7 @@ Again, a few options here, depending on your philosophy.
 
 #### Manual message binding 
 
-This is just for the sake of demostration, and is not recommended 
+This is just for the sake of demonstration, and is not recommended 
 for medium to big projects. Please use the message bundle approach instead.
 
 Implement the interface
