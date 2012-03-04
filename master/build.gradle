@@ -1,0 +1,32 @@
+allprojects{
+  apply plugin: 'eclipse'
+  apply plugin: 'idea'
+}
+
+subprojects{
+  apply plugin: 'java'
+
+  version = "1.0-alpha"
+
+  archivesBaseName = "c10n"
+
+  sourceCompatibility = '1.6'
+  compileJava.options.encoding = 'UTF-8'
+
+  repositories{
+    mavenCentral()
+  }
+
+  configurations{
+    provided
+    testCompile.extendsFrom provided
+  }
+
+  dependencies{
+    provided group: 'org.projectlombok', name: 'lombok', version: '0.10.8'
+    testCompile group: 'junit', name: 'junit', version: '4.8.2'
+  }
+
+  sourceSets.main.compileClasspath += configurations.provided
+  eclipse.classpath.plusConfigurations += configurations.provided 
+}

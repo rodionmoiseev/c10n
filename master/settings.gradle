@@ -1,0 +1,2 @@
+includeFlat 'core', 'tools'
+rootProject.name = 'c10n'

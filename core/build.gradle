@@ -1,0 +1,32 @@
+configurations{
+  guice
+  testCompile.extendsFrom guice
+}
+
+dependencies{
+  guice group: "org.reflections", name: "reflections", version: "0.9.5"
+  guice group: 'com.google.inject', name: 'guice', version: '3.0'
+  guice group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'
+}
+
+eclipse.classpath.plusConfigurations += configurations.guice
+
+sourceSets{
+  guice{
+    java{
+      srcDir "src/ext/guice/java"
+    }
+    compileClasspath += sourceSets.main.output
+    compileClasspath += configurations.provided
+    compileClasspath += configurations.guice
+  }
+}
+
+jar{
+  appendix = "core"
+}
+
+task guiceJar(type: Jar){
+  appendix = "ext-guice"
+  from sourceSets.guice.output
+}
