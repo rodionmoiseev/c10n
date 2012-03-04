@@ -22,7 +22,6 @@ public interface MyApp {
 
   @C10NDef("Rodion")
   String author();
-
 }
 
 @C10NMessages
@@ -94,6 +93,95 @@ public class ConfirmationDialogWindow {
 
 Again, a few options here, depending on your philosophy.
 
-TODO
+1. Implement the message interfaces manually.
+   For a small project this may be a quick and dirty way to get it
+   done and out of the way. C10N can be configured to choose the
+   correct implementation based on the current locale.
+2. Bind message interfaces to a message bundle(s).
+3. When requested message cannot be found using one of the above
+   the value specified in the `@C10NDef("Default value")` will be
+   used.
+
+#### Manual message binding 
+
+This is just for the sake of demostration, and is not recommended 
+for medium to big projects. Please use the message bundle approach instead.
+
+Implement the interface
+
+```java
+@C10NMessages
+public interface Buttons{
+  String ok();
+  String cancel();
+}
+
+class EnglishButtons implements Buttons{
+  String ok(){ return "OK"; }
+  String cancel(){ return "Cancel"; }
+}
+
+class RussianButtons implements Buttons{
+  String ok(){ return "„D„p"; }
+  String cancel(){ return "„O„„„}„u„~„p"; }
+}
+```
+
+Now bind it (somewhere near the `main`):
+
+```java
+C10N.configure(new AbstractC10NConfiguration(){
+  @Override
+  public void configure() {
+    bind(Buttons.class)
+      .to(EnglishButtons.class, Locale.ENGLISH)
+      .to(RussianButtons.class, Locale.RUSSIAN);
+  }
+});
+```
+
+#### Binding messages to a resource bundle
+
+Create the c10n message interface:
+
+```java
+package org.mycompany.myapp;
+
+@C10NMessages
+public interface Buttons{
+  @C10NDef("OK")
+  String ok();
+  
+  @C10NDef("Cancel")
+  String cancel();
+}
+```
+
+Create a resource bundle with the translations (Russian in our case):
+
+```
+-- src/resources/org/mycompany/myapp/Resources_ru.properties
+org.mycompany.myapp.Buttons.ok=„D„p
+org.mycompany.myapp.Buttons.cancel=„O„„„}„u„~„p
+```
+
+Tell c10n to look for messages in our bundle:
+
+```java
+C10N.configure(new AbstractC10NConfiguration() {
+  @Override
+  public void configure() {
+    bindBundle("org.mycompany.myapp.Resources");
+  }
+});
+```
+
+Note that `@C10NDef` is optional. You can choose to put messages
+for the default language into the resource bundle, keep them in
+the source code, or both. Keeping default messages in source
+code makes it easier to reference message content (in Eclipse
+and IntelliJ IDEA a `Ctrl+click` on the method will take you
+to where it's declared. Personally I find it easier than 
+searching through the resource bundle files).
 
   [guice]: http://code.google.com/p/google-guice/  "Google Guice"
