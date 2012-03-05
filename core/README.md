@@ -157,7 +157,9 @@ public interface Buttons{
 }
 ```
 
-Create a resource bundle with the translations (Russian in our case):
+Create a resource bundle with the translations (Russian in our case). 
+Initial set of resource bundles can be generated using the supplied
+command-line utility or a [Gradle][gradle] task:
 
 ```
 -- src/resources/org/mycompany/myapp/Resources_ru.properties
@@ -184,4 +186,8 @@ and IntelliJ IDEA a `Ctrl+click` on the method will take you
 to where it's declared. Personally I find it easier than 
 searching through the resource bundle files).
 
+#### TODOs
+* Docs on resource bundle generation
+
   [guice]: http://code.google.com/p/google-guice/  "Google Guice"
+  [gradle]: http://www.gradle.org/                 "Gradle build tool"

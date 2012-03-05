@@ -11,6 +11,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import c10n.share.utils.ReflectionUtils;
+
 class DefaultC10NFactory implements C10NFactory {
 	private AbstractC10NConfiguration conf = new DefaultC10NConfiguration();
 
@@ -68,7 +70,9 @@ class DefaultC10NFactory implements C10NFactory {
 
 			ResourceBundle bundle = conf.getBundleForLocale(proxiedClass, locale);
 			if (null != bundle) {
-				String key = genKey(method);
+				StringBuilder sb = new StringBuilder();
+				ReflectionUtils.getDefaultKey(proxiedClass, method, sb);
+				String key = sb.toString();
 				if (bundle.containsKey(key)) {
 					return MessageFormat.format(bundle.getString(key), args);
 				}
@@ -80,41 +84,6 @@ class DefaultC10NFactory implements C10NFactory {
 				return untranslatedMessage(methodName, args);
 			}
 			return MessageFormat.format(res, args);
-		}
-
-		private String genKey(Method method) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(proxiedClass.getPackage().getName()).append('.');
-			joinClassHierarchy(sb, '.');
-			sb.append('.').append(method.getName());
-
-			Class<?>[] params = method.getParameterTypes();
-			if (params.length > 0) {
-				sb.append('_');
-				for (int i = 0; i < params.length; i++) {
-					sb.append(params[i].getSimpleName());
-					if (i + 1 < params.length) {
-						sb.append("_");
-					}
-				}
-			}
-			return sb.toString();
-		}
-
-		private void joinClassHierarchy(StringBuilder sb, char delim) {
-			Class<?> parent = proxiedClass;
-			LinkedList<String> typeHierarchy = new LinkedList<String>();
-			do {
-				typeHierarchy.add(parent.getSimpleName());
-			} while ((parent = parent.getEnclosingClass()) != null);
-			
-			Iterator<String> it = typeHierarchy.descendingIterator();
-			while (it.hasNext()) {
-				sb.append(it.next());
-				if (it.hasNext()) {
-					sb.append(delim);
-				}
-			}
 		}
 
 		private String untranslatedMessage(String methodName, Object[] args) {
