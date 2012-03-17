@@ -27,6 +27,12 @@ public final class ReflectionUtils {
 		}
 	}
 	
+	public static String getFQNString(Class<?> clazz){
+		StringBuilder sb = new StringBuilder();
+		getFQNString(clazz, sb);
+		return sb.toString();
+	}
+	
 	public static void getFQNString(Class<?> clazz, StringBuilder sb){
 		sb.append(clazz.getPackage().getName()).append('.');
 		getClassFQNString(clazz, sb, '.');

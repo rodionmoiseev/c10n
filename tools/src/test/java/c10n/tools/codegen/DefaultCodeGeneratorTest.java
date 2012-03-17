@@ -6,9 +6,10 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import c10n.C10NDef;
+import c10n.tools.search.C10NInterfacesSearches;
 
 public class DefaultCodeGeneratorTest {
-	private final CodeGenerator bc = new DefaultCodeGenerator();
+	private final CodeGenerator bc = new DefaultCodeGenerator(C10NInterfacesSearches.reflectionsSearch());
 	
 	@Test
 	public void convertingInterfaceWithDefaultStrategy(){

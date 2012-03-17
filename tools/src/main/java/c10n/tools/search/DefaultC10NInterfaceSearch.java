@@ -1,16 +1,44 @@
 package c10n.tools.search;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Set;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
 import c10n.C10NMessages;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+
 class DefaultC10NInterfaceSearch implements C10NInterfaceSearch {
+	private final Set<URL> cp;
+
+	DefaultC10NInterfaceSearch() {
+		this(ClasspathHelper.forJavaClassPath());
+	}
+
+	DefaultC10NInterfaceSearch(Set<URL> cp) {
+		this.cp = cp;
+	}
 
 	@Override
 	public Set<Class<?>> find(String packagePrefix) {
-		Reflections reflections = new Reflections(packagePrefix);
-		return reflections.getTypesAnnotatedWith(C10NMessages.class);
+		final Predicate<String> filter = new FilterBuilder.Include(
+				FilterBuilder.prefix(packagePrefix));
+		Reflections reflections = new Reflections(new ConfigurationBuilder()
+				.setUrls(cp)
+				.filterInputsBy(filter)
+				.setScanners(
+						new TypeAnnotationsScanner().filterResultsBy(filter),
+						new SubTypesScanner().filterResultsBy(filter)));
+		Set<String> types = reflections.getStore().getTypesAnnotatedWith(C10NMessages.class.getName());
+		URL[] urls = cp.toArray(new URL[cp.size()]);
+		return ImmutableSet.copyOf(Reflections.forNames(types, new URLClassLoader(urls)));
 	}
 }

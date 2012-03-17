@@ -12,7 +12,7 @@ import org.junit.rules.MethodRule;
 
 import c10n.share.util.RuleUtils;
 
-public class CustomBindingTest {
+public class CustomImplementationBindingTest {
 	@Rule
 	public static MethodRule tmpLocale = RuleUtils.tmpLocale();
 	

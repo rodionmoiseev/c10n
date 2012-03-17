@@ -1,5 +1,6 @@
 package c10n;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -11,12 +12,19 @@ import c10n.share.EncodedResourceControl;
 public abstract class AbstractC10NConfiguration {
 	private final Map<String, C10NBundleBinder> bundleBinders = new HashMap<String, C10NBundleBinder>();
 	private final Map<Class<?>, C10NConfigurationBinder<?>> binders = new HashMap<Class<?>, C10NConfigurationBinder<?>>();
+	private final Map<Class<? extends Annotation>, C10NAnnotationBinder<?>> annotationBinders = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder<?>>();
 
 	public abstract void configure();
 
-	protected <T> C10NConfigurationBinder<T> bind(Class<T> c10nInterface) {
+	public <T> C10NConfigurationBinder<T> bind(Class<T> c10nInterface) {
 		C10NConfigurationBinder<T> binder = new C10NConfigurationBinder<T>();
 		binders.put(c10nInterface, binder);
+		return binder;
+	}
+
+	public <T extends Annotation> C10NAnnotationBinder<T> bindAnnotation(Class<T> annotationClass) {
+		C10NAnnotationBinder<T> binder = new C10NAnnotationBinder<T>();
+		annotationBinders.put(annotationClass, binder);
 		return binder;
 	}
 
@@ -36,6 +44,10 @@ public abstract class AbstractC10NConfiguration {
 			}
 		}
 		return null;
+	}
+
+	Map<Class<? extends Annotation>, C10NAnnotationBinder<?>> getAnnotationBinders() {
+		return annotationBinders;
 	}
 
 	Class<?> getBindingForLocale(Class<?> c10nInterface, Locale locale) {
