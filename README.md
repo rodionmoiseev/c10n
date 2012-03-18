@@ -162,7 +162,20 @@ public interface Buttons{
 }
 ```
 
-*Note:* Method parameters are substituted as specified by the `java.text.MessageFormat#format`.
+*Tip:* Method parameters are substituted as specified by the `java.text.MessageFormat#format`.
+`MessageFormat#format` has a surprisingly powerful substitution language, which allows you to
+do things like correct translation for complicated plurals:
+
+```java
+public interface Library{
+  @En("There {0,choice,0#are no books|1#is just one book|1<are {0} books} on the shelf.")
+  String bookshelfHas(int noOfBooks);
+  
+  //bookshelfHas(0) --> "There are no books on the shelf"
+  //bookshelfHas(1) --> "There is just one book on the shelf"
+  //bookshelfHas(3) --> "There are 3 books on the shelf"
+}
+```
 
 #### Binding messages to a resource bundle
 
