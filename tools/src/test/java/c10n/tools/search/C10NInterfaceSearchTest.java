@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import c10n.C10NMessages;
 import c10n.tools.search.test1.Buttons;
 import c10n.tools.search.test1.Window;
 import c10n.tools.search.test1.labels.Labels;
@@ -21,7 +22,7 @@ public class C10NInterfaceSearchTest {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void retrieveAllInterfaceAndSubInterfaceMethodsAsKeys() {
-		Set<Class<?>> c10nInterfaces = s.find("c10n.tools.search.test1");
+		Set<Class<?>> c10nInterfaces = s.find("c10n.tools.search.test1", C10NMessages.class);
 		assertThat(c10nInterfaces, is(set(Window.class,//
 				Buttons.class,//
 				Labels.class,//

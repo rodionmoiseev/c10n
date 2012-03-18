@@ -45,6 +45,7 @@ import java.util.Set;
 import lombok.Cleanup;
 import lombok.Data;
 import c10n.C10NDef;
+import c10n.C10NMessages;
 import c10n.gen.C10NGenMessages;
 import c10n.gen.C10NGenValue;
 import c10n.share.utils.ReflectionUtils;
@@ -172,7 +173,7 @@ class DefaultCodeGenerator implements CodeGenerator {
 	@Override
 	public void convertAll(String packagePrefix, File outputSrcFolder,
 			File baseFile) throws IOException {
-		Set<Class<?>> c10nIfs = search.find(packagePrefix);
+		Set<Class<?>> c10nIfs = search.find(packagePrefix, C10NMessages.class);
 		String targetPackage = "c10n.gen";
 		File targetFolder = new File(outputSrcFolder, "c10n/gen");
 		List<ResourceFile> allFiles = findResourceFiles(baseFile);

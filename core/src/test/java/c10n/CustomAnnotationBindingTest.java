@@ -34,10 +34,14 @@ public class CustomAnnotationBindingTest {
 		Labels msg = C10N.get(Labels.class);
 		assertThat(msg.label(), is(equalTo("English")));
 		assertThat(msg.label2("arg"), is(equalTo("English arg")));
+		assertThat(msg.books(0), is("There are no books."));
+		assertThat(msg.books(3), is("There are 3 books."));
 		
 		Locale.setDefault(Locale.JAPANESE);
 		assertThat(msg.label(), is(equalTo("Japanese")));
 		assertThat(msg.label2("hikisuu"), is(equalTo("Japanese hikisuu")));
+		assertThat(msg.books(0), is("本がありません。"));
+		assertThat(msg.books(3), is("本が3本あります。"));
 		
 		Locale.setDefault(Locale.GERMAN);
 		assertThat(msg.label(), is(equalTo("Default")));
@@ -62,7 +66,6 @@ public class CustomAnnotationBindingTest {
 		String value();
 	}
 
-	@C10NMessages
 	interface Labels{
 		@Eng("English")
 		@Jp("Japanese")
@@ -73,5 +76,9 @@ public class CustomAnnotationBindingTest {
 		@Jp("Japanese {0}")
 		@Def("Default {0}")
 		String label2(String arg);
+		
+		@Eng("There are {0,choice,0#no books|0<{0} books}.")
+		@Jp("本が{0,choice,0#ありません|0<{0}本あります}。")
+		String books(int n);
 	}
 }

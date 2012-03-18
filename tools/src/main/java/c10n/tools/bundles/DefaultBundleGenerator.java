@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import c10n.C10NDef;
+import c10n.C10NMessages;
 import c10n.share.utils.ReflectionUtils;
 import c10n.tools.search.C10NInterfaceSearch;
 
@@ -30,7 +31,7 @@ public class DefaultBundleGenerator implements BundleGenerator {
 	@Override
 	public void generateForPackage(String packagePrefix,
 			Map<String, String> builder) {
-		for(Class<?> c10nInterface : search.find(packagePrefix)){
+		for(Class<?> c10nInterface : search.find(packagePrefix, C10NMessages.class)){
 			generate(c10nInterface, builder);
 		}
 	}

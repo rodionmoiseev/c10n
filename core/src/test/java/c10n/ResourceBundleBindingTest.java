@@ -59,9 +59,9 @@ public class ResourceBundleBindingTest {
 		Buttons buttons = f.get(Buttons.class);
 		
 		Locale.setDefault(Locale.JAPANESE);
-		assertThat(labels.greeting(), is("‚±‚ñ‚É‚¿‚Í¢ŠE!"));
-		assertThat(labels.argGreeting("C10N"), is("‚±‚ñ‚É‚¿‚ÍC10N!"));
-		assertThat(buttons.ok(), is("‚Í‚¢"));
+		assertThat(labels.greeting(), is("ã“ã‚“ã«ã¡ã¯ä¸–ç•Œ!"));
+		assertThat(labels.argGreeting("C10N"), is("ã“ã‚“ã«ã¡ã¯C10N!"));
+		assertThat(buttons.ok(), is("ã¯ã„"));
 		
 		Locale.setDefault(Locale.ENGLISH);
 		assertThat(labels.greeting(), is("Hello, World!"));

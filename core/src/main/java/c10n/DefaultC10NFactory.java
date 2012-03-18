@@ -123,14 +123,13 @@ class DefaultC10NFactory implements C10NFactory {
 					}
 				}
 
-				String methodName = method.toString();
 				String res = null;
 				Map<String, String> trs = getTranslations(locale);
 				if (trs != null) {
-					res = trs.get(methodName);
+					res = trs.get(method.toString());
 				}
 				if (null == res) {
-					return untranslatedMessage(methodName, args);
+					return untranslatedMessage(method.getName(), args);
 				}
 				return MessageFormat.format(res, args);
 			} else if (returnType.isInterface()) {
