@@ -1,6 +1,8 @@
 Cosmopolitan -- C10N
 ====================
 
+*Note:* C10N is still alpha. API may (most likely will) change.
+
 A Java library, focused on making internationalisation more modular, easier
 to evolve and maintain, robust-to-change and IDE-friendly without excess of
 external tools.
@@ -15,30 +17,28 @@ Usage can be vaguely split into two flavours: logger-like and [guice][guice]-bas
 First, all messages that would typically reside in a message bundle become an interface:
 
 ```java
-@C10NMessages
 public interface MyApp {
-  @C10NDef("Hello, C10N-app!")
+  @En("Hello, C10N-app!")
   String title();
 
-  @C10NDef("Rodion")
+  @En("Rodion")
   String author();
 }
 
-@C10NMessages
 public interface Buttons {
-  @C10NDef("OK")
+  @En("OK")
   String ok();
 
-  @C10NDef("Cancel")
+  @En("Cancel")
   String cancel();
 }
 
-@C10NMessages
+
 public interface ConfirmationDialog extends MyApp, Buttons {
-  @C10NDef("Don't go there!")
+  @En("Don't go there!")
   String warningText();
 
-  @C10NDef("Abort")
+  @En("Abort")
   String abort();
 }
 ```
@@ -91,69 +91,97 @@ public class ConfirmationDialogWindow {
 
 ### How does C10N find the messages?
 
-Again, a few options here, depending on your philosophy.
+There are few possible options:
 
-1. Implement the message interfaces manually.
-   For a small project this may be a quick and dirty way to get it
-   done and out of the way. C10N can be configured to choose the
-   correct implementation based on the current locale.
-2. Bind message interfaces to a message bundle(s).
-3. When requested message cannot be found using one of the above
-   the value specified in the `@C10NDef("Default value")` will be
-   used.
+1. Annotate interface methods with translated strings. C10N will
+   choose the correct string based on the configured locale mapping.
+   This method works well if you don't have a requirement for storing
+   all messages in resource bundle files. Also all messages will have
+   to have the same encoding, which means you are stuck with Unicode.
+2. Implement the message interfaces manually. For the brave.
+   There aren't many real advantages for this method, so I am not
+   sure if I should keep support for this.
+3. Bind message interfaces to a message bundle(s).
 
-#### Manual message binding 
+#### Storing translations in source code
 
-This is just for the sake of demonstration, and is not recommended 
-for medium to big projects. Please use the message bundle approach instead.
+Personally I would prefer this approach as it is completely
+refactoring-proof, clean, and does not require any tools.
 
-Implement the interface
+First you'll need to declare a set of annotations for each of the
+locale your software will support. 
+
+Let's create two for English and Russian. Note that the annotation
+must declare a `String value()` field.
 
 ```java
-@C10NMessages
-public interface Buttons{
-  String ok();
-  String cancel();
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface En {
+  String value();
 }
-
-class EnglishButtons implements Buttons{
-  String ok(){ return "OK"; }
-  String cancel(){ return "Cancel"; }
-}
-
-class RussianButtons implements Buttons{
-  String ok(){ return "Да"; }
-  String cancel(){ return "Отмена"; }
+	
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Ru {
+  String value();
 }
 ```
 
-Now bind it (somewhere near the `main`):
+Then you need to bind each of your annotations to a specific locale
+(has to be done before your messages are accessed):
 
 ```java
 C10N.configure(new AbstractC10NConfiguration(){
   @Override
   public void configure() {
-    bind(Buttons.class)
-      .to(EnglishButtons.class, Locale.ENGLISH)
-      .to(RussianButtons.class, Locale.RUSSIAN);
+    //Omitting locale binding instructs c10n to fallback to
+    //this annotation when other locales did not match.
+    bindAnnotation(En.class);
+    bindAnnotation(Ru.class).toLocale(new Locale("ru","RU"));
   }
 });
 ```
 
+C10N setup is complete. Now you can start declaring interfaces and 
+provide translations for each of the locale using the declared annotations:
+
+```java
+public interface Buttons{
+  @En("OK")
+  @Ru("Да")
+  String ok();
+  
+  @En("Cancel")
+  @Ru("Отмена")
+  String cancel();
+  
+  @En("Are you sure you want to {0}?")
+  @Ru("Вы уверены вы хотите {0}?")
+  String confirmationDialog(String action);
+}
+```
+
+*Note:* Method parameters are substituted as specified by the `java.text.MessageFormat#format`.
+
 #### Binding messages to a resource bundle
 
-Create the c10n message interface:
+Create the c10n message interface. You may choose to leave the default translations
+in the source code.
 
 ```java
 package org.mycompany.myapp;
 
 @C10NMessages
 public interface Buttons{
-  @C10NDef("OK")
+  @En("OK")
   String ok();
   
-  @C10NDef("Cancel")
+  @En("Cancel")
   String cancel();
+  
+  @En("Are you sure you want to {0}?")
+  String confirmationDialog(String action);
 }
 ```
 
@@ -165,6 +193,7 @@ command-line utility or a [Gradle][gradle] task:
 -- src/resources/org/mycompany/myapp/Resources_ru.properties
 org.mycompany.myapp.Buttons.ok=Да
 org.mycompany.myapp.Buttons.cancel=Отмена
+org.mycompany.myapp.Buttons.confirmationDialog_String=Вы уверены вы хотите {0}?
 ```
 
 Tell c10n to look for messages in our bundle:
@@ -178,7 +207,7 @@ C10N.configure(new AbstractC10NConfiguration() {
 });
 ```
 
-Note that `@C10NDef` is optional. You can choose to put messages
+Note that `@En` is optional. You can choose to put messages
 for the default language into the resource bundle, keep them in
 the source code, or both. Keeping default messages in source
 code makes it easier to reference message content (in Eclipse
