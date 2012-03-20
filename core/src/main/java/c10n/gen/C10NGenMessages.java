@@ -17,15 +17,27 @@
  *  under the License.
  */
 
-package c10n.tools.search.test1;
+package c10n.gen;
 
-import c10n.C10NDef;
-import c10n.C10NMessages;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@C10NMessages
-public interface Buttons {
-	@C10NDef("OK")
-	String ok();
-	@C10NDef("Cancel")
-	String cancel();
+/**
+ * <p>For internal use:</p>
+ * <p>Applied to c10n interface implementation generated
+ * by the bundle-to-java conversion.</p>
+ *
+ * @author rodion
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface C10NGenMessages {
+  /**
+   * String representation of the locale instance
+   *
+   * @return
+   */
+  String value();
 }

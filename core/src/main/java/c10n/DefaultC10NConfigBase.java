@@ -17,15 +17,10 @@
  *  under the License.
  */
 
-package c10n.tools.search.test1;
+package c10n;
 
-import c10n.C10NDef;
-import c10n.C10NMessages;
-
-@C10NMessages
-public interface Buttons {
-	@C10NDef("OK")
-	String ok();
-	@C10NDef("Cancel")
-	String cancel();
+class DefaultC10NConfigBase extends C10NConfigBase {
+  @Override
+  public void configure() {
+  }
 }

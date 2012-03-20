@@ -17,15 +17,15 @@
  *  under the License.
  */
 
-package c10n.tools.search.test1;
+package c10n.share.utils;
 
-import c10n.C10NDef;
-import c10n.C10NMessages;
-
-@C10NMessages
-public interface Buttons {
-	@C10NDef("OK")
-	String ok();
-	@C10NDef("Cancel")
-	String cancel();
+/**
+ * @author rodion
+ */
+public final class Preconditions {
+  public static final void assertNotNull(Object val, String valName) {
+    if (null == val) {
+      throw new IllegalArgumentException(valName + " is null");
+    }
+  }
 }
