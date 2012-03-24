@@ -42,7 +42,7 @@ public abstract class C10NConfigBase {
   private boolean configured = false;
 
   /**
-   * <p>To be implemeted by subclasses of {@link C10NConfigBase}.</p>
+   * <p>To be implemented by subclasses of {@link C10NConfigBase}.</p>
    * <p>Configuration methods are as follows:
    * <ul>
    * <li>{@link #bindAnnotation(Class)} - binds annotation that holds translation for a specific locale.</li>
