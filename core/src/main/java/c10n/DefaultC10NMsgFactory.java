@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,7 +47,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
   }
 
   public void configure(C10NConfigBase conf) {
-    conf.configure();
+    conf.doConfigure();
     this.conf = conf;
   }
 
@@ -80,7 +81,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       translationsByLocale.put(C10N.FALLBACK_LOCALE, vals);
 
       // Process custom bound annotations
-      for (Entry<Class<? extends Annotation>, C10NConfigBase.C10NAnnotationBinder<?>> entry : conf
+      for (Entry<Class<? extends Annotation>, C10NConfigBase.C10NAnnotationBinder> entry : conf
               .getAnnotationBinders().entrySet()) {
         Class<? extends Annotation> annotationClass = entry.getKey();
         Map<String, String> translations = new HashMap<String, String>();
@@ -130,9 +131,9 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       if (returnType.isAssignableFrom(String.class)) {
         // For methods returning String or CharSequence
 
-        ResourceBundle bundle = conf.getBundleForLocale(proxiedClass,
+        List<ResourceBundle> bundles = conf.getBundlesForLocale(proxiedClass,
                 locale);
-        if (null != bundle) {
+        for (ResourceBundle bundle : bundles) {
           StringBuilder sb = new StringBuilder();
           ReflectionUtils.getDefaultKey(proxiedClass, method, sb);
           String key = sb.toString();

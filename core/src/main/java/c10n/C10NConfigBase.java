@@ -23,7 +23,9 @@ import c10n.share.EncodedResourceControl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,25 +36,50 @@ import static c10n.share.utils.Preconditions.assertNotNull;
 public abstract class C10NConfigBase {
   private final Map<String, C10NBundleBinder> bundleBinders = new HashMap<String, C10NBundleBinder>();
   private final Map<Class<?>, C10NImplementationBinder<?>> binders = new HashMap<Class<?>, C10NImplementationBinder<?>>();
-  private final Map<Class<? extends Annotation>, C10NAnnotationBinder<?>> annotationBinders = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder<?>>();
+  private final Map<Class<? extends Annotation>, C10NAnnotationBinder> annotationBinders = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder>();
+  private final List<C10NConfigBase> childConfigs = new ArrayList<C10NConfigBase>();
 
-  public abstract void configure();
+  private boolean configured = false;
 
-  public <T> C10NImplementationBinder<T> bind(Class<T> c10nInterface) {
+  /**
+   * <p>To be implemeted by subclasses of {@link C10NConfigBase}.</p>
+   * <p>Configuration methods are as follows:
+   * <ul>
+   * <li>{@link #bindAnnotation(Class)} - binds annotation that holds translation for a specific locale.</li>
+   * <li>{@link #bindBundle(String)} - binds a resource bundle containing translated messages.</li>
+   * <li>{@link #install(C10NConfigBase)} - includes configuration from another c10n configuration module</li>
+   * </ul>
+   * </p>
+   */
+  protected abstract void configure();
+
+  void doConfigure() {
+    if (!configured) {
+      configure();
+    }
+    configured = true;
+  }
+
+  protected void install(C10NConfigBase childConfig) {
+    childConfig.doConfigure();
+    childConfigs.add(childConfig);
+  }
+
+  <T> C10NImplementationBinder<T> bind(Class<T> c10nInterface) {
     C10NImplementationBinder<T> binder = new C10NImplementationBinder<T>();
     binders.put(c10nInterface, binder);
     return binder;
   }
 
-  public <T extends Annotation> C10NAnnotationBinder<T> bindAnnotation(Class<T> annotationClass) {
+  protected C10NAnnotationBinder bindAnnotation(Class<? extends Annotation> annotationClass) {
     assertNotNull(annotationClass, "annotationClass");
     checkAnnotationInterface(annotationClass);
-    C10NAnnotationBinder<T> binder = new C10NAnnotationBinder<T>();
+    C10NAnnotationBinder binder = new C10NAnnotationBinder();
     annotationBinders.put(annotationClass, binder);
     return binder;
   }
 
-  private <T extends Annotation> void checkAnnotationInterface(Class<T> annotationClass) {
+  private void checkAnnotationInterface(Class<?> annotationClass) {
     Method valueMethod;
     try {
       valueMethod = annotationClass.getMethod("value");
@@ -68,26 +95,35 @@ public abstract class C10NConfigBase {
     }
   }
 
-  public C10NBundleBinder bindBundle(String baseName) {
+  protected C10NBundleBinder bindBundle(String baseName) {
     C10NBundleBinder binder = new C10NBundleBinder();
     bundleBinders.put(baseName, binder);
     return binder;
   }
 
-  ResourceBundle getBundleForLocale(Class<?> c10nInterface, Locale locale) {
+  List<ResourceBundle> getBundlesForLocale(Class<?> c10nInterface, Locale locale) {
+    List<ResourceBundle> res = new ArrayList<ResourceBundle>();
     for (Entry<String, C10NBundleBinder> entry : bundleBinders.entrySet()) {
       C10NBundleBinder binder = entry.getValue();
       if (binder.getBoundInterfaces().isEmpty()
               || binder.getBoundInterfaces().contains(c10nInterface)) {
-        return ResourceBundle.getBundle(entry.getKey(), locale,
-                new EncodedResourceControl("UTF-8"));
+        res.add(ResourceBundle.getBundle(entry.getKey(), locale,
+                new EncodedResourceControl("UTF-8")));
       }
     }
-    return null;
+    for (C10NConfigBase childConfig : childConfigs) {
+      res.addAll(childConfig.getBundlesForLocale(c10nInterface, locale));
+    }
+    return res;
   }
 
-  Map<Class<? extends Annotation>, C10NAnnotationBinder<?>> getAnnotationBinders() {
-    return annotationBinders;
+  Map<Class<? extends Annotation>, C10NAnnotationBinder> getAnnotationBinders() {
+    Map<Class<? extends Annotation>, C10NAnnotationBinder> res = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder>();
+    res.putAll(annotationBinders);
+    for(C10NConfigBase childConfig : childConfigs){
+      res.putAll(childConfig.getAnnotationBinders());
+    }
+    return res;
   }
 
   Class<?> getBindingForLocale(Class<?> c10nInterface, Locale locale) {
@@ -98,7 +134,7 @@ public abstract class C10NConfigBase {
     return null;
   }
 
-  public static class C10NAnnotationBinder<T> {
+  protected static class C10NAnnotationBinder {
     private Locale locale = C10N.FALLBACK_LOCALE;
 
     public void toLocale(Locale locale) {
@@ -111,7 +147,7 @@ public abstract class C10NConfigBase {
     }
   }
 
-  public static final class C10NImplementationBinder<T> {
+  protected static final class C10NImplementationBinder<T> {
     private final Map<Locale, Class<?>> bindings = new HashMap<Locale, Class<?>>();
 
     public C10NImplementationBinder<T> to(Class<? extends T> to, Locale forLocale) {
