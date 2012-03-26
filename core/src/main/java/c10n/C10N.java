@@ -82,8 +82,7 @@ public final class C10N {
    * Internal locale object used as a fallback when current locale does not
    * match any of the user-defined locale mappings.
    */
-  public static final Locale FALLBACK_LOCALE = new Locale("c10n", "c10n",
-          "c10n");
+  public static final Locale FALLBACK_LOCALE = Locale.ROOT;
 
   public static C10NMsgFactory getRootFactory() {
     return root;
