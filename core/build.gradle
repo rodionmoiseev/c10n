@@ -44,6 +44,10 @@ sourceSets{
     compileClasspath += configurations.provided
     compileClasspath += configurations.guice
   }
+  test{
+    compileClasspath += sourceSets.guice.output
+    runtimeClasspath += sourceSets.guice.output
+  }
 }
 
 jar{
