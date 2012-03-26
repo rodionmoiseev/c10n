@@ -51,4 +51,6 @@ public final class LocaleAnnotations {
   public @interface Def {
     String value();
   }
+
+  private LocaleAnnotations(){}
 }

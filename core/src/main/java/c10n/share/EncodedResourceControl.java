@@ -47,7 +47,7 @@ public class EncodedResourceControl extends ResourceBundle.Control {
       final String resourceName = toResourceName(bundleName, "properties");
       final ClassLoader classLoader = loader;
       final boolean reloadFlag = reload;
-      InputStream stream = null;
+      InputStream stream;
       try {
         stream = AccessController
                 .doPrivileged(new PrivilegedExceptionAction<InputStream>() {
@@ -77,12 +77,10 @@ public class EncodedResourceControl extends ResourceBundle.Control {
       } catch (PrivilegedActionException e) {
         throw (IOException) e.getException();
       }
-      if (stream != null) {
-        try {
-          return new PropertyResourceBundle(new InputStreamReader(stream, charsetName));
-        } finally {
-          stream.close();
-        }
+      try {
+        return new PropertyResourceBundle(new InputStreamReader(stream, charsetName));
+      } finally {
+        stream.close();
       }
     }
     return super.newBundle(baseName, locale, format, loader, reload);

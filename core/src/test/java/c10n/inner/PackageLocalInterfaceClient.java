@@ -26,7 +26,7 @@ import c10n.PackageLocalInterfaceTest;
  * @author rodion
  */
 public class PackageLocalInterfaceClient {
-  PackageLocal msg = C10N.get(PackageLocal.class);
+  private final PackageLocal msg = C10N.get(PackageLocal.class);
   
   public String getGreeting(){
     return msg.greet();
