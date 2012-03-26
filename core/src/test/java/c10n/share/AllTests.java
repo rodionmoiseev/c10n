@@ -17,18 +17,15 @@
  *  under the License.
  */
 
-package c10n;
+package c10n.share;
 
-import c10n.share.ShareModule;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
  * @author rodion
  */
-public class C10NCoreModule {
-  //DI
-  private final ShareModule shareModule = new ShareModule();
-
-  public C10NMsgFactory defaultC10NMsgFactory() {
-    return new DefaultC10NMsgFactory(shareModule.defaultLocaleMapping());
-  }
+@RunWith(Suite.class)
+@Suite.SuiteClasses(LocaleMappingTest.class)
+public class AllTests {
 }

@@ -17,18 +17,13 @@
  *  under the License.
  */
 
-package c10n;
-
-import c10n.share.ShareModule;
+package c10n.share;
 
 /**
  * @author rodion
  */
-public class C10NCoreModule {
-  //DI
-  private final ShareModule shareModule = new ShareModule();
-
-  public C10NMsgFactory defaultC10NMsgFactory() {
-    return new DefaultC10NMsgFactory(shareModule.defaultLocaleMapping());
+public class ShareModule {
+  public LocaleMapping defaultLocaleMapping(){
+    return new DefaultLocaleMapping();
   }
 }

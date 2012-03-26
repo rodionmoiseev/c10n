@@ -28,12 +28,14 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         c10n.guice.AllTests.class,
+        c10n.share.AllTests.class,
         AnnotationBindingConfigurationErrorTest.class,
         C10NConfigBaseInstallTest.class,
         CustomAnnotationBindingTest.class,
         CustomImplementationBindingTest.class,
         DelegationTest.class,
         FallbackC10NFactoryTest.class,
+        LocaleSelectionTest.class,
         PackageLocalInterfaceTest.class,
         ResourceBundleBindingTest.class})
 public class AllTests {

@@ -33,7 +33,7 @@ public class ResourceBundleBindingTest {
   @Rule
   public TestRule tmpLocale = RuleUtils.tmpLocale(Locale.ENGLISH);
 
-  private final C10NMsgFactory f = new DefaultC10NMsgFactory();
+  private final C10NMsgFactory f = new C10NCoreModule().defaultC10NMsgFactory();
 
   @Test
   public void rootBundleBinding() {

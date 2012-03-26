@@ -19,6 +19,7 @@
 
 package c10n;
 
+import c10n.share.LocaleMapping;
 import c10n.share.utils.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -32,9 +33,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 class DefaultC10NMsgFactory implements C10NMsgFactory {
   private C10NConfigBase conf = new DefaultC10NConfigBase();
+  private final LocaleMapping localeMapping;
+
+  DefaultC10NMsgFactory(LocaleMapping localeMapping) {
+    this.localeMapping = localeMapping;
+  }
 
   @SuppressWarnings("unchecked")
   public <T> T get(Class<T> c10nInterface) {
@@ -43,7 +50,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     }
     return (T) Proxy.newProxyInstance(C10N.class.getClassLoader(),
             new Class[]{c10nInterface},
-            C10NInvocationHandler.create(this, conf, c10nInterface));
+            C10NInvocationHandler.create(this, conf, localeMapping, c10nInterface));
   }
 
   public void configure(C10NConfigBase conf) {
@@ -55,20 +62,26 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           InvocationHandler {
     private final C10NMsgFactory c10nFactory;
     private final C10NConfigBase conf;
+    private final LocaleMapping localeMapping;
     private final Class<?> proxiedClass;
     private final Map<Locale, Map<String, String>> translationsByLocale;
+    private final Set<Locale> availableLocales;
 
     C10NInvocationHandler(C10NMsgFactory c10nFactory,
-                          C10NConfigBase conf, Class<?> proxiedClass,
+                          C10NConfigBase conf,
+                          LocaleMapping localeMapping,
+                          Class<?> proxiedClass,
                           Map<Locale, Map<String, String>> translationsByLocale) {
       this.c10nFactory = c10nFactory;
       this.conf = conf;
+      this.localeMapping = localeMapping;
       this.proxiedClass = proxiedClass;
       this.translationsByLocale = translationsByLocale;
+      this.availableLocales = translationsByLocale.keySet();
     }
 
     static C10NInvocationHandler create(C10NMsgFactory c10nFactory,
-                                        C10NConfigBase conf, Class<?> c10nInterface) {
+                                        C10NConfigBase conf, LocaleMapping localeMapping, Class<?> c10nInterface) {
       Map<Locale, Map<String, String>> translationsByLocale = new HashMap<Locale, Map<String, String>>();
 
       Map<String, String> vals = new HashMap<String, String>();
@@ -111,7 +124,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                 translations);
       }
 
-      return new C10NInvocationHandler(c10nFactory, conf, c10nInterface,
+      return new C10NInvocationHandler(c10nFactory, conf, localeMapping, c10nInterface,
               translationsByLocale);
     }
 
@@ -162,11 +175,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     }
 
     private Map<String, String> getTranslations(Locale locale) {
-      Map<String, String> trs = translationsByLocale.get(locale);
-      if (null == trs) {
-        return translationsByLocale.get(C10N.FALLBACK_LOCALE);
-      }
-      return trs;
+      return translationsByLocale.get(localeMapping.findClosestMatch(availableLocales, locale));
     }
 
     private String untranslatedMessage(String methodName, Object[] args) {

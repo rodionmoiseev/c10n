@@ -17,18 +17,38 @@
  *  under the License.
  */
 
-package c10n;
+package c10n.share;
 
-import c10n.share.ShareModule;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author rodion
  */
-public class C10NCoreModule {
-  //DI
-  private final ShareModule shareModule = new ShareModule();
+public final class LocaleAnnotations {
+  @Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Eng {
+    String value();
+  }
 
-  public C10NMsgFactory defaultC10NMsgFactory() {
-    return new DefaultC10NMsgFactory(shareModule.defaultLocaleMapping());
+  @Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Jp {
+    String value();
+  }
+
+  @Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Ru {
+    String value();
+  }
+
+  @Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Def {
+    String value();
   }
 }
