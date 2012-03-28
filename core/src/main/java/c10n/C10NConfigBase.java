@@ -34,6 +34,9 @@ import java.util.ResourceBundle;
 import static c10n.share.utils.Preconditions.assertNotNull;
 
 public abstract class C10NConfigBase {
+  //DI
+  private final C10NCoreModule coreModule = new C10NCoreModule();
+  private LocaleProvider localeProvider = coreModule.defaultLocaleProvider();
   private final Map<String, C10NBundleBinder> bundleBinders = new HashMap<String, C10NBundleBinder>();
   private final Map<Class<?>, C10NImplementationBinder<?>> binders = new HashMap<Class<?>, C10NImplementationBinder<?>>();
   private final Map<Class<? extends Annotation>, C10NAnnotationBinder> annotationBinders = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder>();
@@ -69,6 +72,11 @@ public abstract class C10NConfigBase {
     C10NImplementationBinder<T> binder = new C10NImplementationBinder<T>();
     binders.put(c10nInterface, binder);
     return binder;
+  }
+
+  protected void bindLocaleProvider(LocaleProvider localeProvider){
+    assertNotNull(localeProvider, "localeProvider");
+    this.localeProvider = localeProvider;
   }
 
   protected C10NAnnotationBinder bindAnnotation(Class<? extends Annotation> annotationClass) {
@@ -132,6 +140,14 @@ public abstract class C10NConfigBase {
       return binder.getBindingForLocale(locale);
     }
     return null;
+  }
+
+  /**
+   * Get the current locale as stipulated by the locale provider
+   * @return current locale
+   */
+  Locale getCurrentLocale() {
+    return localeProvider.getLocale();
   }
 
   protected static class C10NAnnotationBinder {

@@ -48,8 +48,13 @@ class DefaultLocaleMapping implements LocaleMapping {
         return candidateLocale;
       }
     }
-    if (!Locale.getDefault().equals(forLocale)) {
-      return findClosestMatch(fromSet, Locale.getDefault());
+    //This code intentionally uses Locale.getDefault()
+    //in order to behave in the same was as the default
+    //resource bundle locale search mechanism.
+    //source: http://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html
+    Locale systemDefaultLocale = Locale.getDefault();
+    if (!systemDefaultLocale.equals(forLocale)) {
+      return findClosestMatch(fromSet, systemDefaultLocale);
     }
     return null;
   }

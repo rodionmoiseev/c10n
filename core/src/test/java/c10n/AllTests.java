@@ -35,6 +35,7 @@ import org.junit.runners.Suite;
         CustomImplementationBindingTest.class,
         DelegationTest.class,
         FallbackC10NFactoryTest.class,
+        LocaleProviderTest.class,
         LocaleSelectionTest.class,
         PackageLocalInterfaceTest.class,
         ResourceBundleBindingTest.class})

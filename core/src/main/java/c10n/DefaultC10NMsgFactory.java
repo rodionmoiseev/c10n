@@ -120,8 +120,16 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
             }
           }
         }
-        translationsByLocale.put(entry.getValue().getLocale(),
-                translations);
+
+        if (!translations.isEmpty()) {
+          Locale locale = entry.getValue().getLocale();
+          Map<String, String> tr = translationsByLocale.get(locale);
+          if (null == tr) {
+            tr = new HashMap<String, String>();
+            translationsByLocale.put(locale, tr);
+          }
+          tr.putAll(translations);
+        }
       }
 
       return new C10NInvocationHandler(c10nFactory, conf, localeMapping, c10nInterface,
@@ -131,7 +139,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable {
-      Locale locale = Locale.getDefault();
+      Locale locale = conf.getCurrentLocale();
       Class<?> binding = conf.getBindingForLocale(proxiedClass, locale);
       if (null != binding) {
         // user specified binding exists

@@ -19,37 +19,11 @@
 
 package c10n;
 
-import c10n.share.ShareModule;
-
 import java.util.Locale;
 
 /**
  * @author rodion
  */
-public class C10NCoreModule {
-  public static final LocaleProvider defaultLocaleProvider = new DefaultLocaleProvider();
-  //DI
-  private final ShareModule shareModule = new ShareModule();
-
-  public C10NMsgFactory defaultC10NMsgFactory() {
-    return new DefaultC10NMsgFactory(shareModule.defaultLocaleMapping());
-  }
-
-  /**
-   * <p>Locale provider that always delegates to
-   * {@link java.util.Locale#getDefault()}.</p>
-   * <p>The value may be changed by calling {@link Locale#setDefault(java.util.Locale)}</p>
-   *
-   * @return current locale
-   */
-  public LocaleProvider defaultLocaleProvider() {
-    return defaultLocaleProvider;
-  }
-
-  private static final class DefaultLocaleProvider implements LocaleProvider{
-    @Override
-    public Locale getLocale() {
-      return Locale.getDefault();
-    }
-  }
+public interface LocaleProvider {
+  Locale getLocale();
 }
