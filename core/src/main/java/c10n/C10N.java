@@ -19,6 +19,8 @@
 
 package c10n;
 
+import c10n.annotations.PredefinedAnnotationsC10NConfig;
+
 import java.util.Locale;
 
 /**
@@ -97,6 +99,8 @@ public final class C10N {
   }
 
   public static void configure(C10NConfigBase conf) {
+    // include predefined annotations
+    conf.install(new PredefinedAnnotationsC10NConfig());
     root.configure(conf);
   }
 }
