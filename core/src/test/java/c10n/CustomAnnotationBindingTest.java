@@ -66,7 +66,7 @@ public class CustomAnnotationBindingTest {
   @Test
   public void unboundAnnotationBehavesAsAFallback() {
     Labels msg = C10N.get(Labels.class);
-    Locale.setDefault(Locale.GERMAN);
+    Locale.setDefault(new Locale("unbound"));
     assertThat(msg.label(), is(equalTo("Default")));
     assertThat(msg.label2("def"), is(equalTo("Default def")));
   }
@@ -84,7 +84,7 @@ public class CustomAnnotationBindingTest {
     assertThat(msg.books(0), is("本がありません。"));
     assertThat(msg.books(3), is("本が3本あります。"));
 
-    Locale.setDefault(Locale.GERMAN);
+    Locale.setDefault(new Locale("unbound"));
     assertThat(msg.label2("def"), is(equalTo("Default def")));
   }
 
