@@ -77,8 +77,8 @@ import java.util.Locale;
  */
 public final class C10N {
   //DI
-  private static final C10NCoreModule C_10_N_CORE_MODULE = new C10NCoreModule();
-  private static C10NMsgFactory root = C_10_N_CORE_MODULE.defaultC10NMsgFactory();
+  private static final C10NCoreModule coreModule = new C10NCoreModule();
+  private static C10NMsgFactory root = coreModule.defaultC10NMsgFactory();
 
   /**
    * Internal locale object used as a fallback when current locale does not
