@@ -20,6 +20,8 @@
 package c10n;
 
 
+import c10n.annotations.DefaultC10NAnnotations;
+import c10n.annotations.En;
 import c10n.share.util.RuleUtils;
 import c10n.share.utils.ReflectionUtils;
 import org.junit.Rule;
@@ -100,6 +102,21 @@ public class C10NConfigBaseInstallTest {
     Locale.setDefault(Locale.JAPANESE);
     assertThat(C10N.get(ChildMessages.class).greeting(), is("こんにちは"));
   }
+  
+  @Test
+  public void annotationsCanBeAdditionallyBoundAsAFallbackLocale(){
+      C10N.configure(new C10NConfigBase(){
+        @Override
+        protected void configure() {
+          install(new DefaultC10NAnnotations());
+          //additionally bind En as fallback
+          bindAnnotation(En.class);
+        }
+      });
+
+      Locale.setDefault(Locale.JAPANESE);
+      assertThat(C10N.get(EnOnlyMessages.class).value(), is("fallback here"));
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
@@ -121,6 +138,11 @@ public class C10NConfigBaseInstallTest {
   interface ChildMessages {
     @Jp("こんにちは")
     String greeting();
+  }
+
+  interface EnOnlyMessages{
+    @En("fallback here")
+    String value();
   }
 
   public static final class ParentResourceBundle extends ResourceBundle {

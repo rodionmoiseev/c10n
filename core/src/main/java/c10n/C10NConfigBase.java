@@ -25,11 +25,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import static c10n.share.utils.Preconditions.assertNotNull;
 
@@ -74,7 +76,7 @@ public abstract class C10NConfigBase {
     return binder;
   }
 
-  protected void bindLocaleProvider(LocaleProvider localeProvider){
+  protected void bindLocaleProvider(LocaleProvider localeProvider) {
     assertNotNull(localeProvider, "localeProvider");
     this.localeProvider = localeProvider;
   }
@@ -125,13 +127,28 @@ public abstract class C10NConfigBase {
     return res;
   }
 
-  Map<Class<? extends Annotation>, C10NAnnotationBinder> getAnnotationBinders() {
-    Map<Class<? extends Annotation>, C10NAnnotationBinder> res = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder>();
-    res.putAll(annotationBinders);
-    for(C10NConfigBase childConfig : childConfigs){
-      res.putAll(childConfig.getAnnotationBinders());
+  Map<Class<? extends Annotation>, Set<Locale>> getAnnotationBinders() {
+    Map<Class<? extends Annotation>, Set<Locale>> res = new HashMap<Class<? extends Annotation>, Set<Locale>>();
+    for (Entry<Class<? extends Annotation>, C10NAnnotationBinder> entry : annotationBinders.entrySet()) {
+      Set<Locale> locales = getLocales(entry.getKey(), res);
+      locales.add(entry.getValue().getLocale());
+    }
+    for (C10NConfigBase childConfig : childConfigs) {
+      for (Entry<Class<? extends Annotation>, Set<Locale>> entry : childConfig.getAnnotationBinders().entrySet()) {
+        Set<Locale> locales = getLocales(entry.getKey(), res);
+        locales.addAll(entry.getValue());
+      }
     }
     return res;
+  }
+
+  private Set<Locale> getLocales(Class<? extends Annotation> key, Map<Class<? extends Annotation>, Set<Locale>> res) {
+    Set<Locale> locales = res.get(key);
+    if (null == locales) {
+      locales = new HashSet<Locale>();
+      res.put(key, locales);
+    }
+    return locales;
   }
 
   Class<?> getBindingForLocale(Class<?> c10nInterface, Locale locale) {
@@ -144,6 +161,7 @@ public abstract class C10NConfigBase {
 
   /**
    * Get the current locale as stipulated by the locale provider
+   *
    * @return current locale
    */
   Locale getCurrentLocale() {

@@ -94,7 +94,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       translationsByLocale.put(C10N.FALLBACK_LOCALE, vals);
 
       // Process custom bound annotations
-      for (Entry<Class<? extends Annotation>, C10NConfigBase.C10NAnnotationBinder> entry : conf
+      for (Entry<Class<? extends Annotation>, Set<Locale>> entry : conf
               .getAnnotationBinders().entrySet()) {
         Class<? extends Annotation> annotationClass = entry.getKey();
         Map<String, String> translations = new HashMap<String, String>();
@@ -122,13 +122,14 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
         }
 
         if (!translations.isEmpty()) {
-          Locale locale = entry.getValue().getLocale();
-          Map<String, String> tr = translationsByLocale.get(locale);
-          if (null == tr) {
-            tr = new HashMap<String, String>();
-            translationsByLocale.put(locale, tr);
+          for (Locale locale : entry.getValue()) {
+            Map<String, String> tr = translationsByLocale.get(locale);
+            if (null == tr) {
+              tr = new HashMap<String, String>();
+              translationsByLocale.put(locale, tr);
+            }
+            tr.putAll(translations);
           }
-          tr.putAll(translations);
         }
       }
 
