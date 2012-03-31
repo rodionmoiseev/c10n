@@ -54,7 +54,35 @@ jar{
   appendix = "core"
 }
 
-task guiceJar(type: Jar){
+sourcesJar{
+  appendix = "core"
+}
+
+task guiceJar(type: Jar, dependsOn: guiceClasses){
   appendix = "ext-guice"
   from sourceSets.guice.output
+}
+
+task guiceSourcesJar(type: Jar, dependsOn: guiceClasses){
+  appendix = "ext-guice"
+  classifier = "sources"
+  from sourceSets.guice.allSource
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      addFilter('core') {artifact, file ->
+        artifact.name == 'c10n-core'
+      }
+      addFilter('ext-guice') {artifact, file ->
+        artifact.name == 'c10n-ext-guice'
+      }
+    }
+  }
+}
+
+artifacts{
+  archives guiceJar
+  archives guiceSourcesJar
 }
