@@ -17,15 +17,42 @@
  *  under the License.
  */
 
+group = "c10n"
+
 allprojects{
   apply plugin: 'eclipse'
   apply plugin: 'idea'
+  apply plugin: 'maven'
+
+  project.ext{
+    releaseRepoUrl = "file://${project(':').projectDir}/../c10n-mvn-repo/releases"
+    snapshotRepoUrl = "file://${project(':').projectDir}/../c10n-mvn-repo/snapshots"
+  }
+
+  uploadArchives {
+    repositories {
+      mavenDeployer {
+        repository(url: project.releaseRepoUrl)
+        snapshotRepository(url: project.snapshotRepoUrl)
+        pom.project {
+          inceptionYear '2012'
+          licenses {
+            license {
+              name 'The Apache Software License, Version 2.0'
+              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+              distribution 'repo'
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 subprojects{
   apply plugin: 'java'
 
-  version = "1.0-alpha"
+  version = "1.0-SNAPSHOT"
 
   archivesBaseName = "c10n"
 
