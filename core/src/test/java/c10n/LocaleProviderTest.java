@@ -19,6 +19,7 @@
 
 package c10n;
 
+import c10n.annotations.DefaultC10NAnnotations;
 import c10n.annotations.En;
 import c10n.annotations.Ja;
 import c10n.annotations.Ru;
@@ -40,6 +41,7 @@ public class LocaleProviderTest {
     C10N.configure(new C10NConfigBase() {
       @Override
       protected void configure() {
+        install(new DefaultC10NAnnotations());
         bindLocaleProvider(lc);
       }
     });

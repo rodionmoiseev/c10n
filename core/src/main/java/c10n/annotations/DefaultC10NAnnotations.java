@@ -26,7 +26,7 @@ import java.util.Locale;
 /**
  * @author rodion
  */
-public class PredefinedAnnotationsC10NConfig extends C10NConfigBase{
+public class DefaultC10NAnnotations extends C10NConfigBase{
   @Override
   protected void configure() {
     bindAnnotation(En.class).toLocale(Locale.ENGLISH);
