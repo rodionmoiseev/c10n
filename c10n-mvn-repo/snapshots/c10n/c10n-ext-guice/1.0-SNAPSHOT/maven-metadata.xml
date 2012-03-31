@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
   <groupId>c10n</groupId>
-  <artifactId>c10n-core</artifactId>
+  <artifactId>c10n-ext-guice</artifactId>
   <version>1.0-SNAPSHOT</version>
   <versioning>
     <snapshot>
