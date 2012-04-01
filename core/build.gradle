@@ -19,6 +19,7 @@
 
 configurations{
   guice
+  guiceArchives
   testCompile.extendsFrom guice
 }
 
@@ -69,20 +70,16 @@ task guiceSourcesJar(type: Jar, dependsOn: guiceClasses){
   from sourceSets.guice.allSource
 }
 
-uploadArchives {
+uploadGuiceArchives {
   repositories {
     mavenDeployer {
-      addFilter('core') {artifact, file ->
-        artifact.name == 'c10n-core'
-      }
-      addFilter('ext-guice') {artifact, file ->
-        artifact.name == 'c10n-ext-guice'
-      }
+      repository(url: project.releaseRepoUrl)
+      snapshotRepository(url: project.snapshotRepoUrl)
     }
   }
 }
 
 artifacts{
-  archives guiceJar
-  archives guiceSourcesJar
+  guiceArchives guiceJar
+  guiceArchives guiceSourcesJar
 }
