@@ -33,10 +33,19 @@ import static org.junit.Assert.assertThat;
 public class CustomImplementationBindingTest {
   @Rule
   public static TestRule tmpLocale = RuleUtils.tmpLocale();
+  @Rule
+  public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
   @Test
   public void localeBinding() {
-    C10N.configure(new MyC10NConfigBase());
+    C10N.configure(new C10NConfigBase() {
+      @Override
+      protected void configure() {
+        bind(Labels.class)
+                .to(LabelsEng.class, Locale.ENGLISH)
+                .to(LabelsJapanese.class, Locale.JAPANESE);
+      }
+    });
     Locale.setDefault(Locale.ENGLISH);
     Labels msg = C10N.get(Labels.class);
     assertThat(msg.label(), is(equalTo("English")));
@@ -44,32 +53,111 @@ public class CustomImplementationBindingTest {
     Locale.setDefault(Locale.JAPANESE);
     assertThat(msg.label(), is(equalTo("Japanese")));
   }
-}
 
-class MyC10NConfigBase extends C10NConfigBase {
-  @Override
-  public void configure() {
-    bind(Labels.class)
-            .to(LabelsEng.class, Locale.ENGLISH)
-            .to(LabelsJapanese.class, Locale.JAPANESE);
+  @Test
+  public void metricSystem() {
+    C10N.configure(new C10NConfigBase() {
+      @Override
+      protected void configure() {
+        bind(Units.class).to(ImperialUnits.class, Locale.UK);
+      }
+    });
+
+    Units msg = C10N.get(Units.class);
+
+    Locale.setDefault(Locale.JAPANESE);
+    assertThat(msg.distance(0.91f), is("0.91 meters"));
+    Locale.setDefault(Locale.UK);
+    assertThat(msg.distance(0.91f), is("1.0 yards"));
   }
-}
 
-@C10NMessages
-interface Labels {
-  String label();
-}
+  @Test
+  public void metricSystemFallBackToImplementation() {
+    C10N.configure(new C10NConfigBase() {
+      @Override
+      protected void configure() {
+        bind(Units.class)
+                .to(ImperialUnits.class, Locale.UK)
+                .to(MetricUnits.class);
+      }
+    });
 
-class LabelsEng implements Labels {
-  @Override
-  public String label() {
-    return "English";
+    Units msg = C10N.get(Units.class);
+    Locale.setDefault(Locale.JAPANESE);
+    assertThat(msg.distance2(0.91f), is("0.91 meters"));
+    Locale.setDefault(Locale.UK);
+    assertThat(msg.distance2(0.91f), is("1.0 yards"));
   }
-}
 
-class LabelsJapanese implements Labels {
-  @Override
-  public String label() {
-    return "Japanese";
+  @Test
+  public void customImplementationBindingsInChildConfigs() {
+    C10N.configure(new C10NConfigBase() {
+      @Override
+      protected void configure() {
+        install(new C10NConfigBase() {
+          @Override
+          protected void configure() {
+            bind(Units.class).to(ImperialUnits.class, Locale.UK);
+          }
+        });
+        bind(Units.class).to(MetricUnits.class);
+      }
+    });
+
+    Units msg = C10N.get(Units.class);
+    Locale.setDefault(Locale.JAPANESE);
+    assertThat(msg.distance2(0.91f), is("0.91 meters"));
+    Locale.setDefault(Locale.UK);
+    assertThat(msg.distance2(0.91f), is("1.0 yards"));
+  }
+
+  @C10NMessages
+  interface Labels {
+    String label();
+  }
+
+  static class LabelsEng implements Labels {
+    @Override
+    public String label() {
+      return "English";
+    }
+  }
+
+  static class LabelsJapanese implements Labels {
+    @Override
+    public String label() {
+      return "Japanese";
+    }
+  }
+
+  interface Units {
+    @C10NDef("{0} meters")
+    String distance(float amount);
+
+    String distance2(float amount);
+  }
+
+  static class ImperialUnits implements Units {
+    @Override
+    public String distance(float amount) {
+      return Float.toString(amount / 0.91f) + " yards";
+    }
+
+    @Override
+    public String distance2(float amount) {
+      return distance(amount);
+    }
+  }
+
+  static class MetricUnits implements Units {
+    @Override
+    public String distance(float amount) {
+      return Float.toString(amount) + " meters";
+    }
+
+    @Override
+    public String distance2(float amount) {
+      return distance(amount);
+    }
   }
 }

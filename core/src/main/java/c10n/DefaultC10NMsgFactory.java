@@ -66,6 +66,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     private final Class<?> proxiedClass;
     private final Map<Locale, Map<String, String>> translationsByLocale;
     private final Set<Locale> availableLocales;
+    private final Set<Locale> availableImplLocales;
 
     C10NInvocationHandler(C10NMsgFactory c10nFactory,
                           C10NConfigBase conf,
@@ -78,6 +79,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       this.proxiedClass = proxiedClass;
       this.translationsByLocale = translationsByLocale;
       this.availableLocales = translationsByLocale.keySet();
+      this.availableImplLocales = conf.getImplLocales(proxiedClass);
     }
 
     static C10NInvocationHandler create(C10NMsgFactory c10nFactory,
@@ -141,7 +143,9 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable {
       Locale locale = conf.getCurrentLocale();
-      Class<?> binding = conf.getBindingForLocale(proxiedClass, locale);
+
+      Locale implLocale = localeMapping.findClosestMatch(availableImplLocales, locale);
+      Class<?> binding = conf.getBindingForLocale(proxiedClass, implLocale);
       if (null != binding) {
         // user specified binding exists
         // simply delegate the call to the binding

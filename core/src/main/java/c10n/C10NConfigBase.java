@@ -70,7 +70,7 @@ public abstract class C10NConfigBase {
     childConfigs.add(childConfig);
   }
 
-  <T> C10NImplementationBinder<T> bind(Class<T> c10nInterface) {
+  protected <T> C10NImplementationBinder<T> bind(Class<T> c10nInterface) {
     C10NImplementationBinder<T> binder = new C10NImplementationBinder<T>();
     binders.put(c10nInterface, binder);
     return binder;
@@ -154,9 +154,37 @@ public abstract class C10NConfigBase {
   Class<?> getBindingForLocale(Class<?> c10nInterface, Locale locale) {
     C10NImplementationBinder<?> binder = binders.get(c10nInterface);
     if (null != binder) {
-      return binder.getBindingForLocale(locale);
+      Class<?> impl = binder.getBindingForLocale(locale);
+      if (null != impl) {
+        return impl;
+      }
+      for (C10NConfigBase childConfig : childConfigs) {
+        Class<?> impl2 = childConfig.getBindingForLocale(c10nInterface, locale);
+        if (null != impl2) {
+          return impl2;
+        }
+      }
     }
     return null;
+  }
+
+  /**
+   * Find all locales that have explicit implementation class
+   * bindings for this c10n interface.
+   *
+   * @param c10nInterface interface to find bindingds for (not-null)
+   * @return Set of locales (not-null)
+   */
+  Set<Locale> getImplLocales(Class<?> c10nInterface) {
+    Set<Locale> res = new HashSet<Locale>();
+    C10NImplementationBinder<?> binder = binders.get(c10nInterface);
+    if (binder != null) {
+      res.addAll(binder.bindings.keySet());
+      for (C10NConfigBase childConfig : childConfigs) {
+        res.addAll(childConfig.getImplLocales(c10nInterface));
+      }
+    }
+    return res;
   }
 
   /**
@@ -186,6 +214,11 @@ public abstract class C10NConfigBase {
 
     public C10NImplementationBinder<T> to(Class<? extends T> to, Locale forLocale) {
       bindings.put(forLocale, to);
+      return this;
+    }
+
+    public C10NImplementationBinder<T> to(Class<? extends T> to) {
+      bindings.put(C10N.FALLBACK_LOCALE, to);
       return this;
     }
 
