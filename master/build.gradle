@@ -89,9 +89,21 @@ subprojects{
 configure(project(':')){
   idea.project.ipr{
     withXml { provider ->
+        //Setup Git root
         def mapping = provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping
         mapping.@vcs = 'Git'
         mapping.@directory = '$PROJECT_DIR$/..'
+        //Make sure IDEA sticks Apache 2.0 preamble for each file
+        def comp = provider.node.component.find { it.@name == 'CopyrightManager' }
+        comp.@default = 'Apache 2.0'
+        def copyright = comp.appendNode('copyright')
+        copyright.appendNode('option', [name: 'notice', value: file("${project.projectDir}/license-preamble.txt").text])
+        ['keyword': 'Copyright',
+         'allowReplaceKeyword': '',
+         'myName': 'Apache 2.0',
+         'myLocal': 'true'].each { name, value ->
+            copyright.appendNode('option', ['name': name, 'value': value])
+        }
     }
   }
 }
