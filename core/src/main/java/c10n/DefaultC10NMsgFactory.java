@@ -36,10 +36,11 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 class DefaultC10NMsgFactory implements C10NMsgFactory {
-  private C10NConfigBase conf = new DefaultC10NConfigBase();
+  private final ConfiguredC10NModule conf;
   private final LocaleMapping localeMapping;
 
-  DefaultC10NMsgFactory(LocaleMapping localeMapping) {
+  DefaultC10NMsgFactory(ConfiguredC10NModule conf, LocaleMapping localeMapping) {
+    this.conf = conf;
     this.localeMapping = localeMapping;
   }
 
@@ -53,15 +54,10 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
             C10NInvocationHandler.create(this, conf, localeMapping, c10nInterface));
   }
 
-  public void configure(C10NConfigBase conf) {
-    conf.doConfigure();
-    this.conf = conf;
-  }
-
   private static final class C10NInvocationHandler implements
           InvocationHandler {
     private final C10NMsgFactory c10nFactory;
-    private final C10NConfigBase conf;
+    private final ConfiguredC10NModule conf;
     private final LocaleMapping localeMapping;
     private final Class<?> proxiedClass;
     private final Map<Locale, Map<String, String>> translationsByLocale;
@@ -69,7 +65,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     private final Set<Locale> availableImplLocales;
 
     C10NInvocationHandler(C10NMsgFactory c10nFactory,
-                          C10NConfigBase conf,
+                          ConfiguredC10NModule conf,
                           LocaleMapping localeMapping,
                           Class<?> proxiedClass,
                           Map<Locale, Map<String, String>> translationsByLocale) {
@@ -79,11 +75,11 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       this.proxiedClass = proxiedClass;
       this.translationsByLocale = translationsByLocale;
       this.availableLocales = translationsByLocale.keySet();
-      this.availableImplLocales = conf.getImplLocales(proxiedClass);
+      this.availableImplLocales = conf.getImplementationBindings(proxiedClass);
     }
 
     static C10NInvocationHandler create(C10NMsgFactory c10nFactory,
-                                        C10NConfigBase conf, LocaleMapping localeMapping, Class<?> c10nInterface) {
+                                        ConfiguredC10NModule conf, LocaleMapping localeMapping, Class<?> c10nInterface) {
       Map<Locale, Map<String, String>> translationsByLocale = new HashMap<Locale, Map<String, String>>();
 
       Map<String, String> vals = new HashMap<String, String>();
@@ -97,7 +93,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
 
       // Process custom bound annotations
       for (Entry<Class<? extends Annotation>, Set<Locale>> entry : conf
-              .getAnnotationBinders().entrySet()) {
+              .getAnnotationBindings(c10nInterface).entrySet()) {
         Class<? extends Annotation> annotationClass = entry.getKey();
         Map<String, String> translations = new HashMap<String, String>();
         for (Method m : c10nInterface.getMethods()) {
@@ -145,7 +141,8 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       Locale locale = conf.getCurrentLocale();
 
       Locale implLocale = localeMapping.findClosestMatch(availableImplLocales, locale);
-      Class<?> binding = conf.getBindingForLocale(proxiedClass, implLocale);
+
+      Class<?> binding = conf.getImplementationBinding(proxiedClass, implLocale);
       if (null != binding) {
         // user specified binding exists
         // simply delegate the call to the binding
@@ -157,8 +154,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       if (returnType.isAssignableFrom(String.class)) {
         // For methods returning String or CharSequence
 
-        List<ResourceBundle> bundles = conf.getBundlesForLocale(proxiedClass,
-                locale);
+        List<ResourceBundle> bundles = conf.getBundleBindings(proxiedClass, locale);
         for (ResourceBundle bundle : bundles) {
           StringBuilder sb = new StringBuilder();
           ReflectionUtils.getDefaultKey(proxiedClass, method, sb);
@@ -175,7 +171,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           res = trs.get(method.toString());
         }
         if (null == res) {
-          return untranslatedMessage(method.getName(), args);
+          return conf.getUntranslatedMessageString(proxiedClass, method, args);
         }
         return MessageFormat.format(res, args);
       } else if (returnType.isInterface()) {
@@ -190,23 +186,5 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     private Map<String, String> getTranslations(Locale locale) {
       return translationsByLocale.get(localeMapping.findClosestMatch(availableLocales, locale));
     }
-
-    private String untranslatedMessage(String methodName, Object[] args) {
-      StringBuilder sb = new StringBuilder();
-      sb.append(proxiedClass.getSimpleName()).append('.');
-      sb.append(methodName);
-      if (args != null && args.length > 0) {
-        sb.append('(');
-        for (int i = 0; i < args.length; i++) {
-          sb.append(String.valueOf(args[i]));
-          if (i + 1 < args.length) {
-            sb.append(", ");
-          }
-        }
-        sb.append(')');
-      }
-      return sb.toString();
-    }
-
   }
 }

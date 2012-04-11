@@ -31,6 +31,7 @@ import org.junit.runners.Suite;
         c10n.share.AllTests.class,
         AnnotationBindingConfigurationErrorTest.class,
         C10NConfigBaseInstallTest.class,
+        ConfigChainResolverTest.class,
         CustomAnnotationBindingTest.class,
         CustomImplementationBindingTest.class,
         DelegationTest.class,
@@ -38,6 +39,7 @@ import org.junit.runners.Suite;
         LocaleProviderTest.class,
         LocaleSelectionTest.class,
         PackageLocalInterfaceTest.class,
-        ResourceBundleBindingTest.class})
+        ResourceBundleBindingTest.class,
+        UntranslatedMessageHandlerTest.class})
 public class AllTests {
 }

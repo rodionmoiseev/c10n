@@ -39,6 +39,7 @@ public abstract class C10NConfigBase {
   //DI
   private final C10NCoreModule coreModule = new C10NCoreModule();
   private LocaleProvider localeProvider = coreModule.defaultLocaleProvider();
+  private UntranslatedMessageHandler untranslatedMessageHandler = coreModule.defaultUnknownMessageHandler();
   private final Map<String, C10NBundleBinder> bundleBinders = new HashMap<String, C10NBundleBinder>();
   private final Map<Class<?>, C10NImplementationBinder<?>> binders = new HashMap<Class<?>, C10NImplementationBinder<?>>();
   private final Map<Class<? extends Annotation>, C10NAnnotationBinder> annotationBinders = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder>();
@@ -53,10 +54,33 @@ public abstract class C10NConfigBase {
    * <li>{@link #bindAnnotation(Class)} - binds annotation that holds translation for a specific locale.</li>
    * <li>{@link #bindBundle(String)} - binds a resource bundle containing translated messages.</li>
    * <li>{@link #install(C10NConfigBase)} - includes configuration from another c10n configuration module</li>
+   * <li>{@link #bind(Class)} - binds a custom class as an implementation for the given c10n interface</li>
+   * <li>{@link #setLocaleProvider(LocaleProvider)} - customises the locale retrieval logic</li>
+   * <li>{@link #setUntranslatedMessageHandler(UntranslatedMessageHandler)} - customises the placeholder for
+   *      unresolved translation mappings</li>
    * </ul>
    * </p>
    */
   protected abstract void configure();
+
+  /**
+   * <p>Get the name of the package for which the current
+   * module is responsible.</p>
+   * <p/>
+   * <p>The name of the package is used to determine
+   * which c10n interfaces this configuration is
+   * responsible for</p>
+   * <p/>
+   * <p>The default implementation, which returns
+   * the string representation of the package of
+   * the configuration class, should suffice in most
+   * cases</p>
+   *
+   * @return name of package the current module is responsible for
+   */
+  protected String getConfigurationPackage() {
+    return getClass().getPackage().getName();
+  }
 
   void doConfigure() {
     if (!configured) {
@@ -65,22 +89,113 @@ public abstract class C10NConfigBase {
     configured = true;
   }
 
+  /**
+   * <p>Install the given child c10n configuration module</p>
+   * <p/>
+   * <p>This will apply the configuration to all c10n interfaces
+   * located in the child configuration package or below.</p>
+   *
+   * @param childConfig child c10n configuration to install (not-null)
+   */
   protected void install(C10NConfigBase childConfig) {
     childConfig.doConfigure();
     childConfigs.add(childConfig);
   }
 
+  /**
+   * <p>Create a custom implementation binding for the given c10n interface</p>
+   * <p/>
+   * <p>There are two basic usages:
+   * <pre><code>
+   *   bind(Messages.class).to(JapaneseMessagesImpl.class, Locale.JAPANESE);
+   * </code></pre>
+   * <p/>
+   * which will use the <code>JapaneseMessagesImpl.class</code> when locale is
+   * set to <code>Locale.JAPANESE</code></p>
+   * <p/>
+   * <p>The second usage is:
+   * <pre><code>
+   *   bind(Messages.class).to(FallbackMessagesImpl.class);
+   * </code></pre>
+   * <p/>
+   * which will use the <code>FallbackMessagesImpl.class</code> when no other
+   * implementation class was matched for the current locale.</p>
+   *
+   * @param c10nInterface C10N interface to create an implementation binding for (not-null)
+   * @param <T>           C10N interface type
+   * @return implementation binding DSL object
+   */
   protected <T> C10NImplementationBinder<T> bind(Class<T> c10nInterface) {
     C10NImplementationBinder<T> binder = new C10NImplementationBinder<T>();
     binders.put(c10nInterface, binder);
     return binder;
   }
 
-  protected void bindLocaleProvider(LocaleProvider localeProvider) {
+  /**
+   * <p>Sets the {@link LocaleProvider} for this configuration.</p>
+   * <p/>
+   * <p>Locale provider is consulted every time a translation is requested,
+   * that is every time a method on an c10n interface is called.</p>
+   * <p/>
+   * <p>As a rule, there should be only one locale provider per application.
+   * Any locale providers defined in child configurations (see {@link #install(C10NConfigBase)}
+   * are disregarded.</p>
+   * <p/>
+   * <p>Because locale provider has to be consulted on every translation request
+   * {@link c10n.LocaleProvider#getLocale()} should avoid any CPU intensive processing</p>
+   * <p/>
+   * <p>Default locale provider implementation always returns the same result as
+   * {@link java.util.Locale#getDefault()}</p>
+   *
+   * @param localeProvider custom locale provider (not-null)
+   */
+  protected void setLocaleProvider(LocaleProvider localeProvider) {
     assertNotNull(localeProvider, "localeProvider");
     this.localeProvider = localeProvider;
   }
 
+  /**
+   * <p>Customise placeholder value for unresolved translations.</p>
+   * <p/>
+   * <p>The default behaviour is to return a string in format:
+   * <pre>
+   *   [InterfaceName].[MethodName]([ArgumentValues])
+   * </pre>
+   * </p>
+   *
+   * @param handler custom implementation of untranslated message handler (not-null)
+   */
+  protected void setUntranslatedMessageHandler(UntranslatedMessageHandler handler) {
+    assertNotNull(handler, "handler");
+    this.untranslatedMessageHandler = handler;
+  }
+
+  /**
+   * <p>Create a method annotation binding to the specified locale</p>
+   * <p/>
+   * <p>There are two basic usages:
+   * <pre><code>
+   *   bindAnnotation(Ja.class).to(Locale.JAPANESE);
+   * </code></pre>
+   * <p/>
+   * which will tell c10n to take the value given in the <code>@Ja</code>
+   * annotation whenever the current locale is <code>Locale.JAPANESE</code></p>
+   * <p/>
+   * <p>The second usage is:
+   * <pre><code>
+   *   bindAnnotation(En.class);
+   * </code></pre>
+   * <p/>
+   * which will make c10n always fallback to the value given in the <code>@En</code>
+   * annotation if no other annotation binding matched the current locale.</p>
+   * <p/>
+   * <p>Note: Some default annotation bindings are defined in {@link c10n.annotations.DefaultC10NAnnotations}.
+   * In order to use <code>install(new DefaultC10NAnnotations());</code> somewhere in your configuration
+   * (see {@link #install(C10NConfigBase)}</p>
+   *
+   * @param annotationClass Class of the annotation to create a local binding for (not-null)
+   * @return annotation locale binding DSL object
+   */
   protected C10NAnnotationBinder bindAnnotation(Class<? extends Annotation> annotationClass) {
     assertNotNull(annotationClass, "annotationClass");
     checkAnnotationInterface(annotationClass);
@@ -121,23 +236,20 @@ public abstract class C10NConfigBase {
                 new EncodedResourceControl("UTF-8")));
       }
     }
-    for (C10NConfigBase childConfig : childConfigs) {
-      res.addAll(childConfig.getBundlesForLocale(c10nInterface, locale));
-    }
     return res;
   }
 
-  Map<Class<? extends Annotation>, Set<Locale>> getAnnotationBinders() {
+  /**
+   * For each annotation bound in this configuration find all
+   * locales it has been bound to.
+   *
+   * @return annotation -&gt; set of locale mapping
+   */
+  Map<Class<? extends Annotation>, Set<Locale>> getAnnotationToLocaleMapping() {
     Map<Class<? extends Annotation>, Set<Locale>> res = new HashMap<Class<? extends Annotation>, Set<Locale>>();
     for (Entry<Class<? extends Annotation>, C10NAnnotationBinder> entry : annotationBinders.entrySet()) {
       Set<Locale> locales = getLocales(entry.getKey(), res);
       locales.add(entry.getValue().getLocale());
-    }
-    for (C10NConfigBase childConfig : childConfigs) {
-      for (Entry<Class<? extends Annotation>, Set<Locale>> entry : childConfig.getAnnotationBinders().entrySet()) {
-        Set<Locale> locales = getLocales(entry.getKey(), res);
-        locales.addAll(entry.getValue());
-      }
     }
     return res;
   }
@@ -158,14 +270,18 @@ public abstract class C10NConfigBase {
       if (null != impl) {
         return impl;
       }
-      for (C10NConfigBase childConfig : childConfigs) {
-        Class<?> impl2 = childConfig.getBindingForLocale(c10nInterface, locale);
-        if (null != impl2) {
-          return impl2;
-        }
-      }
     }
     return null;
+  }
+
+  /**
+   * List of all installed child configurations in
+   * the order they were installed.
+   *
+   * @return List of child configurations
+   */
+  List<C10NConfigBase> getChildConfigs() {
+    return childConfigs;
   }
 
   /**
@@ -180,9 +296,6 @@ public abstract class C10NConfigBase {
     C10NImplementationBinder<?> binder = binders.get(c10nInterface);
     if (binder != null) {
       res.addAll(binder.bindings.keySet());
-      for (C10NConfigBase childConfig : childConfigs) {
-        res.addAll(childConfig.getImplLocales(c10nInterface));
-      }
     }
     return res;
   }
@@ -194,6 +307,10 @@ public abstract class C10NConfigBase {
    */
   Locale getCurrentLocale() {
     return localeProvider.getLocale();
+  }
+
+  String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs) {
+    return untranslatedMessageHandler.render(c10nInterface, method, methodArgs);
   }
 
   protected static class C10NAnnotationBinder {

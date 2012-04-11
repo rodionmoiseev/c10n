@@ -98,6 +98,6 @@ public final class C10N {
   }
 
   public static void configure(C10NConfigBase conf) {
-    root.configure(conf);
+    root = coreModule.defaultC10NMsgFactory(conf);
   }
 }

@@ -22,6 +22,9 @@ package c10n;
 
 import c10n.annotations.DefaultC10NAnnotations;
 import c10n.annotations.En;
+import c10n.inner.sub1.Sub1Config;
+import c10n.inner.sub1.Sub1Config2;
+import c10n.inner.sub1.sub12.Sub12Interface;
 import c10n.share.util.RuleUtils;
 import c10n.share.utils.ReflectionUtils;
 import org.junit.Rule;
@@ -32,6 +35,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -50,7 +54,7 @@ public class C10NConfigBaseInstallTest {
   public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
   @Rule
   public TestRule tmpLocale = RuleUtils.tmpLocale();
-  
+
   @Test
   public void bundleSettingsAreComposedWithInstalledModules() {
     final C10NConfigBase childConfig = new C10NConfigBase() {
@@ -60,21 +64,15 @@ public class C10NConfigBaseInstallTest {
       }
     };
 
-    C10NConfigBase config = new C10NConfigBase() {
+    C10N.configure(new C10NConfigBase() {
       @Override
       public void configure() {
         install(childConfig);
         bindBundle(ParentResourceBundle.class.getName());
       }
-    };
-    config.doConfigure();
+    });
 
-    List<ResourceBundle> b = config.getBundlesForLocale(C10NConfigBaseInstallTest.class, Locale.ENGLISH);
-    assertThat(b.size(), is(2));
-    assertThat(b.get(0).getString("parentKey"), is("parentBundle"));
-    assertThat(b.get(1).getString("childKey"), is("childBundle"));
-
-    C10N.configure(config);
+    Locale.setDefault(Locale.ENGLISH);
     assertThat(C10N.get(Messages.class).greeting(), is("parentHello"));
     assertThat(C10N.get(ChildMessages.class).greeting(), is("childHello"));
   }
@@ -102,20 +100,72 @@ public class C10NConfigBaseInstallTest {
     Locale.setDefault(Locale.JAPANESE);
     assertThat(C10N.get(ChildMessages.class).greeting(), is("こんにちは"));
   }
-  
-  @Test
-  public void annotationsCanBeAdditionallyBoundAsAFallbackLocale(){
-      C10N.configure(new C10NConfigBase(){
-        @Override
-        protected void configure() {
-          install(new DefaultC10NAnnotations());
-          //additionally bind En as fallback
-          bindAnnotation(En.class);
-        }
-      });
 
-      Locale.setDefault(Locale.JAPANESE);
-      assertThat(C10N.get(EnOnlyMessages.class).value(), is("fallback here"));
+  @Test
+  public void annotationsCanBeAdditionallyBoundAsAFallbackLocale() {
+    C10N.configure(new C10NConfigBase() {
+      @Override
+      protected void configure() {
+        install(new DefaultC10NAnnotations());
+        //additionally bind En as fallback
+        bindAnnotation(En.class);
+      }
+    });
+
+    Locale.setDefault(Locale.JAPANESE);
+    assertThat(C10N.get(EnOnlyMessages.class).value(), is("fallback here"));
+  }
+
+  @Test
+  public void untranslatedMessagesAreHandledWithTheSpecifiedHandler() {
+    C10N.configure(new C10NConfigBase() {
+      @Override
+      protected void configure() {
+        setUntranslatedMessageHandler(new UntranslatedMessageHandler() {
+          @Override
+          public String render(Class<?> c10nInterface, Method method, Object[] methodArgs) {
+            return "called if=" + c10nInterface.getSimpleName() +
+                    ", method=" + method.getName() +
+                    ", args=" + Arrays.toString(methodArgs);
+          }
+        });
+      }
+    });
+
+    Messages msg = C10N.get(Messages.class);
+    assertThat(msg.greeting(), is("called if=Messages, method=greeting, args=null"));
+    assertThat(msg.greeting("a", 1), is("called if=Messages, method=greeting, args=[a, 1]"));
+  }
+
+  @Test
+  public void bindingsInChildModulesCanOverrideParentModuleBindings() {
+    C10N.configure(new C10NConfigBase() {
+      @Override
+      protected void configure() {
+        install(new Sub1Config());
+        install(new Sub1Config2());
+        //overrides c10n.inner.sub1.sub12.Sub12Config's
+        // bindAnnotation(En.class).toLocale(Locale.UK);
+        bindAnnotation(En.class).toLocale(Locale.JAPANESE);
+        setUntranslatedMessageHandler(new UntranslatedMessageHandler() {
+          @Override
+          public String render(Class<?> c10nInterface, Method method, Object[] methodArgs) {
+            return "untranslated";
+          }
+        });
+      }
+    });
+
+    ParentMessages parentMsg = C10N.get(ParentMessages.class);
+    Sub12Interface childMsg = C10N.get(Sub12Interface.class);
+
+    Locale.setDefault(Locale.UK);
+    assertThat(parentMsg.value(), is("untranslated"));
+    assertThat(childMsg.enMessage(), is("english2"));
+
+    Locale.setDefault(Locale.JAPANESE);
+    assertThat(parentMsg.value(), is("actually japanese"));
+    assertThat(childMsg.enMessage(), is("untranslated"));
   }
 
   @Target(ElementType.METHOD)
@@ -133,6 +183,8 @@ public class C10NConfigBaseInstallTest {
   interface Messages {
     @Eng("hello")
     String greeting();
+
+    String greeting(String a, int b);
   }
 
   interface ChildMessages {
@@ -140,8 +192,13 @@ public class C10NConfigBaseInstallTest {
     String greeting();
   }
 
-  interface EnOnlyMessages{
+  interface EnOnlyMessages {
     @En("fallback here")
+    String value();
+  }
+
+  interface ParentMessages {
+    @En("actually japanese")
     String value();
   }
 

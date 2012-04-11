@@ -21,6 +21,4 @@ package c10n;
 
 public interface C10NMsgFactory {
   public <T> T get(Class<T> c10nInterface);
-
-  public void configure(C10NConfigBase conf);
 }

@@ -50,7 +50,7 @@ public class FallbackC10NFactoryTest {
     WithArguments msg = C10N.get(WithArguments.class);
     assertThat(msg.greet("World"), is("Hello, World!"));
     assertThat(msg.noDefaultValue("value", "value2"),
-            is("WithArguments.noDefaultValue(value, value2)"));
+            is("WithArguments.noDefaultValue(\"value\", \"value2\")"));
   }
 }
 

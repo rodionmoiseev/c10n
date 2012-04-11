@@ -42,7 +42,7 @@ public class LocaleProviderTest {
       @Override
       protected void configure() {
         install(new DefaultC10NAnnotations());
-        bindLocaleProvider(lc);
+        setLocaleProvider(lc);
       }
     });
 

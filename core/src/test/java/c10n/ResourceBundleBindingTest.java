@@ -33,48 +33,48 @@ public class ResourceBundleBindingTest {
   @Rule
   public TestRule tmpLocale = RuleUtils.tmpLocale(Locale.ENGLISH);
 
-  private final C10NMsgFactory f = new C10NCoreModule().defaultC10NMsgFactory();
+  @Rule
+  public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
   @Test
   public void rootBundleBinding() {
-    f.configure(new C10NConfigBase() {
+    C10N.configure(new C10NConfigBase() {
       @Override
       public void configure() {
         bindBundle("c10n.testBundles.TestBundle");
       }
     });
-    Labels labels = f.get(Labels.class);
+    Labels labels = C10N.get(Labels.class);
     assertThat(labels.greeting(), is("Hello, World!"));
     assertThat(labels.argGreeting("C10N"), is("Hello, C10N!"));
   }
 
   @Test
   public void bundlesExplicitlyBoundToOtherClassesDoNotMatch() {
-    f.configure(new C10NConfigBase() {
+    C10N.configure(new C10NConfigBase() {
       @Override
       public void configure() {
         bindBundle("c10n.testBundles.TestBundle")
                 .to(Buttons.class);
       }
     });
-
-    Labels labels = f.get(Labels.class);
+    Labels labels = C10N.get(Labels.class);
     assertThat(labels.greeting(), is("Labels.greeting"));
 
-    Buttons buttons = f.get(Buttons.class);
+    Buttons buttons = C10N.get(Buttons.class);
     assertThat(buttons.ok(), is("OK!"));
   }
 
   @Test
   public void multiLanguageBundleBinding() {
-    f.configure(new C10NConfigBase() {
+    C10N.configure(new C10NConfigBase() {
       @Override
       public void configure() {
         bindBundle("c10n.testBundles.TestBundle");
       }
     });
-    Labels labels = f.get(Labels.class);
-    Buttons buttons = f.get(Buttons.class);
+    Labels labels = C10N.get(Labels.class);
+    Buttons buttons = C10N.get(Buttons.class);
 
     Locale.setDefault(Locale.JAPANESE);
     assertThat(labels.greeting(), is("こんにちは世界!"));
