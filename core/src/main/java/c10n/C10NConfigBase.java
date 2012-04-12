@@ -79,7 +79,8 @@ public abstract class C10NConfigBase {
    * @return name of package the current module is responsible for
    */
   protected String getConfigurationPackage() {
-    return getClass().getPackage().getName();
+    Package pkg = getClass().getPackage();
+    return pkg != null ? pkg.getName() : "";
   }
 
   void doConfigure() {
