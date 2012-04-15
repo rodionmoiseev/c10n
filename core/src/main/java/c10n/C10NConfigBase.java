@@ -289,7 +289,7 @@ public abstract class C10NConfigBase {
    * Find all locales that have explicit implementation class
    * bindings for this c10n interface.
    *
-   * @param c10nInterface interface to find bindingds for (not-null)
+   * @param c10nInterface interface to find bindings for (not-null)
    * @return Set of locales (not-null)
    */
   Set<Locale> getImplLocales(Class<?> c10nInterface) {
