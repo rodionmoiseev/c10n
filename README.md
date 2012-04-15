@@ -5,8 +5,8 @@ A Java library, focused on making internationalisation more modular, easier
 to evolve and maintain, robust-to-change and IDE-friendly without excess of
 external tools. See [the guide][C10NGuide] for some sample code.
 
-*Note:* C10N is still alpha, you can grab yourself the latest development snapshot
-from the [download section][C10NDownload]. I am currently working on the first release.
+
+*Note:* C10N is in beta stage. Download the latest release candidate from the [download section][C10NDownload]. 
 
 Wiki Links:
 
