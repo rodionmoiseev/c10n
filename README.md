@@ -14,10 +14,13 @@ Wiki Links:
 * [Download C10N][C10NDownload]
 * [Release roadmap][C10NRoadmap]
 * [Contributing][C10NContributing]
-* [Play Framework 2.0 Integration Example][C10NPlayIntegration]
+* Scala related documentation
+ * [Scala Integration][C10NScalaIntegration]
+ * [Play Framework 2.0 Integration Example][C10NPlayIntegration]
 
   [C10NGuide]: https://github.com/rodionmoiseev/c10n/wiki/Overview "C10N Wiki: Guide"
   [C10NDownload]: https://github.com/rodionmoiseev/c10n/wiki/Download "Download C10N"
   [C10NRoadMap]: https://github.com/rodionmoiseev/c10n/wiki/Roadmap "C10N Wiki: Roadmap"
   [C10NContributing]: https://github.com/rodionmoiseev/c10n/wiki/Contributing "C10N Wiki: Contributing"
+  [C10NScalaIntegration]: https://github.com/rodionmoiseev/c10n/wiki/Scala-Integration "C10N Wiki: Scala Integration"
   [C10NPlayIntegration]: https://github.com/rodionmoiseev/c10n/wiki/Play-Framework-2.0-Integration "C10N Wiki: Play Framework 2.0 Integration"
