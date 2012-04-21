@@ -17,8 +17,10 @@
 *.ipr
 *.iml
 *.iws
+out/
 
 #
 # Gradle temporary files
 #
 .gradle
+build/
