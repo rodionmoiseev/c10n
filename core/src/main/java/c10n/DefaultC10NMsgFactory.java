@@ -171,6 +171,28 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           res = trs.get(method.toString());
         }
         if (null == res) {
+          //maybe its a scala trait with a default value?
+          //This should work for scala 2.9.1
+          try {
+            Class<?> traitClass = proxiedClass.getClassLoader().loadClass(proxiedClass.getName() + "$class");
+            Class[] proxyMethodParamsTypes = method.getParameterTypes();
+            Class[] defImplMethodParams = new Class[1 + proxyMethodParamsTypes.length];
+            defImplMethodParams[0] = proxiedClass;
+            if (defImplMethodParams.length > 0) {
+              System.arraycopy(proxyMethodParamsTypes, 0, defImplMethodParams, 1, proxyMethodParamsTypes.length);
+            }
+            Method defImplMethod = traitClass.getMethod(method.getName(), defImplMethodParams);
+            Object[] defImplMethodArgs = new Object[1 + (args != null ? args.length : 0)];
+            defImplMethodArgs[0] = proxy;
+            if(args != null && args.length > 0){
+              System.arraycopy(args, 0, defImplMethodArgs, 1, args.length);
+            }
+            return MessageFormat.format(String.valueOf(defImplMethod.invoke(null, defImplMethodArgs)), args);
+          } catch (ClassNotFoundException classNotFound) {
+            classNotFound.printStackTrace();
+            //not a scala trait, give up.
+          }
+
           return conf.getUntranslatedMessageString(proxiedClass, method, args);
         }
         return MessageFormat.format(res, args);

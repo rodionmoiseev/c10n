@@ -20,9 +20,9 @@
 
 package c10n.testproject.scala
 
-import c10n.{C10NMessages, C10N}
 import java.util.Locale
 import c10n.annotations.{Ru, En, DefaultC10NAnnotations}
+import c10n.{C10NConfigBase, C10NMessages, C10N}
 
 /**
  *
@@ -35,19 +35,27 @@ object Main {
      * @En -> Locale.ENGLISH
      * @Ru -> Locale("ru")
      */
-    C10N.configure(new DefaultC10NAnnotations())
+    C10N.configure(new C10NConfigBase {
+      def configure() {
+        install(new DefaultC10NAnnotations())
+        bind(classOf[Units])
+          .to(classOf[ImperialUnits], Locale.ENGLISH)
+      }
+    })
 
     val gui: Gui = C10N.get(classOf[Gui])
 
     // assume a certain locale for illustration purposes
-    Locale.setDefault(Locale.ENGLISH)
-    //Locale.setDefault(new Locale("ru"))
+    //Locale.setDefault(Locale.ENGLISH)
+    Locale.setDefault(new Locale("ru"))
 
     println("Welcome, " + gui.hello + "!")
     println("Click " + gui.menu.file + " to start.")
     println("Click " + gui.menu.print.pageSettings + " to open page settings.")
     println("Click " + gui.menu.print.execute("Canon iP90v") + " to print")
     println("Push the " + gui.menu.print.redButton + " for something special")
+
+    println("I ran: " + C10N.get(classOf[Units]).distance(100))
   }
 
   @C10NMessages
@@ -68,9 +76,8 @@ object Main {
 
   @C10NMessages
   trait PrintMenu extends ExtendedPrintMenu{
-    @En("Page Settings ...")
     @Ru("Nastroiki stranitsy ...")
-    def pageSettings: String = "default values are ignored, sorry."
+    def pageSettings = "Page Settings ..."
 
     @En("Print with {0}")
     @Ru("Pechat' na {0}")
@@ -81,6 +88,14 @@ object Main {
     @En("red button")
     @Ru("krasnaya knopka")
     def redButton: String
+  }
+
+  trait Units{
+    def distance(meters: Int) = "{0} meters"
+  }
+
+  class ImperialUnits extends Units{
+    override def distance(meters: Int) = (meters*0.97) + " yards"
   }
 }
 

@@ -37,7 +37,8 @@ configurations{
 }
 
 dependencies {
-  compile group: 'c10n', name: 'c10n-core', version: '1.0-rc2'
+  //compile group: 'c10n', name: 'c10n-core', version: '1.0-rc2'
+  compile files('../../master/out/production/core')
 
   // Libraries needed to run the scala tools
   scalaTools 'org.scala-lang:scala-compiler:2.9.1'
