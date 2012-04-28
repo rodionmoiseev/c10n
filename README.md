@@ -6,7 +6,7 @@ to evolve and maintain, robust-to-change and IDE-friendly without excess of
 external tools. See [the guide][C10NGuide] for some sample code.
 
 
-*Note:* C10N is in beta stage. Download the latest release candidate from the [download section][C10NDownload]. 
+Download the latest 1.0 release from the [download section][C10NDownload]. 
 
 Wiki Links:
 
