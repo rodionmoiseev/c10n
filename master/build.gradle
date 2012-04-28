@@ -52,7 +52,7 @@ allprojects{
 subprojects{
   apply plugin: 'java'
 
-  version = "1.0-rc2"
+  version = "1.0"
 
   archivesBaseName = "c10n"
 
