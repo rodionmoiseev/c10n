@@ -75,7 +75,7 @@ public class Main {
   }
 
   private static void action1() {
-    new Action1().run();
+    //TODO
   }
 
   private static Locale parseLocale(String localeStr) {
