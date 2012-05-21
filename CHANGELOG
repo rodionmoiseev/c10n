@@ -1,0 +1,8 @@
+Current (1.1) - 2012/05/21
+
+* Fixed: c10n interface classes fail to get auto-reloaded when using Play2 auto-redeploy feature (rodionmoiseev)
+
+
+Version 1.0 - 2012/04/28
+
+* See wiki overview plage for initial release (1.0) features.
