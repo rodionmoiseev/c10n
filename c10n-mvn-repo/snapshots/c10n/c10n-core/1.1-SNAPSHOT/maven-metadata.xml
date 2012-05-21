@@ -2,12 +2,12 @@
 <metadata>
   <groupId>c10n</groupId>
   <artifactId>c10n-core</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <versioning>
-    <versions>
-      <version>1.0-SNAPSHOT</version>
-      <version>1.1-SNAPSHOT</version>
-    </versions>
+    <snapshot>
+      <timestamp>20120521.080925</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
     <lastUpdated>20120521080925</lastUpdated>
   </versioning>
 </metadata>
