@@ -38,10 +38,12 @@ import java.util.Set;
 class DefaultC10NMsgFactory implements C10NMsgFactory {
   private final ConfiguredC10NModule conf;
   private final LocaleMapping localeMapping;
+  private final ClassLoader proxyClassloader;
 
-  DefaultC10NMsgFactory(ConfiguredC10NModule conf, LocaleMapping localeMapping) {
+  DefaultC10NMsgFactory(ConfiguredC10NModule conf, LocaleMapping localeMapping, ClassLoader proxyClassloader) {
     this.conf = conf;
     this.localeMapping = localeMapping;
+    this.proxyClassloader = proxyClassloader;
   }
 
   @SuppressWarnings("unchecked")
@@ -49,7 +51,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     if (null == c10nInterface) {
       throw new NullPointerException("c10nInterface is null");
     }
-    return (T) Proxy.newProxyInstance(C10N.class.getClassLoader(),
+    return (T) Proxy.newProxyInstance(proxyClassloader,
             new Class[]{c10nInterface},
             C10NInvocationHandler.create(this, conf, localeMapping, c10nInterface));
   }
