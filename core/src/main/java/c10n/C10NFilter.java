@@ -20,23 +20,9 @@
 
 package c10n;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
 /**
  * @author rodion
  */
-interface ConfiguredC10NModule {
-  Locale getCurrentLocale();
-  Map<Class<? extends Annotation>, Set<Locale>> getAnnotationBindings(Class<?> c10nInterface);
-  Set<Locale> getImplementationBindings(Class<?> c10nInterface);
-  Class<?> getImplementationBinding(Class<?> c10nInterface, Locale locale);
-  List<ResourceBundle> getBundleBindings(Class<?> c10nInterface, Locale locale);
-  String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs);
-  Map<Class<?>, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface);
+public interface C10NFilter<T> {
+  Object apply(T arg);
 }

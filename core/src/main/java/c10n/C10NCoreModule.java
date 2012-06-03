@@ -67,6 +67,30 @@ public class C10NCoreModule {
     return new DefaultConfiguredC10NModule(parentConfig, chainResolver);
   }
 
+  /**
+   * <p>Filter provider that always returns the specified instance</p>
+   * @param filter filter instance to return from the generated provider(not-null)
+   * @param <T> Filter argument type
+   * @return instance of filter provider (never-null)
+   */
+  public <T> C10NFilterProvider<T> staticFilterProvider(C10NFilter<T> filter){
+    assertNotNull(filter, "filter");
+    return new StaticC10NFilterProvider<T>(filter);
+  }
+
+  /**
+   * <p>Decorates the specified filter provider with a simple static cache.
+   * Only the first call will result in an execution of {@link c10n.C10NFilterProvider#get()} method.
+   * The following calls will always return a cached instance of the first call.</p>
+   * @param filterProvider filter provider to decorate with caching (not-null)
+   * @param <T> Filter argument type
+   * @return instance of a filter provider decorated with simple static cache (never-null)
+   */
+  public <T> C10NFilterProvider<T> cachedFilterProvider(C10NFilterProvider<T> filterProvider){
+    assertNotNull(filterProvider, "filterProvider");
+    return new CachedC10NFilterProvider<T>(filterProvider);
+  }
+
   private static final class DefaultLocaleProvider implements LocaleProvider {
     @Override
     public Locale getLocale() {
@@ -77,6 +101,36 @@ public class C10NCoreModule {
   private static final class UnconfiguredC10NConfig extends C10NConfigBase{
     @Override
     protected void configure() {
+    }
+  }
+
+  private static final class StaticC10NFilterProvider<T> implements C10NFilterProvider<T>{
+    private final C10NFilter<T> filter;
+
+    private StaticC10NFilterProvider(C10NFilter<T> filter) {
+      this.filter = filter;
+    }
+
+    @Override
+    public C10NFilter<T> get() {
+      return filter;
+    }
+  }
+
+  private static final class CachedC10NFilterProvider<T> implements C10NFilterProvider<T>{
+    private final C10NFilterProvider<T> base;
+    private C10NFilter<T> thunk = null;
+
+    private CachedC10NFilterProvider(C10NFilterProvider<T> base) {
+      this.base = base;
+    }
+
+    @Override
+    public C10NFilter<T> get() {
+      if(null==thunk){
+        thunk = base.get();
+      }
+      return thunk;
     }
   }
 }

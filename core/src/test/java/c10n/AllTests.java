@@ -32,6 +32,7 @@ import org.junit.runners.Suite;
         c10n.share.AllTests.class,
         AnnotationBindingConfigurationErrorTest.class,
         C10NConfigBaseInstallTest.class,
+        C10NFilterTest.class,
         ConfigChainResolverTest.class,
         CustomAnnotationBindingTest.class,
         CustomImplementationBindingTest.class,

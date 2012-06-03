@@ -65,6 +65,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     private final Map<Locale, Map<String, String>> translationsByLocale;
     private final Set<Locale> availableLocales;
     private final Set<Locale> availableImplLocales;
+    private final Map<Class<?>, C10NFilterProvider<?>> filters;
 
     C10NInvocationHandler(C10NMsgFactory c10nFactory,
                           ConfiguredC10NModule conf,
@@ -78,6 +79,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       this.translationsByLocale = translationsByLocale;
       this.availableLocales = translationsByLocale.keySet();
       this.availableImplLocales = conf.getImplementationBindings(proxiedClass);
+      this.filters = conf.getFilterBindings(proxiedClass);
     }
 
     static C10NInvocationHandler create(C10NMsgFactory c10nFactory,
@@ -162,8 +164,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           ReflectionUtils.getDefaultKey(proxiedClass, method, sb);
           String key = sb.toString();
           if (bundle.containsKey(key)) {
-            return MessageFormat
-                    .format(bundle.getString(key), args);
+            return format(bundle.getString(key), locale, method.getParameterTypes(), args);
           }
         }
 
@@ -175,7 +176,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
         if (null == res) {
           return conf.getUntranslatedMessageString(proxiedClass, method, args);
         }
-        return MessageFormat.format(res, args);
+        return format(res, locale, method.getParameterTypes(), args);
       } else if (returnType.isInterface()) {
         if (null != returnType.getAnnotation(C10NMessages.class)) {
           return c10nFactory.get(returnType);
@@ -183,6 +184,23 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       }
       // don't know how to handle this return type
       return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private String format(String message, Locale locale, Class[] argTypes, Object ... args){
+      if(args != null && args.length > 0){
+        Object[] filteredArgs = new Object[args.length];
+        for(int i=0; i<args.length; i++){
+          C10NFilterProvider<Object> filter = (C10NFilterProvider<Object>)filters.get(argTypes[i]);
+          if(null != filter){
+            filteredArgs[i] = filter.get().apply(args[i]);
+          }else {
+            filteredArgs[i] = args[i];
+          }
+        }
+        return MessageFormat.format(message, filteredArgs);
+      }
+      return MessageFormat.format(message, args);
     }
 
     private Map<String, String> getTranslations(Locale locale) {

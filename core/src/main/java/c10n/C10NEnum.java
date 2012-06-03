@@ -20,23 +20,17 @@
 
 package c10n;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author rodion
  */
-interface ConfiguredC10NModule {
-  Locale getCurrentLocale();
-  Map<Class<? extends Annotation>, Set<Locale>> getAnnotationBindings(Class<?> c10nInterface);
-  Set<Locale> getImplementationBindings(Class<?> c10nInterface);
-  Class<?> getImplementationBinding(Class<?> c10nInterface, Locale locale);
-  List<ResourceBundle> getBundleBindings(Class<?> c10nInterface, Locale locale);
-  String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs);
-  Map<Class<?>, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface);
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface C10NEnum {
 }

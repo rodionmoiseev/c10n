@@ -96,6 +96,19 @@ class DefaultConfiguredC10NModule implements ConfiguredC10NModule {
   }
 
   @Override
+  public Map<Class<?>, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface) {
+    List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
+    Map<Class<?>, C10NFilterProvider<?>> res = new HashMap<Class<?>, C10NFilterProvider<?>>();
+    Collections.reverse(configChain);
+    for (C10NConfigBase config : configChain) {
+      for(C10NConfigBase.C10NFilterBinder filterBinder : config.getFilterBinders()){
+        res.put(filterBinder.getType(), filterBinder.getFilterProvider());
+      }
+    }
+    return res;
+  }
+
+  @Override
   public String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs) {
     return parentConfig.getUntranslatedMessageString(c10nInterface, method, methodArgs);
   }
