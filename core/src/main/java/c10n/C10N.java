@@ -74,14 +74,14 @@ import java.util.Locale;
  * @author rodion
  */
 public final class C10N {
-  //DI
-  private static final C10NCoreModule coreModule = new C10NCoreModule();
-  private static C10NMsgFactory root = coreModule.defaultC10NMsgFactory();
-
   /**
    * <p>Classloader to use for loading c10n-interface proxies</p>
    */
   private static ClassLoader proxyClassloader = C10N.class.getClassLoader();
+
+  //DI
+  private static final C10NCoreModule coreModule = new C10NCoreModule();
+  private static C10NMsgFactory root = coreModule.defaultC10NMsgFactory();
 
   /**
    * Internal locale object used as a fallback when current locale does not
