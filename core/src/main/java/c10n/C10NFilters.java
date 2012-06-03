@@ -67,7 +67,7 @@ public final class C10NFilters {
    *   }
    * </pre></code>
    *
-   * <p>Now, everytime c10n encounteres Status as a method argument in a c10n-interface type,
+   * <p>Now, every time c10n encounters Status as a method argument in a c10n-interface type,
    * the it will be replaced with the appropriate localised version of the Enum value:</p>
    *
    * <code><pre>
