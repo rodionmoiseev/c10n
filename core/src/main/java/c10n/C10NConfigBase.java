@@ -241,7 +241,7 @@ public abstract class C10NConfigBase {
   protected <T> C10NFilterBinder<T> bindFilter(C10NFilter<T> c10nFilter, Class<T> type) {
     assertNotNull(c10nFilter, "c10nFilter");
     assertNotNull(type, "type");
-    C10NFilterBinder<T> filterBinder = new C10NFilterBinder<T>(coreModule.staticFilterProvider(c10nFilter), type);
+    C10NFilterBinder<T> filterBinder = new C10NFilterBinder<T>(C10NFilters.staticFilterProvider(c10nFilter), type);
     filterBinders.add(filterBinder);
     return filterBinder;
   }

@@ -29,7 +29,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -52,7 +51,7 @@ public class C10NFilterTest {
       @Override
       protected void configure() {
         install(new DefaultC10NAnnotations());
-        bindFilter(new EnumMappingFilterProvider<Status>(Status.class, StatusTr.class), Status.class);
+        bindFilter(C10NFilters.enumMapping(Status.class, StatusTr.class), Status.class);
       }
     });
 
@@ -97,7 +96,7 @@ public class C10NFilterTest {
       @Override
       protected void configure() {
         install(new DefaultC10NAnnotations());
-        bindFilter(new EnumMappingFilterProvider<Status>(Status.class, StatusTr.class), Status.class)
+        bindFilter(C10NFilters.enumMapping(Status.class, StatusTr.class), Status.class)
                 .annotatedWith(C10NEnum.class);
       }
     });
@@ -167,78 +166,6 @@ public class C10NFilterTest {
           return statusTr.status_pending();
         default:
           throw new IllegalArgumentException("Unexpected status type: " + arg);
-      }
-    }
-  }
-
-  private static final class EnumMappingFilterProvider<E extends Enum<?>> implements C10NFilterProvider<E> {
-    private final Class<E> enumClass;
-    private final Class<?> c10nMappedInterface;
-
-    private EnumMappingFilterProvider(Class<E> enumClass, Class<?> c10nMappedInterface) {
-      this.enumClass = enumClass;
-      this.c10nMappedInterface = c10nMappedInterface;
-    }
-
-    @Override
-    public C10NFilter<E> get() {
-      return new EnumMappingFilter<E>(enumClass, c10nMappedInterface);
-    }
-  }
-
-  private static final class EnumMappingFilter<E extends Enum<?>> implements C10NFilter<E> {
-    private final Class<?> enumC10NInterface;
-    private final Object enumC10NInterfaceInstance;
-    private final Map<Enum<?>, Method> c10nInfMethodMapping;
-
-    EnumMappingFilter(Class<E> enumClass, Class<?> c10nInterface) {
-      this.enumC10NInterface = c10nInterface;
-      this.enumC10NInterfaceInstance = C10N.get(enumC10NInterface);
-      this.c10nInfMethodMapping = genMapping(enumClass, enumC10NInterface);
-    }
-
-    private static <E extends Enum<?>> Map<Enum<?>, Method> genMapping(Class<E> enumClass, Class<?> enumC10NInterface) {
-      Map<String, Method> allMethods = new HashMap<String, Method>();
-      for (Method m : enumC10NInterface.getMethods()) {
-        allMethods.put(m.getName().toLowerCase(), m);
-      }
-
-      Map<Enum<?>, Method> res = new HashMap<Enum<?>, Method>();
-
-      for (Enum<?> enumValue : enumClass.getEnumConstants()) {
-        //1. Check of methods for pattern: ClassName_EnumValue()
-        Method m = allMethods.get(enumClass.getSimpleName().toLowerCase() + "_" + enumValue.name().toLowerCase());
-        if (null == m || !noArgMethod(m) || !returnsObject(m)) {
-          //no good ...
-          //2. Check for methods for pattern: EnumValue()
-          m = allMethods.get(enumValue.name().toLowerCase());
-          if (null == m || !noArgMethod(m) || !returnsObject(m)) {
-            throw new IllegalStateException("method mapping for " +
-                    enumClass.getSimpleName() + "." + enumValue.name() + " was not found!!");
-          }
-        }
-        res.put(enumValue, m);
-      }
-      return res;
-    }
-
-    private static boolean returnsObject(Method m) {
-      return !m.getReturnType().equals(Void.TYPE);
-    }
-
-    private static boolean noArgMethod(Method m) {
-      Class[] paramTypes = m.getParameterTypes();
-      return paramTypes == null || paramTypes.length == 0;
-    }
-
-    @Override
-    public Object apply(E arg) {
-      Method m = c10nInfMethodMapping.get(arg);
-      try {
-        return m.invoke(enumC10NInterfaceInstance);
-      } catch (Exception e) {
-        throw new RuntimeException("Failed to dispatch invocation to " +
-                m.getDeclaringClass().getSimpleName() + "." + m.getName() + "() method.", e);
       }
     }
   }
