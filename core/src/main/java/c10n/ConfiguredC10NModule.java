@@ -38,5 +38,35 @@ interface ConfiguredC10NModule {
   Class<?> getImplementationBinding(Class<?> c10nInterface, Locale locale);
   List<ResourceBundle> getBundleBindings(Class<?> c10nInterface, Locale locale);
   String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs);
-  Map<Class<?>, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface);
+  Map<AnnotatedClass, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface);
+}
+
+class AnnotatedClass {
+  final Class<?> clazz;
+  final Class<? extends Annotation> annotation;
+
+  AnnotatedClass(Class<?> clazz, Class<? extends Annotation> annotation) {
+    this.clazz = clazz;
+    this.annotation = annotation;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    AnnotatedClass that = (AnnotatedClass) o;
+
+    if (annotation != null ? !annotation.equals(that.annotation) : that.annotation != null) return false;
+    if (clazz != null ? !clazz.equals(that.clazz) : that.clazz != null) return false;
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = clazz != null ? clazz.hashCode() : 0;
+    result = 31 * result + (annotation != null ? annotation.hashCode() : 0);
+    return result;
+  }
 }

@@ -24,11 +24,14 @@ import c10n.annotations.DefaultC10NAnnotations;
 import c10n.annotations.En;
 import c10n.annotations.Ja;
 import c10n.share.util.RuleUtils;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -90,7 +93,6 @@ public class C10NFilterTest {
   }
 
   @Test
-  @Ignore
   public void onlySpecifiedAnnotatedArgumentsGetTheFilterAppliedToThem() {
     C10N.configure(new C10NConfigBase() {
       @Override
@@ -107,8 +109,48 @@ public class C10NFilterTest {
     assertThat(msg.statusIs2(Status.Open, Status.Closed), is("Open-closed"));
 
     Locale.setDefault(Locale.JAPANESE);
-    assertThat(msg.statusIs(Status.Closed), is("状態: 開"));
+    assertThat(msg.statusIs(Status.Closed), is("状態: 閉"));
     assertThat(msg.statusIs2(Status.Closed, Status.Open), is("Closed-開"));
+  }
+
+  @Test
+  public void primitiveTypeFilters() {
+    C10N.configure(new C10NConfigBase() {
+      @Override
+      protected void configure() {
+        install(new DefaultC10NAnnotations());
+        bindFilter(new IntFormattingFilter(), int.class).annotatedWith(Precise.class);
+      }
+    });
+
+    Locale.setDefault(Locale.ENGLISH);
+    Messages msg = C10N.get(Messages.class);
+    assertThat(msg.primitiveTypeMapping(1, 2), is("precise 1.00 normal 2"));
+
+    Locale.setDefault(Locale.JAPANESE);
+    assertThat(msg.primitiveTypeMapping(1, 2), is("1.00 - 2"));
+  }
+
+  @Test
+  public void multipleAnnotationTest() {
+    C10N.configure(new C10NConfigBase() {
+      @Override
+      protected void configure() {
+        install(new DefaultC10NAnnotations());
+        bindFilter(C10NFilters.enumMapping(Status.class, StatusTr.class), Status.class)
+                .annotatedWith(C10NEnum.class)
+                .annotatedWith(Precise.class);
+      }
+    });
+
+    Locale.setDefault(Locale.ENGLISH);
+    Messages msg = C10N.get(Messages.class);
+    assertThat(msg.statusIs2(Status.Open, Status.Closed), is("Open-closed"));
+    assertThat(msg.multipleAnnotations(Status.Pending), is("pending"));
+
+    Locale.setDefault(Locale.JAPANESE);
+    assertThat(msg.statusIs2(Status.Closed, Status.Open), is("Closed-開"));
+    assertThat(msg.multipleAnnotations(Status.Pending), is("進行中"));
   }
 
   private static final class CustomFilterProvider implements C10NFilterProvider<Status> {
@@ -184,6 +226,14 @@ public class C10NFilterTest {
     @En("{0}-{1}")
     @Ja("{0}-{1}")
     String statusIs2(Status status, @C10NEnum Status annotatedStatus);
+
+    @En("precise {0} normal {1}")
+    @Ja("{0} - {1}")
+    String primitiveTypeMapping(@Precise int precise, int normal);
+
+    @En("{0}")
+    @Ja("{0}")
+    String multipleAnnotations(@Precise Status status);
   }
 
   public interface StatusTr {
@@ -198,5 +248,17 @@ public class C10NFilterTest {
     @En("pending")
     @Ja("進行中")
     String status_pending();
+  }
+
+  public static final class IntFormattingFilter implements C10NFilter<Integer> {
+    @Override
+    public Object apply(Integer arg) {
+      return String.valueOf(arg) + ".00";
+    }
+  }
+
+  @Target(ElementType.PARAMETER)
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface Precise {
   }
 }

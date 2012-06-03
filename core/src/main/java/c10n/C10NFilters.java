@@ -82,6 +82,21 @@ public final class C10NFilters {
    * <p>Invoking <code>showStatus(Status.Closed)</code> will render
    * as <code>"Localised status is: closed! beer time!"</code>.</p>
    *
+   * <h2>Restricting Filter Application</h2>
+   * <p>You can restrict filter application only to method arguments annotated with a given
+   * annotation, or one of the given annotations from a list, by using <code>annotatedWith(Class)</code> method
+   * when binding. For example: </p>
+   * <code><pre>
+   *   void configure(){
+   *     bindFilter(new IntFormattingFilter(), int.class)
+   *       .annotatedWith(Precise.class);
+   *   }
+   * </pre></code>
+   *
+   * <p>The above declaration will make sure int arguments are only passed through the
+   * <code>IntFormattingFilter</code> whenever the method argument is marked with the <code>&#64;Precise</code>
+   * annotation. Other int arguments will not have the filter applied.</p>
+   *
    * <h2>Method Mapping Rules</h2>
    * <p>Enum values are mapped to c10n-interface methods in the following order:
    *  <ol>

@@ -58,6 +58,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
 
   private static final class C10NInvocationHandler implements
           InvocationHandler {
+    private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
     private final C10NMsgFactory c10nFactory;
     private final ConfiguredC10NModule conf;
     private final LocaleMapping localeMapping;
@@ -65,7 +66,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     private final Map<Locale, Map<String, String>> translationsByLocale;
     private final Set<Locale> availableLocales;
     private final Set<Locale> availableImplLocales;
-    private final Map<Class<?>, C10NFilterProvider<?>> filters;
+    private final Map<AnnotatedClass, C10NFilterProvider<?>> filters;
 
     C10NInvocationHandler(C10NMsgFactory c10nFactory,
                           ConfiguredC10NModule conf,
@@ -164,7 +165,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           ReflectionUtils.getDefaultKey(proxiedClass, method, sb);
           String key = sb.toString();
           if (bundle.containsKey(key)) {
-            return format(bundle.getString(key), locale, method.getParameterTypes(), args);
+            return format(bundle.getString(key), locale, method, args);
           }
         }
 
@@ -176,7 +177,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
         if (null == res) {
           return conf.getUntranslatedMessageString(proxiedClass, method, args);
         }
-        return format(res, locale, method.getParameterTypes(), args);
+        return format(res, locale, method, args);
       } else if (returnType.isInterface()) {
         if (null != returnType.getAnnotation(C10NMessages.class)) {
           return c10nFactory.get(returnType);
@@ -186,21 +187,42 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private String format(String message, Locale locale, Class[] argTypes, Object ... args){
+    private String format(String message, Locale locale, Method method, Object... args){
+      Annotation[][] argAnnotations = method.getParameterAnnotations();
+      Class[] argTypes = method.getParameterTypes();
       if(args != null && args.length > 0){
         Object[] filteredArgs = new Object[args.length];
         for(int i=0; i<args.length; i++){
-          C10NFilterProvider<Object> filter = (C10NFilterProvider<Object>)filters.get(argTypes[i]);
-          if(null != filter){
-            filteredArgs[i] = filter.get().apply(args[i]);
-          }else {
-            filteredArgs[i] = args[i];
-          }
+          Annotation[] annotations = argAnnotations != null ? argAnnotations[i] : NO_ANNOTATIONS;
+          filteredArgs[i] = applyArgFilterIfExists(annotations, argTypes[i], args[i]);
         }
         return MessageFormat.format(message, filteredArgs);
       }
       return MessageFormat.format(message, args);
+    }
+
+    private Object applyArgFilterIfExists(Annotation[] annotations, Class argType, Object arg) {
+      //1. Look for first filter matching any of the annotations
+      for(Annotation annotation : annotations){
+        C10NFilterProvider<Object> filter = findFilterFor(argType, annotation.annotationType());
+        if(null != filter){
+          //filter found, look no further
+          return filter.get().apply(arg);
+        }
+      }
+      //2. Try annotation-less filter binding
+      C10NFilterProvider<Object> filter = findFilterFor(argType, null);
+      if(null != filter){
+        return filter.get().apply(arg);
+      }
+      //3. No filter found, return argument as-is
+      return arg;
+    }
+
+    @SuppressWarnings("unchecked")
+    private C10NFilterProvider<Object> findFilterFor(Class argType, Class<? extends Annotation> annotationClass) {
+      return (C10NFilterProvider<Object>)filters
+                    .get(new AnnotatedClass(argType, annotationClass));
     }
 
     private Map<String, String> getTranslations(Locale locale) {

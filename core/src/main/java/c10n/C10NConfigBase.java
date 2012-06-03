@@ -406,6 +406,13 @@ public abstract class C10NConfigBase {
       this.type = type;
     }
 
+    /**
+     * <p>Restrict filter application only to argumets annotated with the
+     * given annotation.</p>
+     * <p>Multiple annotations can be specified using method chaining.</p>
+     * @param annotation annotation class to restrict filter application to
+     * @return this DLS object for method chaining
+     */
     public C10NFilterBinder annotatedWith(Class<? extends Annotation> annotation){
       this.annotatedWith.add(annotation);
       return this;
@@ -417,6 +424,14 @@ public abstract class C10NConfigBase {
 
     Class<T> getType(){
       return type;
+    }
+
+    public List<Class<? extends Annotation>> getAnnotatedWith() {
+      for(Class<? extends Annotation> a : annotatedWith){
+
+      }
+      return annotatedWith;
+
     }
   }
 }

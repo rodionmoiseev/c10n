@@ -96,13 +96,19 @@ class DefaultConfiguredC10NModule implements ConfiguredC10NModule {
   }
 
   @Override
-  public Map<Class<?>, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface) {
+  public Map<AnnotatedClass, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface) {
     List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
-    Map<Class<?>, C10NFilterProvider<?>> res = new HashMap<Class<?>, C10NFilterProvider<?>>();
+    Map<AnnotatedClass, C10NFilterProvider<?>> res = new HashMap<AnnotatedClass, C10NFilterProvider<?>>();
     Collections.reverse(configChain);
     for (C10NConfigBase config : configChain) {
-      for(C10NConfigBase.C10NFilterBinder filterBinder : config.getFilterBinders()){
-        res.put(filterBinder.getType(), filterBinder.getFilterProvider());
+      for(C10NConfigBase.C10NFilterBinder<?> filterBinder : config.getFilterBinders()){
+        if(filterBinder.getAnnotatedWith().isEmpty()){
+          res.put(new AnnotatedClass(filterBinder.getType(), null), filterBinder.getFilterProvider());
+        } else {
+          for(Class<? extends Annotation> annotation : filterBinder.getAnnotatedWith()){
+            res.put(new AnnotatedClass(filterBinder.getType(), annotation), filterBinder.getFilterProvider());
+          }
+        }
       }
     }
     return res;
