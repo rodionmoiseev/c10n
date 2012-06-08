@@ -1,5 +1,6 @@
 Current (1.1) - 2012/05/21
 
+* Fixed: issue #4 - Fallback does not work when there is at least one non-fallback method declared (rodionmoiseev) 
 * Feature: argument filters. Now you can inject custom transformation logic to c10n interface method arguments.
   One useful example includes an Enum mapper. See C10NFilters.enumMapping javadoc. (rodionmoiseev)
 * Fixed: c10n interface classes fail to get auto-reloaded when using Play2 auto-redeploy feature (rodionmoiseev)

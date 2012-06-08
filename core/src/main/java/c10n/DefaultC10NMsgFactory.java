@@ -63,8 +63,8 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     private final ConfiguredC10NModule conf;
     private final LocaleMapping localeMapping;
     private final Class<?> proxiedClass;
-    private final Map<Locale, Map<String, String>> translationsByLocale;
-    private final Set<Locale> availableLocales;
+    private final Map<String, Map<Locale, String>> translationsByMethod;
+    //private final Set<Locale> availableLocales;
     private final Set<Locale> availableImplLocales;
     private final Map<AnnotatedClass, C10NFilterProvider<?>> filters;
 
@@ -72,42 +72,49 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                           ConfiguredC10NModule conf,
                           LocaleMapping localeMapping,
                           Class<?> proxiedClass,
-                          Map<Locale, Map<String, String>> translationsByLocale) {
+                          Map<String, Map<Locale, String>> translationsByMethod) {
       this.c10nFactory = c10nFactory;
       this.conf = conf;
       this.localeMapping = localeMapping;
       this.proxiedClass = proxiedClass;
-      this.translationsByLocale = translationsByLocale;
-      this.availableLocales = translationsByLocale.keySet();
+      this.translationsByMethod = translationsByMethod;
       this.availableImplLocales = conf.getImplementationBindings(proxiedClass);
       this.filters = conf.getFilterBindings(proxiedClass);
     }
 
     static C10NInvocationHandler create(C10NMsgFactory c10nFactory,
                                         ConfiguredC10NModule conf, LocaleMapping localeMapping, Class<?> c10nInterface) {
-      Map<Locale, Map<String, String>> translationsByLocale = new HashMap<Locale, Map<String, String>>();
+      Map<String, Map<Locale, String>> translationsByMethod = new HashMap<String, Map<Locale, String>>();
 
-      Map<String, String> vals = new HashMap<String, String>();
+      //Translations defined in @C10NDef annotation are
+      //always considered a fallback
       for (Method m : c10nInterface.getMethods()) {
-        C10NDef c10n = m.getAnnotation(C10NDef.class);
-        if (null != c10n) {
-          vals.put(m.toString(), c10n.value());
+        C10NDef c10nDef = m.getAnnotation(C10NDef.class);
+        if (null != c10nDef) {
+          Map<Locale, String> defMapping = new HashMap<Locale, String>();
+          defMapping.put(C10N.FALLBACK_LOCALE, c10nDef.value());
+          translationsByMethod.put(m.toString(), defMapping);
         }
       }
-      translationsByLocale.put(C10N.FALLBACK_LOCALE, vals);
 
       // Process custom bound annotations
       for (Entry<Class<? extends Annotation>, Set<Locale>> entry : conf
               .getAnnotationBindings(c10nInterface).entrySet()) {
         Class<? extends Annotation> annotationClass = entry.getKey();
-        Map<String, String> translations = new HashMap<String, String>();
         for (Method m : c10nInterface.getMethods()) {
           Annotation a = m.getAnnotation(annotationClass);
           if (null != a) {
             try {
               String translation = String.valueOf(annotationClass
                       .getMethod("value").invoke(a));
-              translations.put(m.toString(), translation);
+              Map<Locale, String> translationsByLocale = translationsByMethod.get(m.toString());
+              if (null == translationsByLocale) {
+                translationsByLocale = new HashMap<Locale, String>();
+                translationsByMethod.put(m.toString(), translationsByLocale);
+              }
+              for (Locale locale : entry.getValue()) {
+                translationsByLocale.put(locale, translation);
+              }
             } catch (SecurityException e) {
               throw new RuntimeException("Annotation "
                       + annotationClass.getName()
@@ -123,21 +130,10 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
             }
           }
         }
-
-        if (!translations.isEmpty()) {
-          for (Locale locale : entry.getValue()) {
-            Map<String, String> tr = translationsByLocale.get(locale);
-            if (null == tr) {
-              tr = new HashMap<String, String>();
-              translationsByLocale.put(locale, tr);
-            }
-            tr.putAll(translations);
-          }
-        }
       }
 
       return new C10NInvocationHandler(c10nFactory, conf, localeMapping, c10nInterface,
-              translationsByLocale);
+              translationsByMethod);
     }
 
     @Override
@@ -169,11 +165,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           }
         }
 
-        String res = null;
-        Map<String, String> trs = getTranslations(locale);
-        if (trs != null) {
-          res = trs.get(method.toString());
-        }
+        String res = findTranslationFromAnnotations(method, locale);
         if (null == res) {
           return conf.getUntranslatedMessageString(proxiedClass, method, args);
         }
@@ -187,12 +179,20 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       return null;
     }
 
-    private String format(String message, Locale locale, Method method, Object... args){
+    private String findTranslationFromAnnotations(Method method, Locale locale) {
+      Map<Locale, String> translationsByLocale = translationsByMethod.get(method.toString());
+      if (null != translationsByLocale) {
+        return translationsByLocale.get(localeMapping.findClosestMatch(translationsByLocale.keySet(), locale));
+      }
+      return null;
+    }
+
+    private String format(String message, Locale locale, Method method, Object... args) {
       Annotation[][] argAnnotations = method.getParameterAnnotations();
       Class[] argTypes = method.getParameterTypes();
-      if(args != null && args.length > 0){
+      if (args != null && args.length > 0) {
         Object[] filteredArgs = new Object[args.length];
-        for(int i=0; i<args.length; i++){
+        for (int i = 0; i < args.length; i++) {
           Annotation[] annotations = argAnnotations != null ? argAnnotations[i] : NO_ANNOTATIONS;
           filteredArgs[i] = applyArgFilterIfExists(annotations, argTypes[i], args[i]);
         }
@@ -203,16 +203,16 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
 
     private Object applyArgFilterIfExists(Annotation[] annotations, Class argType, Object arg) {
       //1. Look for first filter matching any of the annotations
-      for(Annotation annotation : annotations){
+      for (Annotation annotation : annotations) {
         C10NFilterProvider<Object> filter = findFilterFor(argType, annotation.annotationType());
-        if(null != filter){
+        if (null != filter) {
           //filter found, look no further
           return filter.get().apply(arg);
         }
       }
       //2. Try annotation-less filter binding
       C10NFilterProvider<Object> filter = findFilterFor(argType, null);
-      if(null != filter){
+      if (null != filter) {
         return filter.get().apply(arg);
       }
       //3. No filter found, return argument as-is
@@ -221,12 +221,8 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
 
     @SuppressWarnings("unchecked")
     private C10NFilterProvider<Object> findFilterFor(Class argType, Class<? extends Annotation> annotationClass) {
-      return (C10NFilterProvider<Object>)filters
-                    .get(new AnnotatedClass(argType, annotationClass));
-    }
-
-    private Map<String, String> getTranslations(Locale locale) {
-      return translationsByLocale.get(localeMapping.findClosestMatch(availableLocales, locale));
+      return (C10NFilterProvider<Object>) filters
+              .get(new AnnotatedClass(argType, annotationClass));
     }
   }
 }

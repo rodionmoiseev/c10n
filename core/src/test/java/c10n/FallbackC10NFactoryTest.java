@@ -19,12 +19,25 @@
 
 package c10n;
 
+import c10n.annotations.DefaultC10NAnnotations;
+import c10n.annotations.En;
+import c10n.annotations.Ja;
+import c10n.share.util.RuleUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class FallbackC10NFactoryTest {
+  @Rule
+  public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+  @Rule
+  public TestRule tmpLocale = RuleUtils.tmpLocale();
+
   @Test
   public void messageDeclaredInAnnotationIsFallenBackOnto() {
     assertThat(C10N.get(WithFallback.class).message(),
@@ -51,6 +64,32 @@ public class FallbackC10NFactoryTest {
     assertThat(msg.greet("World"), is("Hello, World!"));
     assertThat(msg.noDefaultValue("value", "value2"),
             is("WithArguments.noDefaultValue(\"value\", \"value2\")"));
+  }
+
+  @Test
+  public void fallbackToEnglishTranslationWorksOnPartiallyTranslatedInterfaces() {
+    C10N.configure(new C10NConfigBase() {
+
+      @Override
+      protected void configure() {
+        install(new DefaultC10NAnnotations());
+        bindAnnotation(En.class);//fallback to @En
+      }
+    });
+
+    Locale.setDefault(Locale.JAPANESE);
+    Messages msg = C10N.get(Messages.class);
+    assertThat(msg.greeting1(), is("konnichiwa"));
+    assertThat(msg.greeting2(), is("fallback"));
+  }
+
+  interface Messages {
+    @En("hello")
+    @Ja("konnichiwa")
+    String greeting1();
+
+    @En("fallback")
+    String greeting2();
   }
 }
 
