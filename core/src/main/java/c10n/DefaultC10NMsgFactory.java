@@ -161,7 +161,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           ReflectionUtils.getDefaultKey(proxiedClass, method, sb);
           String key = sb.toString();
           if (bundle.containsKey(key)) {
-            return format(bundle.getString(key), locale, method, args);
+            return format(bundle.getString(key), method, args);
           }
         }
 
@@ -169,7 +169,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
         if (null == res) {
           return conf.getUntranslatedMessageString(proxiedClass, method, args);
         }
-        return format(res, locale, method, args);
+        return format(res, method, args);
       } else if (returnType.isInterface()) {
         if (null != returnType.getAnnotation(C10NMessages.class)) {
           return c10nFactory.get(returnType);
@@ -187,7 +187,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       return null;
     }
 
-    private String format(String message, Locale locale, Method method, Object... args) {
+    private String format(String message, Method method, Object... args) {
       Annotation[][] argAnnotations = method.getParameterAnnotations();
       Class[] argTypes = method.getParameterTypes();
       if (args != null && args.length > 0) {
