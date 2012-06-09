@@ -39,6 +39,18 @@ public class RuleUtils {
     return new TmpLocale(tmpLocale);
   }
 
+  public static UsingTmpDir tmpDir(String testDirName) {
+    return new UsingTmpDir(testDirName);
+  }
+
+  public static UsingTmpDir tmpDir(Class<?> clazz) {
+    return new UsingTmpDir(clazz);
+  }
+
+  public static UsingTmpDir tmpDir() {
+    return new UsingTmpDir();
+  }
+
   private static final class TmpC10NConfiguration extends ExternalResource {
     @Override
     protected void after() {

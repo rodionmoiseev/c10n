@@ -19,6 +19,8 @@
 
 package c10n.annotations;
 
+import c10n.C10N;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -32,5 +34,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Ja {
-  String value();
+  String value() default C10N.UNDEF;
+
+  String extRes() default C10N.UNDEF;
 }

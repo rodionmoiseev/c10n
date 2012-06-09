@@ -29,6 +29,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         c10n.annotations.AllTests.class,
         c10n.guice.AllTests.class,
+        c10n.resources.AllTests.class,
         c10n.share.AllTests.class,
         AnnotationBindingConfigurationErrorTest.class,
         C10NConfigBaseInstallTest.class,

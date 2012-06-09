@@ -22,10 +22,17 @@ package c10n;
 import c10n.share.LocaleMapping;
 import c10n.share.utils.ReflectionUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.CharBuffer;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +41,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class DefaultC10NMsgFactory implements C10NMsgFactory {
   private final ConfiguredC10NModule conf;
@@ -105,8 +114,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           Annotation a = m.getAnnotation(annotationClass);
           if (null != a) {
             try {
-              String translation = String.valueOf(annotationClass
-                      .getMethod("value").invoke(a));
+              String translation = getAnnotationValue(c10nInterface, annotationClass, a);
               Map<Locale, String> translationsByLocale = translationsByMethod.get(m.toString());
               if (null == translationsByLocale) {
                 translationsByLocale = new HashMap<Locale, String>();
@@ -123,6 +131,8 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
               throw new RuntimeException("Annotation "
                       + annotationClass.getName()
                       + " must declare value() method");
+            } catch (RuntimeException e) {
+              throw e;
             } catch (Exception e) {
               throw new RuntimeException(
                       "Could not call value() on annotation "
@@ -134,6 +144,74 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
 
       return new C10NInvocationHandler(c10nFactory, conf, localeMapping, c10nInterface,
               translationsByMethod);
+    }
+
+    private static String getAnnotationValue(Class<?> c10nInterface,
+                                             Class<? extends Annotation> annotationClass,
+                                             Annotation a)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+      Object valueTranslation = annotationClass.getMethod("value").invoke(a);
+      if (valueTranslation.equals(C10N.UNDEF)) {
+        //check for external resource declarations
+        Object extRes = annotationClass.getMethod("extRes").invoke(a);
+        if (extRes.equals(C10N.UNDEF)) {
+          throw new RuntimeException("One of @" + annotationClass.getSimpleName() + " annotations on the " +
+                  c10nInterface.getCanonicalName() + " class does not have any of 'value' or 'extRes' specified.");
+        }
+        return readTextFromUrl(replaceSystemProps(String.valueOf(extRes)));
+      }
+      return String.valueOf(valueTranslation);
+    }
+
+    private static String replaceSystemProps(String string) {
+      if (null == string) {
+        return null;
+      }
+      String res = string;
+      Pattern p = Pattern.compile("\\$\\{.*?\\}");
+      Matcher m = p.matcher(string);
+      while (m.find()) {
+        String prop = string.substring(m.start() + 2, m.end() - 1);
+        String propValue = System.getProperty(prop);
+        if (propValue != null) {
+          res = res.replace("${" + prop + "}", propValue);
+        }
+      }
+      return res;
+    }
+
+    private static String readTextFromUrl(String urlString) {
+      try {
+        URL url = new URL(urlString);
+        BufferedReader br = null;
+        try {
+          try {
+            br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF8"), 1024 * 8);
+            CharBuffer buf = CharBuffer.allocate(64);
+            int read;
+            do {
+              read = br.read(buf);
+              if (read == 0 && !buf.hasRemaining()) {
+                CharBuffer newBuf = CharBuffer.allocate(buf.capacity() * 2);
+                buf.flip();
+                newBuf.put(buf);
+                buf = newBuf;
+              }
+            } while (read != -1);
+
+            buf.flip();
+            return buf.toString();
+          } finally {
+            if (null != br) {
+              br.close();
+            }
+          }
+        } catch (IOException e) {
+          throw new RuntimeException("Failed to read text data from URL: " + urlString, e);
+        }
+      } catch (MalformedURLException e) {
+        throw new RuntimeException("Could not interpret external resource URL: " + urlString, e);
+      }
     }
 
     @Override

@@ -19,6 +19,8 @@
 
 package c10n;
 
+import c10n.annotations.DefaultC10NAnnotations;
+import c10n.annotations.En;
 import c10n.share.util.RuleUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -89,6 +91,15 @@ public class AnnotationBindingConfigurationErrorTest {
     });
   }
 
+  @Test
+  public void annotationsWithNoDefaultValueSpecifiedThrowException() {
+    thrown.expect(RuntimeException.class);
+    thrown.expectMessage("@En");
+    thrown.expectMessage(Messages.class.getCanonicalName());
+    C10N.configure(new DefaultC10NAnnotations());
+    C10N.get(Messages.class);
+  }
+
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   public @interface NoValueMethod {
@@ -104,5 +115,11 @@ public class AnnotationBindingConfigurationErrorTest {
   @Retention(RetentionPolicy.RUNTIME)
   public @interface Eng {
     String value();
+  }
+
+  public interface Messages {
+    @SuppressWarnings("UnusedDeclaration")
+    @En
+    String illegal();
   }
 }
