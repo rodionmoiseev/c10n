@@ -74,7 +74,6 @@ import java.util.Locale;
  * @author rodion
  */
 public final class C10N {
-  public static final String UNDEF = "__C10N_UNDEF__";
   /**
    * <p>Classloader to use for loading c10n-interface proxies</p>
    */

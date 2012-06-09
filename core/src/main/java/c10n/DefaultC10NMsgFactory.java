@@ -19,6 +19,7 @@
 
 package c10n;
 
+import c10n.share.Constants;
 import c10n.share.LocaleMapping;
 import c10n.share.utils.ReflectionUtils;
 
@@ -151,10 +152,10 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                                              Annotation a)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
       Object valueTranslation = annotationClass.getMethod("value").invoke(a);
-      if (valueTranslation.equals(C10N.UNDEF)) {
+      if (valueTranslation.equals(Constants.UNDEF)) {
         //check for external resource declarations
         Object extRes = annotationClass.getMethod("extRes").invoke(a);
-        if (extRes.equals(C10N.UNDEF)) {
+        if (extRes.equals(Constants.UNDEF)) {
           throw new RuntimeException("One of @" + annotationClass.getSimpleName() + " annotations on the " +
                   c10nInterface.getCanonicalName() + " class does not have any of 'value' or 'extRes' specified.");
         }
