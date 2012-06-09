@@ -123,6 +123,27 @@ public class ExternalResourceTest {
     C10N.get(MalformedUrl.class);
   }
 
+  @Test
+  public void internalResourceTest() {
+    C10N.configure(new DefaultC10NAnnotations());
+    InternalMessages msg = C10N.get(InternalMessages.class);
+
+    Locale.setDefault(Locale.ENGLISH);
+    assertThat(msg.fromInJarTextFile(), is("Internal resource test!\r\nenglish.txt"));
+
+    Locale.setDefault(Locale.JAPANESE);
+    assertThat(msg.fromInJarTextFile(), is("内部リソーステスト!\r\njapanese.txt"));
+  }
+
+  @Test
+  public void internalResourceThrowsExceptionWhenFileIsNotFound() {
+    thrown.expect(RuntimeException.class);
+    thrown.expectMessage("c10n/does/not/exist.txt");
+    thrown.expectMessage("does not exist");
+    C10N.configure(new DefaultC10NAnnotations());
+    C10N.get(NonExistingInternalResource.class).nonExistingFile();
+  }
+
   private HttpServer serveTextOverHttp(final String text, String path, int port) throws IOException {
     HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
     HttpHandler handler = new HttpHandler() {
@@ -155,7 +176,19 @@ public class ExternalResourceTest {
   }
 
   interface MalformedUrl {
+    @SuppressWarnings("UnusedDeclaration")
     @En(extRes = "invalid://url")
     String illegal();
+  }
+
+  interface InternalMessages {
+    @En(intRes = "c10n/text/english.txt")
+    @Ja(intRes = "c10n/text/japanese.txt")
+    String fromInJarTextFile();
+  }
+
+  interface NonExistingInternalResource {
+    @En(intRes = "c10n/does/not/exist.txt")
+    String nonExistingFile();
   }
 }

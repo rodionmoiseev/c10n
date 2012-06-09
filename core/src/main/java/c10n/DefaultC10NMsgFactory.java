@@ -25,6 +25,7 @@ import c10n.share.utils.ReflectionUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -156,8 +157,13 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
         //check for external resource declarations
         Object extRes = annotationClass.getMethod("extRes").invoke(a);
         if (extRes.equals(Constants.UNDEF)) {
-          throw new RuntimeException("One of @" + annotationClass.getSimpleName() + " annotations on the " +
-                  c10nInterface.getCanonicalName() + " class does not have any of 'value' or 'extRes' specified.");
+          Object intRes = annotationClass.getMethod("intRes").invoke(a);
+          if (intRes.equals(Constants.UNDEF)) {
+            throw new RuntimeException("One of @" + annotationClass.getSimpleName() + " annotations on the " +
+                    c10nInterface.getCanonicalName() +
+                    " class does not have any of 'value' or 'extRes' or 'intRes' specified.");
+          }
+          return readTextFromInternalResource(replaceSystemProps(String.valueOf(intRes)));
         }
         return readTextFromUrl(replaceSystemProps(String.valueOf(extRes)));
       }
@@ -184,27 +190,14 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     private static String readTextFromUrl(String urlString) {
       try {
         URL url = new URL(urlString);
-        BufferedReader br = null;
+        InputStream is = null;
         try {
           try {
-            br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF8"), 1024 * 8);
-            CharBuffer buf = CharBuffer.allocate(64);
-            int read;
-            do {
-              read = br.read(buf);
-              if (read == 0 && !buf.hasRemaining()) {
-                CharBuffer newBuf = CharBuffer.allocate(buf.capacity() * 2);
-                buf.flip();
-                newBuf.put(buf);
-                buf = newBuf;
-              }
-            } while (read != -1);
-
-            buf.flip();
-            return buf.toString();
+            is = url.openStream();
+            return readTextFromInputStream(is);
           } finally {
-            if (null != br) {
-              br.close();
+            if (is != null) {
+              is.close();
             }
           }
         } catch (IOException e) {
@@ -213,6 +206,43 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       } catch (MalformedURLException e) {
         throw new RuntimeException("Could not interpret external resource URL: " + urlString, e);
       }
+    }
+
+    private static String readTextFromInternalResource(String path) {
+      InputStream is = null;
+      try {
+        try {
+          is = C10N.class.getClassLoader().getResourceAsStream(path);
+          if (null == is) {
+            throw new RuntimeException("Internal resource: " + path + " does not exist");
+          }
+          return readTextFromInputStream(is);
+        } finally {
+          if (null != is) {
+            is.close();
+          }
+        }
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to read text data from internal resource: " + path, e);
+      }
+    }
+
+    private static String readTextFromInputStream(InputStream is) throws IOException {
+      BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF8"), 1024 * 8);
+      CharBuffer buf = CharBuffer.allocate(64);
+      int read;
+      do {
+        read = br.read(buf);
+        if (read == 0 && !buf.hasRemaining()) {
+          CharBuffer newBuf = CharBuffer.allocate(buf.capacity() * 2);
+          buf.flip();
+          newBuf.put(buf);
+          buf = newBuf;
+        }
+      } while (read != -1);
+
+      buf.flip();
+      return buf.toString();
     }
 
     @Override

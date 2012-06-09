@@ -37,4 +37,6 @@ public @interface Ru {
   String value() default Constants.UNDEF;
 
   String extRes() default Constants.UNDEF;
+
+  String intRes() default Constants.UNDEF;
 }
