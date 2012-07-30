@@ -41,154 +41,155 @@ import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.util.Locale;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author rodion
  */
 public class ExternalResourceTest {
-  @Rule
-  public UsingTmpDir tmp = RuleUtils.tmpDir("ExtResTest");
-  @Rule
-  public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
-  @Rule
-  public TestRule tmpLocale = RuleUtils.tmpLocale();
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
+    private static final String NL = System.getProperty("line.separator");
+    @Rule
+    public UsingTmpDir tmp = RuleUtils.tmpDir("ExtResTest");
+    @Rule
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+    @Rule
+    public TestRule tmpLocale = RuleUtils.tmpLocale();
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-  @Test
-  public void loadingExternalResource() throws IOException {
-    C10N.configure(new DefaultC10NAnnotations());
+    @Test
+    public void loadingExternalResource() throws IOException {
+        C10N.configure(new DefaultC10NAnnotations());
 
-    File englishText = new File(tmp.dir, "english.txt");
-    FileUtils.writeStringToFile(englishText, "hello\nworld!");
+        File englishText = new File(tmp.dir, "english.txt");
+        FileUtils.writeStringToFile(englishText, "hello" + NL + "world!");
 
-    File japaneseText = new File(tmp.dir, "japanese.txt");
-    FileUtils.writeStringToFile(japaneseText, "konnichiwa\nworld!");
+        File japaneseText = new File(tmp.dir, "japanese.txt");
+        FileUtils.writeStringToFile(japaneseText, "konnichiwa" + NL + "world!");
 
-    ExtMessages msg = C10N.get(ExtMessages.class);
+        ExtMessages msg = C10N.get(ExtMessages.class);
 
-    Locale.setDefault(Locale.ENGLISH);
-    assertThat(msg.fromTextFile(), is("hello\nworld!"));
-    assertThat(msg.normalText(), is("english"));
+        Locale.setDefault(Locale.ENGLISH);
+        assertThat(msg.fromTextFile(), is("hello" + NL + "world!"));
+        assertThat(msg.normalText(), is("english"));
 
-    Locale.setDefault(Locale.JAPANESE);
-    assertThat(msg.fromTextFile(), is("konnichiwa\nworld!"));
-    assertThat(msg.normalText(), is("japanese"));
-  }
-
-  @Test
-  public void largeText() throws IOException {
-    C10N.configure(new DefaultC10NAnnotations());
-    File englishText = new File(tmp.dir, "english.txt");
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < 1024; i++) {
-      sb.append(i);
-      sb.append(" hello\nworld!\n");
+        Locale.setDefault(Locale.JAPANESE);
+        assertThat(msg.fromTextFile(), is("konnichiwa" + NL + "world!"));
+        assertThat(msg.normalText(), is("japanese"));
     }
-    FileUtils.writeStringToFile(englishText, sb.toString());
 
-    ExtMessages msg = C10N.get(ExtMessages.class);
-    Locale.setDefault(Locale.ENGLISH);
-    assertThat(msg.fromTextFile(), is(sb.toString()));
-  }
+    @Test
+    public void largeText() throws IOException {
+        C10N.configure(new DefaultC10NAnnotations());
+        File englishText = new File(tmp.dir, "english.txt");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 1024; i++) {
+            sb.append(i);
+            sb.append(" hello" + NL + "world!" + NL);
+        }
+        FileUtils.writeStringToFile(englishText, sb.toString());
 
-  @Test
-  public void httpResourceTest() throws Exception {
-    final String text = "hello\nhttp\nworld!";
-    final String path = "/english.txt";
-    final int port = 50800;
-    HttpServer httpServer = serveTextOverHttp(text, path, port);
-
-    try {
-      httpServer.start();
-
-      C10N.configure(new DefaultC10NAnnotations());
-      HttpMessages msg = C10N.get(HttpMessages.class);
-      Locale.setDefault(Locale.ENGLISH);
-      assertThat(msg.textOverHttp(), is(text));
-
-    } finally {
-      httpServer.stop(0);
+        ExtMessages msg = C10N.get(ExtMessages.class);
+        Locale.setDefault(Locale.ENGLISH);
+        assertThat(msg.fromTextFile(), is(sb.toString()));
     }
-  }
 
-  @Test
-  public void malformedUrlThrowsRuntimeException() {
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Could not interpret external resource URL: invalid://url");
-    C10N.configure(new DefaultC10NAnnotations());
-    Locale.setDefault(Locale.ENGLISH);
-    C10N.get(MalformedUrl.class);
-  }
+    @Test
+    public void httpResourceTest() throws Exception {
+        final String text = "hello" + NL + "http" + NL + "world!";
+        final String path = "/english.txt";
+        final int port = 50800;
+        HttpServer httpServer = serveTextOverHttp(text, path, port);
 
-  @Test
-  public void internalResourceTest() {
-    C10N.configure(new DefaultC10NAnnotations());
-    InternalMessages msg = C10N.get(InternalMessages.class);
+        try {
+            httpServer.start();
 
-    Locale.setDefault(Locale.ENGLISH);
-    assertThat(msg.fromInJarTextFile(), is("Internal resource test!\r\nenglish.txt"));
+            C10N.configure(new DefaultC10NAnnotations());
+            HttpMessages msg = C10N.get(HttpMessages.class);
+            Locale.setDefault(Locale.ENGLISH);
+            assertThat(msg.textOverHttp(), is(text));
 
-    Locale.setDefault(Locale.JAPANESE);
-    assertThat(msg.fromInJarTextFile(), is("内部リソーステスト!\r\njapanese.txt"));
-  }
+        } finally {
+            httpServer.stop(0);
+        }
+    }
 
-  @Test
-  public void internalResourceThrowsExceptionWhenFileIsNotFound() {
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("c10n/does/not/exist.txt");
-    thrown.expectMessage("does not exist");
-    C10N.configure(new DefaultC10NAnnotations());
-    C10N.get(NonExistingInternalResource.class).nonExistingFile();
-  }
+    @Test
+    public void malformedUrlThrowsRuntimeException() {
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("Could not interpret external resource URL: invalid://url");
+        C10N.configure(new DefaultC10NAnnotations());
+        Locale.setDefault(Locale.ENGLISH);
+        C10N.get(MalformedUrl.class);
+    }
 
-  private HttpServer serveTextOverHttp(final String text, String path, int port) throws IOException {
-    HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
-    HttpHandler handler = new HttpHandler() {
-      @Override
-      public void handle(HttpExchange exchange) throws IOException {
-        byte[] response = text.getBytes();
-        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK,
-                response.length);
-        exchange.getResponseBody().write(response);
-        exchange.close();
-      }
-    };
-    httpServer.createContext(path, handler);
-    return httpServer;
-  }
+    @Test
+    public void internalResourceTest() {
+        C10N.configure(new DefaultC10NAnnotations());
+        InternalMessages msg = C10N.get(InternalMessages.class);
 
-  interface ExtMessages {
-    @En(extRes = "file:///${java.io.tmpdir}/ExtResTest/english.txt")
-    @Ja(extRes = "file:///${java.io.tmpdir}/ExtResTest/japanese.txt")
-    String fromTextFile();
+        Locale.setDefault(Locale.ENGLISH);
+        assertThat(msg.fromInJarTextFile(), is("Internal resource test!" + NL + "english.txt"));
 
-    @En("english")
-    @Ja("japanese")
-    String normalText();
-  }
+        Locale.setDefault(Locale.JAPANESE);
+        assertThat(msg.fromInJarTextFile(), is("内部リソーステスト!" + NL + "japanese.txt"));
+    }
 
-  interface HttpMessages {
-    @En(extRes = "http://localhost:50800/english.txt")
-    String textOverHttp();
-  }
+    @Test
+    public void internalResourceThrowsExceptionWhenFileIsNotFound() {
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("c10n/does/not/exist.txt");
+        thrown.expectMessage("does not exist");
+        C10N.configure(new DefaultC10NAnnotations());
+        C10N.get(NonExistingInternalResource.class).nonExistingFile();
+    }
 
-  interface MalformedUrl {
-    @SuppressWarnings("UnusedDeclaration")
-    @En(extRes = "invalid://url")
-    String illegal();
-  }
+    private HttpServer serveTextOverHttp(final String text, String path, int port) throws IOException {
+        HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
+        HttpHandler handler = new HttpHandler() {
+            @Override
+            public void handle(HttpExchange exchange) throws IOException {
+                byte[] response = text.getBytes();
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK,
+                        response.length);
+                exchange.getResponseBody().write(response);
+                exchange.close();
+            }
+        };
+        httpServer.createContext(path, handler);
+        return httpServer;
+    }
 
-  interface InternalMessages {
-    @En(intRes = "c10n/text/english.txt")
-    @Ja(intRes = "c10n/text/japanese.txt")
-    String fromInJarTextFile();
-  }
+    interface ExtMessages {
+        @En(extRes = "file:///${java.io.tmpdir}/ExtResTest/english.txt")
+        @Ja(extRes = "file:///${java.io.tmpdir}/ExtResTest/japanese.txt")
+        String fromTextFile();
 
-  interface NonExistingInternalResource {
-    @En(intRes = "c10n/does/not/exist.txt")
-    String nonExistingFile();
-  }
+        @En("english")
+        @Ja("japanese")
+        String normalText();
+    }
+
+    interface HttpMessages {
+        @En(extRes = "http://localhost:50800/english.txt")
+        String textOverHttp();
+    }
+
+    interface MalformedUrl {
+        @SuppressWarnings("UnusedDeclaration")
+        @En(extRes = "invalid://url")
+        String illegal();
+    }
+
+    interface InternalMessages {
+        @En(intRes = "c10n/text/english.txt")
+        @Ja(intRes = "c10n/text/japanese.txt")
+        String fromInJarTextFile();
+    }
+
+    interface NonExistingInternalResource {
+        @En(intRes = "c10n/does/not/exist.txt")
+        String nonExistingFile();
+    }
 }
