@@ -26,75 +26,97 @@ import org.junit.rules.TestRule;
 
 import java.util.Locale;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 public class ResourceBundleBindingTest {
-  @Rule
-  public TestRule tmpLocale = RuleUtils.tmpLocale(Locale.ENGLISH);
+    @Rule
+    public TestRule tmpLocale = RuleUtils.tmpLocale(Locale.ENGLISH);
 
-  @Rule
-  public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+    @Rule
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
-  @Test
-  public void rootBundleBinding() {
-    C10N.configure(new C10NConfigBase() {
-      @Override
-      public void configure() {
-        bindBundle("c10n.testBundles.TestBundle");
-      }
-    });
-    Labels labels = C10N.get(Labels.class);
-    assertThat(labels.greeting(), is("Hello, World!"));
-    assertThat(labels.argGreeting("C10N"), is("Hello, C10N!"));
-  }
+    @Test
+    public void rootBundleBinding() {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindBundle("c10n.testBundles.TestBundle");
+            }
+        });
+        Labels labels = C10N.get(Labels.class);
+        assertThat(labels.greeting(), is("Hello, World!"));
+        assertThat(labels.argGreeting("C10N"), is("Hello, C10N!"));
+    }
 
-  @Test
-  public void bundlesExplicitlyBoundToOtherClassesDoNotMatch() {
-    C10N.configure(new C10NConfigBase() {
-      @Override
-      public void configure() {
-        bindBundle("c10n.testBundles.TestBundle")
-                .to(Buttons.class);
-      }
-    });
-    Labels labels = C10N.get(Labels.class);
-    assertThat(labels.greeting(), is("Labels.greeting"));
+    @Test
+    public void bundlesExplicitlyBoundToOtherClassesDoNotMatch() {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindBundle("c10n.testBundles.TestBundle")
+                        .to(Buttons.class);
+            }
+        });
+        Labels labels = C10N.get(Labels.class);
+        assertThat(labels.greeting(), is("Labels.greeting"));
 
-    Buttons buttons = C10N.get(Buttons.class);
-    assertThat(buttons.ok(), is("OK!"));
-  }
+        Buttons buttons = C10N.get(Buttons.class);
+        assertThat(buttons.ok(), is("OK!"));
+    }
 
-  @Test
-  public void multiLanguageBundleBinding() {
-    C10N.configure(new C10NConfigBase() {
-      @Override
-      public void configure() {
-        bindBundle("c10n.testBundles.TestBundle");
-      }
-    });
-    Labels labels = C10N.get(Labels.class);
-    Buttons buttons = C10N.get(Buttons.class);
+    @Test
+    public void multiLanguageBundleBinding() {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindBundle("c10n.testBundles.TestBundle");
+            }
+        });
+        Labels labels = C10N.get(Labels.class);
+        Buttons buttons = C10N.get(Buttons.class);
 
-    Locale.setDefault(Locale.JAPANESE);
-    assertThat(labels.greeting(), is("こんにちは世界!"));
-    assertThat(labels.argGreeting("C10N"), is("こんにちはC10N!"));
-    assertThat(buttons.ok(), is("はい"));
+        Locale.setDefault(Locale.JAPANESE);
+        assertThat(labels.greeting(), is("こんにちは世界!"));
+        assertThat(labels.argGreeting("C10N"), is("こんにちはC10N!"));
+        assertThat(buttons.ok(), is("はい"));
 
-    Locale.setDefault(Locale.ENGLISH);
-    assertThat(labels.greeting(), is("Hello, World!"));
-    assertThat(labels.argGreeting("C10N"), is("Hello, C10N!"));
-    assertThat(buttons.ok(), is("OK!"));
-  }
+        Locale.setDefault(Locale.ENGLISH);
+        assertThat(labels.greeting(), is("Hello, World!"));
+        assertThat(labels.argGreeting("C10N"), is("Hello, C10N!"));
+        assertThat(buttons.ok(), is("OK!"));
+    }
 
-  interface Labels {
+    @Test
+    public void bundleKeysAreGeneratedBasedOnTheClassTheMethodIsDeclaredIn() {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindBundle("c10n.testBundles.TestBundle");
+            }
+        });
+        ExtLabels labels = C10N.get(ExtLabels.class);
 
-    String greeting();
+        Locale.setDefault(Locale.JAPANESE);
+        assertThat(labels.greeting(), is("こんにちは世界!"));
+        assertThat(labels.argGreeting("C10N"), is("こんにちはC10N!"));
 
-    String argGreeting(String who);
-  }
+        Locale.setDefault(Locale.ENGLISH);
+        assertThat(labels.greeting(), is("Hello, World!"));
+        assertThat(labels.argGreeting("C10N"), is("Hello, C10N!"));
+    }
 
-  interface Buttons {
-    String ok();
-  }
+    interface Labels {
+
+        String greeting();
+
+        String argGreeting(String who);
+    }
+
+    interface ExtLabels extends Labels {
+    }
+
+    interface Buttons {
+        String ok();
+    }
 }

@@ -31,7 +31,7 @@ public final class ReflectionUtils {
   }
 
   public static void getDefaultKey(Class<?> clazz, Method method, StringBuilder sb) {
-    getFQNString(clazz, sb);
+    getFQNString(method.getDeclaringClass(), sb);
     sb.append('.').append(method.getName());
 
     Class<?>[] params = method.getParameterTypes();
