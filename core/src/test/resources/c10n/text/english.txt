@@ -1,2 +1,2 @@
 Internal resource test!
-english.txt
+english.txt {0}

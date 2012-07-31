@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.text.MessageFormat;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -71,11 +72,11 @@ public class ExternalResourceTest {
         ExtMessages msg = C10N.get(ExtMessages.class);
 
         Locale.setDefault(Locale.ENGLISH);
-        assertThat(msg.fromTextFile(), is("hello" + NL + "world!"));
+        assertThat(msg.fromTextFile("substitute"), is("hello" + NL + "world!"));
         assertThat(msg.normalText(), is("english"));
 
         Locale.setDefault(Locale.JAPANESE);
-        assertThat(msg.fromTextFile(), is("konnichiwa" + NL + "world!"));
+        assertThat(msg.fromTextFile("substitute"), is("konnichiwa" + NL + "world!"));
         assertThat(msg.normalText(), is("japanese"));
     }
 
@@ -86,13 +87,13 @@ public class ExternalResourceTest {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 1024; i++) {
             sb.append(i);
-            sb.append(" hello" + NL + "world!" + NL);
+            sb.append(" hello" + NL + "world! {0}" + NL);
         }
         FileUtils.writeStringToFile(englishText, sb.toString());
 
         ExtMessages msg = C10N.get(ExtMessages.class);
         Locale.setDefault(Locale.ENGLISH);
-        assertThat(msg.fromTextFile(), is(sb.toString()));
+        assertThat(msg.fromTextFile("substitute"), is(MessageFormat.format(sb.toString(), "substitute")));
     }
 
     @Test
@@ -130,10 +131,10 @@ public class ExternalResourceTest {
         InternalMessages msg = C10N.get(InternalMessages.class);
 
         Locale.setDefault(Locale.ENGLISH);
-        assertThat(msg.fromInJarTextFile(), is("Internal resource test!" + NL + "english.txt"));
+        assertThat(msg.fromInJarTextFile("substitute"), is("Internal resource test!" + NL + "english.txt substitute"));
 
         Locale.setDefault(Locale.JAPANESE);
-        assertThat(msg.fromInJarTextFile(), is("内部リソーステスト!" + NL + "japanese.txt"));
+        assertThat(msg.fromInJarTextFile("substitute"), is("内部リソーステスト!" + NL + "japanese.txt"));
     }
 
     @Test
@@ -164,7 +165,7 @@ public class ExternalResourceTest {
     interface ExtMessages {
         @En(extRes = "file:///${java.io.tmpdir}/ExtResTest/english.txt")
         @Ja(extRes = "file:///${java.io.tmpdir}/ExtResTest/japanese.txt")
-        String fromTextFile();
+        String fromTextFile(String arg);
 
         @En("english")
         @Ja("japanese")
@@ -185,7 +186,7 @@ public class ExternalResourceTest {
     interface InternalMessages {
         @En(intRes = "c10n/text/english.txt")
         @Ja(intRes = "c10n/text/japanese.txt")
-        String fromInJarTextFile();
+        String fromInJarTextFile(String arg);
     }
 
     interface NonExistingInternalResource {
