@@ -19,6 +19,8 @@
 
 package c10n;
 
+import c10n.share.Constants;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,6 +41,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface C10NDef {
     String value();
+
+    String extRes() default Constants.UNDEF;
+
+    String intRes() default Constants.UNDEF;
 
     boolean raw() default false;
 }
