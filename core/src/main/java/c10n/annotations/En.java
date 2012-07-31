@@ -22,11 +22,7 @@ package c10n.annotations;
 
 import c10n.share.Constants;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Annotation bound to {@link java.util.Locale#ENGLISH} locale
@@ -35,11 +31,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface En {
-  String value() default Constants.UNDEF;
+    String value() default Constants.UNDEF;
 
-  String extRes() default Constants.UNDEF;
+    String extRes() default Constants.UNDEF;
 
-  String intRes() default Constants.UNDEF;
+    String intRes() default Constants.UNDEF;
 
-  boolean raw() default false;
+    boolean raw() default false;
 }

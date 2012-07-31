@@ -35,79 +35,79 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author rodion
  */
 public class ConfigChainResolverTest {
-  @Rule
-  public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+    @Rule
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
-  @Test
-  public void resolveInterfaceInSamePackageAsThatOfParentConfig() {
-    assertThat(resolveFor(ParentInterface.class), is(asList("ParentConfig")));
-  }
-
-  @Test
-  public void resolveInterfaceInPackageAsThatOfNestedConfig() {
-    assertThat(resolveFor(Sub1Interface.class), is(asList("Sub1Config", "Sub1Config2", "ParentConfig")));
-  }
-
-  @Test
-  public void resolveInterfaceInSubPackageAsThatOfNestedConfig() {
-    assertThat(resolveFor(Sub11Interface.class), is(asList("Sub1Config", "Sub1Config2", "ParentConfig")));
-  }
-
-  @Test
-  public void resolveInterfaceInSamePackageAsThatOfDoubleNestedConfig() {
-    assertThat(resolveFor(Sub12Interface.class), is(asList("Sub12Config", "Sub1Config", "Sub1Config2", "ParentConfig")));
-  }
-
-  @Test
-  public void defaultAnnotationConfigAlwaysAppearsAtTheBottomOfTheHierarchy() {
-    assertThat(resolveFor(new ParentConfigWithDefault(), Sub11Interface.class),
-            is(asList("Sub1Config", "Sub1Config2", "ParentConfigWithDefault", "DefaultC10NAnnotations")));
-  }
-
-  private List<String> resolveFor(Class<?> c10nInterface) {
-    return resolveFor(new ParentConfig(), c10nInterface);
-  }
-
-  private List<String> resolveFor(C10NConfigBase parent, Class<?> c10nInterface) {
-    C10N.configure(parent);
-
-    ConfigChainResolver resolver = create(parent);
-    List<C10NConfigBase> chain = resolver.resolve(c10nInterface);
-    List<String> names = new ArrayList<String>();
-    for (C10NConfigBase config : chain) {
-      names.add(config.getClass().getSimpleName());
+    @Test
+    public void resolveInterfaceInSamePackageAsThatOfParentConfig() {
+        assertThat(resolveFor(ParentInterface.class), is(asList("ParentConfig")));
     }
-    return names;
-  }
 
-  private ConfigChainResolver create(C10NConfigBase parent) {
-    return new DefaultConfigChainResolver(parent);
-  }
-
-  static class ParentConfig extends C10NConfigBase {
-    @Override
-    protected void configure() {
-      install(new Sub1Config());
-      install(new Sub1Config2());
+    @Test
+    public void resolveInterfaceInPackageAsThatOfNestedConfig() {
+        assertThat(resolveFor(Sub1Interface.class), is(asList("Sub1Config", "Sub1Config2", "ParentConfig")));
     }
-  }
 
-  static class ParentConfigWithDefault extends C10NConfigBase {
-    @Override
-    protected void configure() {
-      install(new DefaultC10NAnnotations());
-      install(new Sub1Config());
-      install(new Sub1Config2());
+    @Test
+    public void resolveInterfaceInSubPackageAsThatOfNestedConfig() {
+        assertThat(resolveFor(Sub11Interface.class), is(asList("Sub1Config", "Sub1Config2", "ParentConfig")));
     }
-  }
 
-  interface ParentInterface {
-  }
+    @Test
+    public void resolveInterfaceInSamePackageAsThatOfDoubleNestedConfig() {
+        assertThat(resolveFor(Sub12Interface.class), is(asList("Sub12Config", "Sub1Config", "Sub1Config2", "ParentConfig")));
+    }
+
+    @Test
+    public void defaultAnnotationConfigAlwaysAppearsAtTheBottomOfTheHierarchy() {
+        assertThat(resolveFor(new ParentConfigWithDefault(), Sub11Interface.class),
+                is(asList("Sub1Config", "Sub1Config2", "ParentConfigWithDefault", "DefaultC10NAnnotations")));
+    }
+
+    private List<String> resolveFor(Class<?> c10nInterface) {
+        return resolveFor(new ParentConfig(), c10nInterface);
+    }
+
+    private List<String> resolveFor(C10NConfigBase parent, Class<?> c10nInterface) {
+        C10N.configure(parent);
+
+        ConfigChainResolver resolver = create(parent);
+        List<C10NConfigBase> chain = resolver.resolve(c10nInterface);
+        List<String> names = new ArrayList<String>();
+        for (C10NConfigBase config : chain) {
+            names.add(config.getClass().getSimpleName());
+        }
+        return names;
+    }
+
+    private ConfigChainResolver create(C10NConfigBase parent) {
+        return new DefaultConfigChainResolver(parent);
+    }
+
+    static class ParentConfig extends C10NConfigBase {
+        @Override
+        protected void configure() {
+            install(new Sub1Config());
+            install(new Sub1Config2());
+        }
+    }
+
+    static class ParentConfigWithDefault extends C10NConfigBase {
+        @Override
+        protected void configure() {
+            install(new DefaultC10NAnnotations());
+            install(new Sub1Config());
+            install(new Sub1Config2());
+        }
+    }
+
+    interface ParentInterface {
+    }
 }

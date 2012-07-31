@@ -74,60 +74,62 @@ import java.util.Locale;
  * @author rodion
  */
 public final class C10N {
-  /**
-   * <p>Classloader to use for loading c10n-interface proxies</p>
-   */
-  private static ClassLoader proxyClassloader = C10N.class.getClassLoader();
+    /**
+     * <p>Classloader to use for loading c10n-interface proxies</p>
+     */
+    private static ClassLoader proxyClassloader = C10N.class.getClassLoader();
 
-  //DI
-  private static final C10NCoreModule coreModule = new C10NCoreModule();
-  private static C10NMsgFactory root = coreModule.defaultC10NMsgFactory();
+    //DI
+    private static final C10NCoreModule coreModule = new C10NCoreModule();
+    private static C10NMsgFactory root = coreModule.defaultC10NMsgFactory();
 
-  /**
-   * Internal locale object used as a fallback when current locale does not
-   * match any of the user-defined locale mappings.
-   */
-  public static final Locale FALLBACK_LOCALE = Locale.ROOT;
+    /**
+     * Internal locale object used as a fallback when current locale does not
+     * match any of the user-defined locale mappings.
+     */
+    public static final Locale FALLBACK_LOCALE = Locale.ROOT;
 
-  @SuppressWarnings("unused")
-  public static C10NMsgFactory getRootFactory() {
-    return root;
-  }
-
-  public static void setRootFactory(C10NMsgFactory newRoot) {
-    root = newRoot;
-  }
-
-  public static <T> T get(Class<T> c10nInterface) {
-    return root.get(c10nInterface);
-  }
-
-  public static void configure(C10NConfigBase conf) {
-    root = coreModule.defaultC10NMsgFactory(conf);
-  }
-
-  /**
-   * <p>Overrides the classloader used for loading c10n-interface proxies.
-   * This maybe useful in the context of hot-swapping enabled classloaders, like
-   * the one for Play framework 2.0</p>
-   *
-   * <p>Overriding should be done before any calls to {@link C10N#get(Class)}, to be effective.</p>
-   *
-   * <p>By default, the classloader of {@link c10n.C10N#getClass()} class is used.</p>
-   * @param classloader the classloader to use for loading c10n-interface proxies (not-null)
-   */
-  public static void setProxyClassloader(ClassLoader classloader){
-    if(null == classloader){
-      throw new IllegalArgumentException("classloader is null");
+    @SuppressWarnings("unused")
+    public static C10NMsgFactory getRootFactory() {
+        return root;
     }
-    proxyClassloader = classloader;
-  }
 
-  /**
-   * Get the instance of the classloader currently used for loading c10n-interface proxies.
-   * @return classloader instance (not-null)
-   */
-  public static ClassLoader getProxyClassloader(){
-    return proxyClassloader;
-  }
+    public static void setRootFactory(C10NMsgFactory newRoot) {
+        root = newRoot;
+    }
+
+    public static <T> T get(Class<T> c10nInterface) {
+        return root.get(c10nInterface);
+    }
+
+    public static void configure(C10NConfigBase conf) {
+        root = coreModule.defaultC10NMsgFactory(conf);
+    }
+
+    /**
+     * <p>Overrides the classloader used for loading c10n-interface proxies.
+     * This maybe useful in the context of hot-swapping enabled classloaders, like
+     * the one for Play framework 2.0</p>
+     * <p/>
+     * <p>Overriding should be done before any calls to {@link C10N#get(Class)}, to be effective.</p>
+     * <p/>
+     * <p>By default, the classloader of {@link c10n.C10N#getClass()} class is used.</p>
+     *
+     * @param classloader the classloader to use for loading c10n-interface proxies (not-null)
+     */
+    public static void setProxyClassloader(ClassLoader classloader) {
+        if (null == classloader) {
+            throw new IllegalArgumentException("classloader is null");
+        }
+        proxyClassloader = classloader;
+    }
+
+    /**
+     * Get the instance of the classloader currently used for loading c10n-interface proxies.
+     *
+     * @return classloader instance (not-null)
+     */
+    public static ClassLoader getProxyClassloader() {
+        return proxyClassloader;
+    }
 }

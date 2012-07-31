@@ -23,9 +23,9 @@ package c10n.share.utils;
  * @author rodion
  */
 public final class Preconditions {
-  public static void assertNotNull(Object val, String valName) {
-    if (null == val) {
-      throw new IllegalArgumentException(valName + " is null");
+    public static void assertNotNull(Object val, String valName) {
+        if (null == val) {
+            throw new IllegalArgumentException(valName + " is null");
+        }
     }
-  }
 }

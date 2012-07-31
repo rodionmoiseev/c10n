@@ -25,59 +25,59 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
-* @author rodion
-*/
+ * @author rodion
+ */
 final class EnumMappingFilter<E extends Enum<?>> implements C10NFilter<E> {
-  private final Object enumC10NInterfaceInstance;
-  private final Map<Enum<?>, Method> c10nInfMethodMapping;
+    private final Object enumC10NInterfaceInstance;
+    private final Map<Enum<?>, Method> c10nInfMethodMapping;
 
-  EnumMappingFilter(Class<E> enumClass, Class<?> c10nInterface) {
-    this.enumC10NInterfaceInstance = C10N.get(c10nInterface);
-    this.c10nInfMethodMapping = genMapping(enumClass, c10nInterface);
-  }
-
-  private static <E extends Enum<?>> Map<Enum<?>, Method> genMapping(Class<E> enumClass, Class<?> enumC10NInterface) {
-    Map<String, Method> allMethods = new HashMap<String, Method>();
-    for (Method m : enumC10NInterface.getMethods()) {
-      allMethods.put(m.getName().toLowerCase(), m);
+    EnumMappingFilter(Class<E> enumClass, Class<?> c10nInterface) {
+        this.enumC10NInterfaceInstance = C10N.get(c10nInterface);
+        this.c10nInfMethodMapping = genMapping(enumClass, c10nInterface);
     }
 
-    Map<Enum<?>, Method> res = new HashMap<Enum<?>, Method>();
-
-    for (Enum<?> enumValue : enumClass.getEnumConstants()) {
-      //1. Check of methods for pattern: ClassName_EnumValue()
-      Method m = allMethods.get(enumClass.getSimpleName().toLowerCase() + "_" + enumValue.name().toLowerCase());
-      if (null == m || !noArgMethod(m) || !returnsObject(m)) {
-        //no good ...
-        //2. Check for methods for pattern: EnumValue()
-        m = allMethods.get(enumValue.name().toLowerCase());
-        if (null == m || !noArgMethod(m) || !returnsObject(m)) {
-          throw new IllegalStateException("method mapping for " +
-                  enumClass.getSimpleName() + "." + enumValue.name() + " was not found!!");
+    private static <E extends Enum<?>> Map<Enum<?>, Method> genMapping(Class<E> enumClass, Class<?> enumC10NInterface) {
+        Map<String, Method> allMethods = new HashMap<String, Method>();
+        for (Method m : enumC10NInterface.getMethods()) {
+            allMethods.put(m.getName().toLowerCase(), m);
         }
-      }
-      res.put(enumValue, m);
+
+        Map<Enum<?>, Method> res = new HashMap<Enum<?>, Method>();
+
+        for (Enum<?> enumValue : enumClass.getEnumConstants()) {
+            //1. Check of methods for pattern: ClassName_EnumValue()
+            Method m = allMethods.get(enumClass.getSimpleName().toLowerCase() + "_" + enumValue.name().toLowerCase());
+            if (null == m || !noArgMethod(m) || !returnsObject(m)) {
+                //no good ...
+                //2. Check for methods for pattern: EnumValue()
+                m = allMethods.get(enumValue.name().toLowerCase());
+                if (null == m || !noArgMethod(m) || !returnsObject(m)) {
+                    throw new IllegalStateException("method mapping for " +
+                            enumClass.getSimpleName() + "." + enumValue.name() + " was not found!!");
+                }
+            }
+            res.put(enumValue, m);
+        }
+        return res;
     }
-    return res;
-  }
 
-  private static boolean returnsObject(Method m) {
-    return !m.getReturnType().equals(Void.TYPE);
-  }
-
-  private static boolean noArgMethod(Method m) {
-    Class[] paramTypes = m.getParameterTypes();
-    return paramTypes == null || paramTypes.length == 0;
-  }
-
-  @Override
-  public Object apply(E arg) {
-    Method m = c10nInfMethodMapping.get(arg);
-    try {
-      return m.invoke(enumC10NInterfaceInstance);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to dispatch invocation to " +
-              m.getDeclaringClass().getSimpleName() + "." + m.getName() + "() method.", e);
+    private static boolean returnsObject(Method m) {
+        return !m.getReturnType().equals(Void.TYPE);
     }
-  }
+
+    private static boolean noArgMethod(Method m) {
+        Class[] paramTypes = m.getParameterTypes();
+        return paramTypes == null || paramTypes.length == 0;
+    }
+
+    @Override
+    public Object apply(E arg) {
+        Method m = c10nInfMethodMapping.get(arg);
+        try {
+            return m.invoke(enumC10NInterfaceInstance);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to dispatch invocation to " +
+                    m.getDeclaringClass().getSimpleName() + "." + m.getName() + "() method.", e);
+        }
+    }
 }

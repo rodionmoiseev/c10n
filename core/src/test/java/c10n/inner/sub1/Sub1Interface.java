@@ -26,6 +26,6 @@ import c10n.annotations.De;
  * @author rodion
  */
 public interface Sub1Interface {
-  @De("german1")
-  String deMessage();
+    @De("german1")
+    String deMessage();
 }

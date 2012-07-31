@@ -30,38 +30,38 @@ import java.io.File;
 /**
  * @author rodion
  */
-public class UsingTmpDir extends ExternalResource{
-  public final File dir;
+public class UsingTmpDir extends ExternalResource {
+    public final File dir;
 
-  public static File systemTmpDir(String childFolder){
-    return new File(System.getProperty("java.io.tmpdir"), childFolder);
-  }
+    public static File systemTmpDir(String childFolder) {
+        return new File(System.getProperty("java.io.tmpdir"), childFolder);
+    }
 
-  public UsingTmpDir(){
-    this(systemTmpDir("JavaTest"));
-  }
+    public UsingTmpDir() {
+        this(systemTmpDir("JavaTest"));
+    }
 
-  public UsingTmpDir(String testDirName){
-      this(systemTmpDir(testDirName));
-  }
+    public UsingTmpDir(String testDirName) {
+        this(systemTmpDir(testDirName));
+    }
 
-  public UsingTmpDir(Class<?> clazz){
-    this(systemTmpDir(clazz.getSimpleName()));
-  }
+    public UsingTmpDir(Class<?> clazz) {
+        this(systemTmpDir(clazz.getSimpleName()));
+    }
 
-  public UsingTmpDir(File tmpDir){
-    this.dir = tmpDir;
-  }
+    public UsingTmpDir(File tmpDir) {
+        this.dir = tmpDir;
+    }
 
-  @Before
-  @Override
-  protected void before() throws Throwable {
-    FileUtils.forceMkdir(dir);
-  }
+    @Before
+    @Override
+    protected void before() throws Throwable {
+        FileUtils.forceMkdir(dir);
+    }
 
-  @After
-  @Override
-  protected void after() {
-    super.after();
-  }
+    @After
+    @Override
+    protected void after() {
+        super.after();
+    }
 }

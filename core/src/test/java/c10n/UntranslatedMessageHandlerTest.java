@@ -24,57 +24,57 @@ import org.junit.Test;
 
 import java.lang.reflect.Method;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author rodion
  */
 public class UntranslatedMessageHandlerTest {
-  private final UntranslatedMessageHandler h = new DefaultUntranslatedMessageHandler();
+    private final UntranslatedMessageHandler h = new DefaultUntranslatedMessageHandler();
 
-  @Test
-  public void noArgs() {
-    assertThat(h.render(Messages.class, noArgsMethod(), new Object[0]), is("Messages.noArgs"));
-  }
-
-  @Test
-  public void withArgs() {
-    assertThat(h.render(Messages.class, withArgsMethod(), new Object[]{"hello", 123}),
-            is("Messages.withArgs(\"hello\", 123)"));
-  }
-
-  @Test
-  public void emptyStringArgumentCheck() {
-    assertThat(h.render(Messages.class, withArgsMethod(), new Object[]{"", -123}),
-            is("Messages.withArgs(\"\", -123)"));
-  }
-
-  @Test
-  public void longArgumentValuesGetTruncatedTo10Chars() {
-    assertThat(h.render(Messages.class, withArgsMethod(), new Object[]{"a very long text message", 123}),
-            is("Messages.withArgs(\"a very lon...\", 123)"));
-  }
-
-  private Method noArgsMethod() {
-    try {
-      return Messages.class.getMethod("noArgs");
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(e);
+    @Test
+    public void noArgs() {
+        assertThat(h.render(Messages.class, noArgsMethod(), new Object[0]), is("Messages.noArgs"));
     }
-  }
 
-  private Method withArgsMethod() {
-    try {
-      return Messages.class.getMethod("withArgs", new Class[]{String.class, Integer.class});
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(e);
+    @Test
+    public void withArgs() {
+        assertThat(h.render(Messages.class, withArgsMethod(), new Object[]{"hello", 123}),
+                is("Messages.withArgs(\"hello\", 123)"));
     }
-  }
 
-  interface Messages {
-    String noArgs();
+    @Test
+    public void emptyStringArgumentCheck() {
+        assertThat(h.render(Messages.class, withArgsMethod(), new Object[]{"", -123}),
+                is("Messages.withArgs(\"\", -123)"));
+    }
 
-    String withArgs(String str, Integer i);
-  }
+    @Test
+    public void longArgumentValuesGetTruncatedTo10Chars() {
+        assertThat(h.render(Messages.class, withArgsMethod(), new Object[]{"a very long text message", 123}),
+                is("Messages.withArgs(\"a very lon...\", 123)"));
+    }
+
+    private Method noArgsMethod() {
+        try {
+            return Messages.class.getMethod("noArgs");
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Method withArgsMethod() {
+        try {
+            return Messages.class.getMethod("withArgs", new Class[]{String.class, Integer.class});
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    interface Messages {
+        String noArgs();
+
+        String withArgs(String str, Integer i);
+    }
 }

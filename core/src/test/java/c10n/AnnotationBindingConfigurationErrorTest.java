@@ -37,89 +37,89 @@ import java.lang.annotation.Target;
  * @author rodion
  */
 public class AnnotationBindingConfigurationErrorTest {
-  @Rule
-  public TestRule tmpConfig = RuleUtils.tmpC10NConfiguration();
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
+    @Rule
+    public TestRule tmpConfig = RuleUtils.tmpC10NConfiguration();
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-  @Test
-  public void nullAnnotationsAreNotAccepted() {
-    thrown.expect(IllegalArgumentException.class);
-    thrown.expectMessage(JUnitMatchers.containsString("is null"));
-    C10N.configure(new C10NConfigBase() {
-      @Override
-      public void configure() {
-        bindAnnotation(null);
-      }
-    });
-  }
+    @Test
+    public void nullAnnotationsAreNotAccepted() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(JUnitMatchers.containsString("is null"));
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindAnnotation(null);
+            }
+        });
+    }
 
-  @Test
-  public void annotationsWithoutValueMethodThrowExceptionAtConfigurationTime() {
-    thrown.expect(C10NConfigException.class);
-    thrown.expectMessage(JUnitMatchers.containsString("value()"));
-    C10N.configure(new C10NConfigBase() {
-      @Override
-      public void configure() {
-        bindAnnotation(NoValueMethod.class);
-      }
-    });
-  }
+    @Test
+    public void annotationsWithoutValueMethodThrowExceptionAtConfigurationTime() {
+        thrown.expect(C10NConfigException.class);
+        thrown.expectMessage(JUnitMatchers.containsString("value()"));
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindAnnotation(NoValueMethod.class);
+            }
+        });
+    }
 
-  @Test
-  public void valueMethodMustReturnStringOrElseExceptionIsThrownAtConfigurationTime() {
-    thrown.expect(C10NConfigException.class);
-    thrown.expectMessage(JUnitMatchers.containsString("value()"));
-    thrown.expectMessage(JUnitMatchers.containsString("String"));
-    C10N.configure(new C10NConfigBase() {
-      @Override
-      public void configure() {
-        bindAnnotation(IntValueMethod.class);
-      }
-    });
-  }
+    @Test
+    public void valueMethodMustReturnStringOrElseExceptionIsThrownAtConfigurationTime() {
+        thrown.expect(C10NConfigException.class);
+        thrown.expectMessage(JUnitMatchers.containsString("value()"));
+        thrown.expectMessage(JUnitMatchers.containsString("String"));
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindAnnotation(IntValueMethod.class);
+            }
+        });
+    }
 
-  @Test
-  public void cannotBindToNullLocale() {
-    thrown.expect(IllegalArgumentException.class);
-    thrown.expectMessage(JUnitMatchers.containsString("locale is null"));
-    C10N.configure(new C10NConfigBase() {
-      @Override
-      public void configure() {
-        bindAnnotation(Eng.class).toLocale(null);
-      }
-    });
-  }
+    @Test
+    public void cannotBindToNullLocale() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(JUnitMatchers.containsString("locale is null"));
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindAnnotation(Eng.class).toLocale(null);
+            }
+        });
+    }
 
-  @Test
-  public void annotationsWithNoDefaultValueSpecifiedThrowException() {
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("@En");
-    thrown.expectMessage(Messages.class.getCanonicalName());
-    C10N.configure(new DefaultC10NAnnotations());
-    C10N.get(Messages.class);
-  }
+    @Test
+    public void annotationsWithNoDefaultValueSpecifiedThrowException() {
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("@En");
+        thrown.expectMessage(Messages.class.getCanonicalName());
+        C10N.configure(new DefaultC10NAnnotations());
+        C10N.get(Messages.class);
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface NoValueMethod {
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface NoValueMethod {
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface IntValueMethod {
-    int value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface IntValueMethod {
+        int value();
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Eng {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Eng {
+        String value();
+    }
 
-  public interface Messages {
-    @SuppressWarnings("UnusedDeclaration")
-    @En
-    String illegal();
-  }
+    public interface Messages {
+        @SuppressWarnings("UnusedDeclaration")
+        @En
+        String illegal();
+    }
 }

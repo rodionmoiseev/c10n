@@ -34,10 +34,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface C10NGenMessages {
-  /**
-   * String representation of the locale instance
-   *
-   * @return
-   */
-  String value();
+    /**
+     * String representation of the locale instance
+     *
+     * @return
+     */
+    String value();
 }

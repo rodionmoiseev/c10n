@@ -26,35 +26,35 @@ import java.lang.reflect.Method;
  * @author rodion
  */
 class DefaultUntranslatedMessageHandler implements UntranslatedMessageHandler {
-  private static final int MAX_ARG_VALUE_LENGTH = 10;
+    private static final int MAX_ARG_VALUE_LENGTH = 10;
 
-  @Override
-  public String render(Class<?> c10nInterface, Method method, Object[] methodArgs) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(c10nInterface.getSimpleName()).append('.');
-    sb.append(method.getName());
-    if (methodArgs != null && methodArgs.length > 0) {
-      sb.append('(');
-      for (int i = 0; i < methodArgs.length; i++) {
-        String argValue = truncate(String.valueOf(methodArgs[i]), MAX_ARG_VALUE_LENGTH);
-        if(methodArgs[i] instanceof String){
-          argValue = "\""+argValue+"\"";
+    @Override
+    public String render(Class<?> c10nInterface, Method method, Object[] methodArgs) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(c10nInterface.getSimpleName()).append('.');
+        sb.append(method.getName());
+        if (methodArgs != null && methodArgs.length > 0) {
+            sb.append('(');
+            for (int i = 0; i < methodArgs.length; i++) {
+                String argValue = truncate(String.valueOf(methodArgs[i]), MAX_ARG_VALUE_LENGTH);
+                if (methodArgs[i] instanceof String) {
+                    argValue = "\"" + argValue + "\"";
+                }
+                sb.append(argValue);
+                if (i + 1 < methodArgs.length) {
+                    sb.append(", ");
+                }
+            }
+            sb.append(')');
         }
-        sb.append(argValue);
-        if (i + 1 < methodArgs.length) {
-          sb.append(", ");
-        }
-      }
-      sb.append(')');
+        return sb.toString();
     }
-    return sb.toString();
-  }
 
-  private static String truncate(String value, int maxChars) {
-    int l = Math.min(value.length(), maxChars);
-    if (l < value.length()) {
-      return value.substring(0, l) + "...";
+    private static String truncate(String value, int maxChars) {
+        int l = Math.min(value.length(), maxChars);
+        if (l < value.length()) {
+            return value.substring(0, l) + "...";
+        }
+        return value;
     }
-    return value;
-  }
 }

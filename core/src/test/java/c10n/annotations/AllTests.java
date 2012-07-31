@@ -20,7 +20,6 @@
 
 package c10n.annotations;
 
-import c10n.guice.GuiceLoaderTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 

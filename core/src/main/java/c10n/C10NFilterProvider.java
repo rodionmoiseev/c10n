@@ -24,5 +24,5 @@ package c10n;
  * @author rodion
  */
 public interface C10NFilterProvider<T> {
-  C10NFilter<T> get();
+    C10NFilter<T> get();
 }

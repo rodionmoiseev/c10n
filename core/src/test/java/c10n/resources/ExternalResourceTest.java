@@ -161,7 +161,7 @@ public class ExternalResourceTest {
         assertThat(msg.rawResource("ignored"), is("This text can contain {} {0} {USER}." + NL + "without any problems!"));
 
         Locale.setDefault(Locale.JAPANESE);
-        assertThat(msg.rawResource("ignored"), is("{} {0} {ユーザー}など含んでいても"+NL+"問題ない!"));
+        assertThat(msg.rawResource("ignored"), is("{} {0} {ユーザー}など含んでいても" + NL + "問題ない!"));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class ExternalResourceTest {
         C10N.configure(new DefaultC10NAnnotations());
 
         File englishText = new File(tmp.dir, "english.txt");
-        FileUtils.writeStringToFile(englishText, "{hello} {}"+NL+"{world}!");
+        FileUtils.writeStringToFile(englishText, "{hello} {}" + NL + "{world}!");
 
         File japaneseText = new File(tmp.dir, "japanese.txt");
         FileUtils.writeStringToFile(japaneseText, "{konnichiwa} {}" + NL + "{world}!");
@@ -177,21 +177,21 @@ public class ExternalResourceTest {
         RawExtMessages msg = C10N.get(RawExtMessages.class);
 
         Locale.setDefault(Locale.ENGLISH);
-        assertThat(msg.fromTextFile("ignored"), is("{hello} {}"+NL+"{world}!"));
+        assertThat(msg.fromTextFile("ignored"), is("{hello} {}" + NL + "{world}!"));
 
         Locale.setDefault(Locale.JAPANESE);
         assertThat(msg.fromTextFile("ignored"), is("{konnichiwa} {}" + NL + "{world}!"));
     }
 
     @Test
-    public void customAnnotationsWithNoIntResOrExtResAndNotValuesSetThrowsAnException(){
+    public void customAnnotationsWithNoIntResOrExtResAndNotValuesSetThrowsAnException() {
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("class does not have any of 'value' or 'extRes' or 'intRes'");
 
         C10N.configure(new C10NConfigBase() {
             @Override
             protected void configure() {
-               bindAnnotation(Custom.class);
+                bindAnnotation(Custom.class);
             }
         });
 
@@ -199,11 +199,11 @@ public class ExternalResourceTest {
     }
 
     @Test
-    public void customAnnotationWithOnlyIntResDeclared(){
+    public void customAnnotationWithOnlyIntResDeclared() {
         C10N.configure(new C10NConfigBase() {
             @Override
             protected void configure() {
-               bindAnnotation(CustomWithIntResOnly.class);
+                bindAnnotation(CustomWithIntResOnly.class);
             }
         });
 
@@ -211,22 +211,22 @@ public class ExternalResourceTest {
                 is("Internal resource test!" + NL + "english.txt {0}"));
     }
 
-  @Test
-  public void customAnnotationWithOnlyExtResDeclared() throws IOException {
-      C10N.configure(new C10NConfigBase() {
-          @Override
-          protected void configure() {
-              bindAnnotation(CustomWithExtResOnly.class);
-          }
-      });
+    @Test
+    public void customAnnotationWithOnlyExtResDeclared() throws IOException {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            protected void configure() {
+                bindAnnotation(CustomWithExtResOnly.class);
+            }
+        });
 
-      File englishText = new File(tmp.dir, "english.txt");
-      FileUtils.writeStringToFile(englishText, "hello, external world!");
+        File englishText = new File(tmp.dir, "english.txt");
+        FileUtils.writeStringToFile(englishText, "hello, external world!");
 
-      assertThat(C10N.get(CustomTest.class).externalResource(), is("hello, external world!"));
-  }
+        assertThat(C10N.get(CustomTest.class).externalResource(), is("hello, external world!"));
+    }
 
-  private HttpServer serveTextOverHttp(final String text, String path, int port) throws IOException {
+    private HttpServer serveTextOverHttp(final String text, String path, int port) throws IOException {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
         HttpHandler handler = new HttpHandler() {
             @Override

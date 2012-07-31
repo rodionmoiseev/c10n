@@ -31,74 +31,74 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Locale;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author rodion
  */
 public class LocaleSelectionTest {
-  @Rule
-  public TestRule tmpLocale = RuleUtils.tmpLocale();
-  @Rule
-  public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+    @Rule
+    public TestRule tmpLocale = RuleUtils.tmpLocale();
+    @Rule
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
-  @Before
-  public void setUp() throws Exception {
-    C10N.configure(new C10NConfigBase() {
-      @Override
-      protected void configure() {
-        bindAnnotation(RuPrecise.class).toLocale(new Locale("ru", "RU", "dialect"));
-        bindAnnotation(RuFallback1.class).toLocale(new Locale("ru", "RU"));
-        bindAnnotation(RuFallback2.class).toLocale(new Locale("ru"));
-        bindAnnotation(Fallback.class);
-      }
-    });
-  }
+    @Before
+    public void setUp() throws Exception {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            protected void configure() {
+                bindAnnotation(RuPrecise.class).toLocale(new Locale("ru", "RU", "dialect"));
+                bindAnnotation(RuFallback1.class).toLocale(new Locale("ru", "RU"));
+                bindAnnotation(RuFallback2.class).toLocale(new Locale("ru"));
+                bindAnnotation(Fallback.class);
+            }
+        });
+    }
 
-  @Test
-  public void preciseMatchAndFallback() {
-    Msg msg = C10N.get(Msg.class);
-    Locale.setDefault(new Locale("ru", "RU", "dialect"));
-    assertThat(msg.greet(), is("precise"));
-    Locale.setDefault(new Locale("ru", "RU", "unknownDialect"));
-    assertThat(msg.greet(), is("fallback1"));
-    Locale.setDefault(new Locale("ru", "UZ"));
-    assertThat(msg.greet(), is("fallback2"));
-    Locale.setDefault(new Locale("en"));
-    assertThat(msg.greet(), is("last resort"));
-  }
+    @Test
+    public void preciseMatchAndFallback() {
+        Msg msg = C10N.get(Msg.class);
+        Locale.setDefault(new Locale("ru", "RU", "dialect"));
+        assertThat(msg.greet(), is("precise"));
+        Locale.setDefault(new Locale("ru", "RU", "unknownDialect"));
+        assertThat(msg.greet(), is("fallback1"));
+        Locale.setDefault(new Locale("ru", "UZ"));
+        assertThat(msg.greet(), is("fallback2"));
+        Locale.setDefault(new Locale("en"));
+        assertThat(msg.greet(), is("last resort"));
+    }
 
-  @C10NMessages
-  interface Msg {
-    @RuPrecise("precise")
-    @RuFallback1("fallback1")
-    @RuFallback2("fallback2")
-    @Fallback("last resort")
-    String greet();
-  }
+    @C10NMessages
+    interface Msg {
+        @RuPrecise("precise")
+        @RuFallback1("fallback1")
+        @RuFallback2("fallback2")
+        @Fallback("last resort")
+        String greet();
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface RuPrecise {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface RuPrecise {
+        String value();
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface RuFallback1 {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface RuFallback1 {
+        String value();
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface RuFallback2 {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface RuFallback2 {
+        String value();
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Fallback {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Fallback {
+        String value();
+    }
 }

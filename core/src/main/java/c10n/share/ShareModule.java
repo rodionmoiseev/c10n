@@ -23,7 +23,7 @@ package c10n.share;
  * @author rodion
  */
 public class ShareModule {
-  public LocaleMapping defaultLocaleMapping(){
-    return new DefaultLocaleMapping();
-  }
+    public LocaleMapping defaultLocaleMapping() {
+        return new DefaultLocaleMapping();
+    }
 }

@@ -27,47 +27,46 @@ import org.junit.Test;
 
 import java.util.Locale;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author rodion
  */
 public class LocaleProviderTest {
-  @Test
-  public void defaultLocaleIsFetchedFromTheGivenLocaleProvider() {
-    final MyLocaleProvider lc = new MyLocaleProvider();
-    C10N.configure(new C10NConfigBase() {
-      @Override
-      protected void configure() {
-        install(new DefaultC10NAnnotations());
-        setLocaleProvider(lc);
-      }
-    });
+    @Test
+    public void defaultLocaleIsFetchedFromTheGivenLocaleProvider() {
+        final MyLocaleProvider lc = new MyLocaleProvider();
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            protected void configure() {
+                install(new DefaultC10NAnnotations());
+                setLocaleProvider(lc);
+            }
+        });
 
-    Buttons msg = C10N.get(Buttons.class);
-    lc.locale = new Locale("ru");
-    assertThat(msg.ok(), is(equalTo("Ugu")));
-    lc.locale = Locale.ENGLISH;
-    assertThat(msg.ok(), is(equalTo("OK")));
-    lc.locale = Locale.JAPANESE;
-    assertThat(msg.ok(), is(equalTo("Hai")));
-  }
-
-  private interface Buttons{
-    @En("OK")
-    @Ru("Ugu")
-    @Ja("Hai")
-    String ok();
-  }
-
-  private static final class MyLocaleProvider implements LocaleProvider {
-    public Locale locale = Locale.getDefault();
-
-    @Override
-    public Locale getLocale() {
-      return locale;
+        Buttons msg = C10N.get(Buttons.class);
+        lc.locale = new Locale("ru");
+        assertThat(msg.ok(), is(equalTo("Ugu")));
+        lc.locale = Locale.ENGLISH;
+        assertThat(msg.ok(), is(equalTo("OK")));
+        lc.locale = Locale.JAPANESE;
+        assertThat(msg.ok(), is(equalTo("Hai")));
     }
-  }
+
+    private interface Buttons {
+        @En("OK")
+        @Ru("Ugu")
+        @Ja("Hai")
+        String ok();
+    }
+
+    private static final class MyLocaleProvider implements LocaleProvider {
+        public Locale locale = Locale.getDefault();
+
+        @Override
+        public Locale getLocale() {
+            return locale;
+        }
+    }
 }

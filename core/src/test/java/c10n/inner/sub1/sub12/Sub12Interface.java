@@ -26,6 +26,6 @@ import c10n.annotations.En;
  * @author rodion
  */
 public interface Sub12Interface {
-  @En("english2")
-  String enMessage();
+    @En("english2")
+    String enMessage();
 }

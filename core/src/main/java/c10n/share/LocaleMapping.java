@@ -26,16 +26,16 @@ import java.util.Set;
  * @author rodion
  */
 public interface LocaleMapping {
-  /**
-   * <p>Find the locale from the given locale set that
-   * is the closes match to the forLocale.</p>
-   * <p/>
-   * <p>Provided the set contains {@link Locale#ROOT}, the
-   * result is guaranteed to be non-null.</p>
-   *
-   * @param fromList  possible locales to pick from
-   * @param forLocale locale to find the closest match for
-   * @return closest locale match from the list, or null.
-   */
-  Locale findClosestMatch(Set<Locale> fromList, Locale forLocale);
+    /**
+     * <p>Find the locale from the given locale set that
+     * is the closes match to the forLocale.</p>
+     * <p/>
+     * <p>Provided the set contains {@link Locale#ROOT}, the
+     * result is guaranteed to be non-null.</p>
+     *
+     * @param fromList  possible locales to pick from
+     * @param forLocale locale to find the closest match for
+     * @return closest locale match from the list, or null.
+     */
+    Locale findClosestMatch(Set<Locale> fromList, Locale forLocale);
 }

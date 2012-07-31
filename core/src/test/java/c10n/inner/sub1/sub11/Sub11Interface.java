@@ -27,9 +27,9 @@ import c10n.annotations.Ja;
  * @author rodion
  */
 public interface Sub11Interface {
-  @De("german11")
-  String deMessage();
+    @De("german11")
+    String deMessage();
 
-  @Ja("japanese11")
-  String jaMessage();
+    @Ja("japanese11")
+    String jaMessage();
 }

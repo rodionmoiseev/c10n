@@ -21,8 +21,6 @@ package c10n;
 
 import c10n.inner.PackageLocalInterfaceClient;
 import c10n.share.util.RuleUtils;
-import com.google.inject.matcher.Matchers;
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -32,30 +30,30 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author rodion
  */
 public class PackageLocalInterfaceTest {
-  @Rule
-  public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+    @Rule
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
-  @Test
-  public void packageLocalInterfacesCanBeUsed() {
-    C10N.configure(new C10NConfigBase(){
-      @Override
-      public void configure() {
-        bindAnnotation(Eng.class);
-      }
-    });
-    assertThat(new PackageLocalInterfaceClient().getGreeting(), is("package local text"));
-  }
+    @Test
+    public void packageLocalInterfacesCanBeUsed() {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindAnnotation(Eng.class);
+            }
+        });
+        assertThat(new PackageLocalInterfaceClient().getGreeting(), is("package local text"));
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Eng {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Eng {
+        String value();
+    }
 }

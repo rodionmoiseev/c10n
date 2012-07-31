@@ -29,51 +29,51 @@ import org.junit.rules.TestRule;
 
 import java.util.Locale;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author rodion
  */
 public class DefaultC10NAnnotationsTest {
-  @Rule
-  public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
-  @Rule
-  public TestRule tmpLocale = RuleUtils.tmpLocale();
-  private Msg msg = null;
+    @Rule
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+    @Rule
+    public TestRule tmpLocale = RuleUtils.tmpLocale();
+    private Msg msg = null;
 
-  @Before
-  public void setupDefaultAnnotations(){
-    C10N.configure(new DefaultC10NAnnotations());
-    msg = C10N.get(Msg.class);
-  }
+    @Before
+    public void setupDefaultAnnotations() {
+        C10N.configure(new DefaultC10NAnnotations());
+        msg = C10N.get(Msg.class);
+    }
 
-  @Test
-  public void testDefaultLocales(){
-    assertMsgForLocaleIs(Locale.GERMAN, "de");
-    assertMsgForLocaleIs(Locale.ENGLISH, "en");
-    assertMsgForLocaleIs(Locale.FRENCH, "fr");
-    assertMsgForLocaleIs(Locale.ITALIAN, "it");
-    assertMsgForLocaleIs(Locale.JAPANESE, "ja");
-    assertMsgForLocaleIs(Locale.KOREAN, "ko");
-    assertMsgForLocaleIs(new Locale("ru"), "ru");
-    assertMsgForLocaleIs(Locale.CHINESE, "zh");
-  }
+    @Test
+    public void testDefaultLocales() {
+        assertMsgForLocaleIs(Locale.GERMAN, "de");
+        assertMsgForLocaleIs(Locale.ENGLISH, "en");
+        assertMsgForLocaleIs(Locale.FRENCH, "fr");
+        assertMsgForLocaleIs(Locale.ITALIAN, "it");
+        assertMsgForLocaleIs(Locale.JAPANESE, "ja");
+        assertMsgForLocaleIs(Locale.KOREAN, "ko");
+        assertMsgForLocaleIs(new Locale("ru"), "ru");
+        assertMsgForLocaleIs(Locale.CHINESE, "zh");
+    }
 
-  private void assertMsgForLocaleIs(Locale locale, String expectedMsg){
-    Locale.setDefault(locale);
-    assertThat(msg.msg(), is(expectedMsg));
-  }
+    private void assertMsgForLocaleIs(Locale locale, String expectedMsg) {
+        Locale.setDefault(locale);
+        assertThat(msg.msg(), is(expectedMsg));
+    }
 
-  interface Msg{
-    @De("de")
-    @En("en")
-    @Fr("fr")
-    @It("it")
-    @Ja("ja")
-    @Ko("ko")
-    @Ru("ru")
-    @Zh("zh")
-    String msg();
-  }
+    interface Msg {
+        @De("de")
+        @En("en")
+        @Fr("fr")
+        @It("it")
+        @Ja("ja")
+        @Ko("ko")
+        @Ru("ru")
+        @Zh("zh")
+        String msg();
+    }
 }

@@ -28,29 +28,30 @@ import java.lang.annotation.Target;
  * @author rodion
  */
 public final class LocaleAnnotations {
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Eng {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Eng {
+        String value();
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Jp {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Jp {
+        String value();
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Ru {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Ru {
+        String value();
+    }
 
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Def {
-    String value();
-  }
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Def {
+        String value();
+    }
 
-  private LocaleAnnotations(){}
+    private LocaleAnnotations() {
+    }
 }

@@ -24,5 +24,5 @@ package c10n.share;
  * @author rodion
  */
 public class Constants {
-  public static final String UNDEF = "__C10N_UNDEF__";
+    public static final String UNDEF = "__C10N_UNDEF__";
 }

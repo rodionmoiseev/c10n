@@ -23,11 +23,11 @@ package c10n;
  * @author rodion
  */
 public class C10NException extends RuntimeException {
-  public C10NException(String message) {
-    super(message);
-  }
+    public C10NException(String message) {
+        super(message);
+    }
 
-  public C10NException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public C10NException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

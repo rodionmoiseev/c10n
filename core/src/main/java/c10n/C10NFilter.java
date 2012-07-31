@@ -24,5 +24,5 @@ package c10n;
  * @author rodion
  */
 public interface C10NFilter<T> {
-  Object apply(T arg);
+    Object apply(T arg);
 }

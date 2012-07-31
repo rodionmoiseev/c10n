@@ -23,11 +23,11 @@ package c10n;
  * @author rodion
  */
 public class C10NConfigException extends C10NException {
-  public C10NConfigException(String message) {
-    super(message);
-  }
+    public C10NConfigException(String message) {
+        super(message);
+    }
 
-  public C10NConfigException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public C10NConfigException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

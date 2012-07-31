@@ -26,16 +26,17 @@ import java.util.List;
  * @author rodion
  */
 interface ConfigChainResolver {
-  /**
-   * <p>Resolve all c10n configurations responsible for the specified
-   * c10n interface.</p>
-   *
-   * <p>Configurations are returned in the bottom-up order, that is the
-   * most concrete configuration first, followed by parent configurations.
-   * When multiple configurations exist on the same hierarchy level, they
-   * are returned in alphabetical order of their class name.</p>
-   * @param c10nInterface C10N interface to resolve configurations for (non-null)
-   * @return List of configurations responsible for the given c10n interface
-   */
-  List<C10NConfigBase> resolve(Class<?> c10nInterface);
+    /**
+     * <p>Resolve all c10n configurations responsible for the specified
+     * c10n interface.</p>
+     * <p/>
+     * <p>Configurations are returned in the bottom-up order, that is the
+     * most concrete configuration first, followed by parent configurations.
+     * When multiple configurations exist on the same hierarchy level, they
+     * are returned in alphabetical order of their class name.</p>
+     *
+     * @param c10nInterface C10N interface to resolve configurations for (non-null)
+     * @return List of configurations responsible for the given c10n interface
+     */
+    List<C10NConfigBase> resolve(Class<?> c10nInterface);
 }

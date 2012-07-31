@@ -22,100 +22,92 @@ package c10n;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author rodion
  */
 class DefaultConfiguredC10NModule implements ConfiguredC10NModule {
-  private final C10NConfigBase parentConfig;
-  private final ConfigChainResolver configResolver;
+    private final C10NConfigBase parentConfig;
+    private final ConfigChainResolver configResolver;
 
-  DefaultConfiguredC10NModule(C10NConfigBase parentConfig, ConfigChainResolver configResolver) {
-    this.parentConfig = parentConfig;
-    this.configResolver = configResolver;
-  }
-
-  @Override
-  public Locale getCurrentLocale() {
-    return this.parentConfig.getCurrentLocale();
-  }
-
-  @Override
-  public Map<Class<? extends Annotation>, Set<Locale>> getAnnotationBindings(Class<?> c10nInterface) {
-    Map<Class<? extends Annotation>, Set<Locale>> res = new HashMap<Class<? extends Annotation>, Set<Locale>>();
-    List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
-    Collections.reverse(configChain);
-    for (C10NConfigBase config : configChain) {
-      //config chain is reversed (parent -> .. -> child) to
-      //make sure child configurations overwrite parent ones
-      //to take precedence
-      res.putAll(config.getAnnotationToLocaleMapping());
+    DefaultConfiguredC10NModule(C10NConfigBase parentConfig, ConfigChainResolver configResolver) {
+        this.parentConfig = parentConfig;
+        this.configResolver = configResolver;
     }
-    return res;
-  }
 
-  @Override
-  public Set<Locale> getImplementationBindings(Class<?> c10nInterface) {
-    Set<Locale> res = new HashSet<Locale>();
-    List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
-    for (C10NConfigBase config : configChain) {
-      res.addAll(config.getImplLocales(c10nInterface));
+    @Override
+    public Locale getCurrentLocale() {
+        return this.parentConfig.getCurrentLocale();
     }
-    return res;
-  }
 
-  @Override
-  public Class<?> getImplementationBinding(Class<?> c10nInterface, Locale locale) {
-    List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
-    for (C10NConfigBase config : configChain) {
-      Class<?> impl = config.getBindingForLocale(c10nInterface, locale);
-      if (null != impl) {
-        return impl;
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public List<ResourceBundle> getBundleBindings(Class<?> c10nInterface, Locale locale) {
-    List<ResourceBundle> res = new ArrayList<ResourceBundle>();
-    List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
-    for (C10NConfigBase config : configChain) {
-      res.addAll(config.getBundlesForLocale(c10nInterface, locale));
-    }
-    return res;
-  }
-
-  @Override
-  public Map<AnnotatedClass, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface) {
-    List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
-    Map<AnnotatedClass, C10NFilterProvider<?>> res = new HashMap<AnnotatedClass, C10NFilterProvider<?>>();
-    Collections.reverse(configChain);
-    for (C10NConfigBase config : configChain) {
-      for(C10NConfigBase.C10NFilterBinder<?> filterBinder : config.getFilterBinders()){
-        if(filterBinder.getAnnotatedWith().isEmpty()){
-          res.put(new AnnotatedClass(filterBinder.getType(), null), filterBinder.getFilterProvider());
-        } else {
-          for(Class<? extends Annotation> annotation : filterBinder.getAnnotatedWith()){
-            res.put(new AnnotatedClass(filterBinder.getType(), annotation), filterBinder.getFilterProvider());
-          }
+    @Override
+    public Map<Class<? extends Annotation>, Set<Locale>> getAnnotationBindings(Class<?> c10nInterface) {
+        Map<Class<? extends Annotation>, Set<Locale>> res = new HashMap<Class<? extends Annotation>, Set<Locale>>();
+        List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
+        Collections.reverse(configChain);
+        for (C10NConfigBase config : configChain) {
+            //config chain is reversed (parent -> .. -> child) to
+            //make sure child configurations overwrite parent ones
+            //to take precedence
+            res.putAll(config.getAnnotationToLocaleMapping());
         }
-      }
+        return res;
     }
-    return res;
-  }
 
-  @Override
-  public String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs) {
-    return parentConfig.getUntranslatedMessageString(c10nInterface, method, methodArgs);
-  }
+    @Override
+    public Set<Locale> getImplementationBindings(Class<?> c10nInterface) {
+        Set<Locale> res = new HashSet<Locale>();
+        List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
+        for (C10NConfigBase config : configChain) {
+            res.addAll(config.getImplLocales(c10nInterface));
+        }
+        return res;
+    }
+
+    @Override
+    public Class<?> getImplementationBinding(Class<?> c10nInterface, Locale locale) {
+        List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
+        for (C10NConfigBase config : configChain) {
+            Class<?> impl = config.getBindingForLocale(c10nInterface, locale);
+            if (null != impl) {
+                return impl;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<ResourceBundle> getBundleBindings(Class<?> c10nInterface, Locale locale) {
+        List<ResourceBundle> res = new ArrayList<ResourceBundle>();
+        List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
+        for (C10NConfigBase config : configChain) {
+            res.addAll(config.getBundlesForLocale(c10nInterface, locale));
+        }
+        return res;
+    }
+
+    @Override
+    public Map<AnnotatedClass, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface) {
+        List<C10NConfigBase> configChain = configResolver.resolve(c10nInterface);
+        Map<AnnotatedClass, C10NFilterProvider<?>> res = new HashMap<AnnotatedClass, C10NFilterProvider<?>>();
+        Collections.reverse(configChain);
+        for (C10NConfigBase config : configChain) {
+            for (C10NConfigBase.C10NFilterBinder<?> filterBinder : config.getFilterBinders()) {
+                if (filterBinder.getAnnotatedWith().isEmpty()) {
+                    res.put(new AnnotatedClass(filterBinder.getType(), null), filterBinder.getFilterProvider());
+                } else {
+                    for (Class<? extends Annotation> annotation : filterBinder.getAnnotatedWith()) {
+                        res.put(new AnnotatedClass(filterBinder.getType(), annotation), filterBinder.getFilterProvider());
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs) {
+        return parentConfig.getUntranslatedMessageString(c10nInterface, method, methodArgs);
+    }
 }

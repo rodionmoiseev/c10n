@@ -29,8 +29,8 @@ import java.util.Locale;
  * @author rodion
  */
 public class Sub1Config2 extends C10NConfigBase {
-  @Override
-  protected void configure() {
-    bindAnnotation(Ru.class).toLocale(new Locale("ru"));
-  }
+    @Override
+    protected void configure() {
+        bindAnnotation(Ru.class).toLocale(new Locale("ru"));
+    }
 }

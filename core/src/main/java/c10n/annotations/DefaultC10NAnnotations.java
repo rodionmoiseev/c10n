@@ -27,27 +27,27 @@ import java.util.Locale;
  * @author rodion
  */
 public class DefaultC10NAnnotations extends C10NConfigBase {
-  /**
-   * <p>Always returns an empty package name to make
-   * sure this configuration is always the parent
-   * of all other configurations in the hierarchy</p>
-   *
-   * @return Empty string
-   */
-  @Override
-  protected String getConfigurationPackage() {
-    return "";
-  }
+    /**
+     * <p>Always returns an empty package name to make
+     * sure this configuration is always the parent
+     * of all other configurations in the hierarchy</p>
+     *
+     * @return Empty string
+     */
+    @Override
+    protected String getConfigurationPackage() {
+        return "";
+    }
 
-  @Override
-  protected void configure() {
-    bindAnnotation(En.class).toLocale(Locale.ENGLISH);
-    bindAnnotation(De.class).toLocale(Locale.GERMAN);
-    bindAnnotation(Fr.class).toLocale(Locale.FRENCH);
-    bindAnnotation(It.class).toLocale(Locale.ITALIAN);
-    bindAnnotation(Ja.class).toLocale(Locale.JAPANESE);
-    bindAnnotation(Ko.class).toLocale(Locale.KOREAN);
-    bindAnnotation(Ru.class).toLocale(new Locale("ru"));
-    bindAnnotation(Zh.class).toLocale(Locale.CHINESE);
-  }
+    @Override
+    protected void configure() {
+        bindAnnotation(En.class).toLocale(Locale.ENGLISH);
+        bindAnnotation(De.class).toLocale(Locale.GERMAN);
+        bindAnnotation(Fr.class).toLocale(Locale.FRENCH);
+        bindAnnotation(It.class).toLocale(Locale.ITALIAN);
+        bindAnnotation(Ja.class).toLocale(Locale.JAPANESE);
+        bindAnnotation(Ko.class).toLocale(Locale.KOREAN);
+        bindAnnotation(Ru.class).toLocale(new Locale("ru"));
+        bindAnnotation(Zh.class).toLocale(Locale.CHINESE);
+    }
 }

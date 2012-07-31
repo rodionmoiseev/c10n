@@ -34,18 +34,18 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface C10NGenValue {
-  /**
-   * Translated string value.
-   *
-   * @return
-   */
-  String value();
+    /**
+     * Translated string value.
+     *
+     * @return
+     */
+    String value();
 
-  /**
-   * Whether translated string value actually
-   * appears in the bundle
-   *
-   * @return
-   */
-  boolean defined() default true;
+    /**
+     * Whether translated string value actually
+     * appears in the bundle
+     *
+     * @return
+     */
+    boolean defined() default true;
 }

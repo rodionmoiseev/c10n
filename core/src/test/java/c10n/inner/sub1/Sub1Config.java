@@ -29,10 +29,10 @@ import java.util.Locale;
 /**
  * @author rodion
  */
-public class Sub1Config extends C10NConfigBase{
-  @Override
-  protected void configure() {
-    install(new Sub12Config());
-    bindAnnotation(De.class).toLocale(Locale.GERMAN);
-  }
+public class Sub1Config extends C10NConfigBase {
+    @Override
+    protected void configure() {
+        install(new Sub12Config());
+        bindAnnotation(De.class).toLocale(Locale.GERMAN);
+    }
 }

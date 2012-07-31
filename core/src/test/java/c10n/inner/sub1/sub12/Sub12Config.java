@@ -28,9 +28,9 @@ import java.util.Locale;
 /**
  * @author rodion
  */
-public class Sub12Config extends C10NConfigBase{
-  @Override
-  protected void configure() {
-    bindAnnotation(En.class).toLocale(Locale.UK);
-  }
+public class Sub12Config extends C10NConfigBase {
+    @Override
+    protected void configure() {
+        bindAnnotation(En.class).toLocale(Locale.UK);
+    }
 }

@@ -20,7 +20,7 @@
 package c10n;
 
 class DefaultC10NConfigBase extends C10NConfigBase {
-  @Override
-  public void configure() {
-  }
+    @Override
+    public void configure() {
+    }
 }

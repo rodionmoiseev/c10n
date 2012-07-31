@@ -29,45 +29,45 @@ import java.util.List;
  * @author rodion
  */
 public class DefaultConfigChainResolver implements ConfigChainResolver {
-  private static final Comparator<C10NConfigBase> cmpByConfPkgName = new C10NConfigBaseComparator();
-  private final C10NConfigBase parentConfig;
+    private static final Comparator<C10NConfigBase> cmpByConfPkgName = new C10NConfigBaseComparator();
+    private final C10NConfigBase parentConfig;
 
-  public DefaultConfigChainResolver(C10NConfigBase parentConfig) {
-    this.parentConfig = parentConfig;
-  }
-
-  @Override
-  public List<C10NConfigBase> resolve(Class<?> c10nInterface) {
-    List<C10NConfigBase> res = new ArrayList<C10NConfigBase>();
-    traverse(parentConfig, c10nInterface, res);
-    Collections.sort(res, cmpByConfPkgName);
-    return res;
-  }
-
-  private void traverse(C10NConfigBase config, Class<?> c10nInterface, List<C10NConfigBase> result) {
-    result.add(config);
-    for (C10NConfigBase childConfig : config.getChildConfigs()) {
-      if (isPackageAncestorOf(childConfig, c10nInterface)) {
-        traverse(childConfig, c10nInterface, result);
-      }
+    public DefaultConfigChainResolver(C10NConfigBase parentConfig) {
+        this.parentConfig = parentConfig;
     }
-  }
 
-  private boolean isPackageAncestorOf(C10NConfigBase config, Class<?> c10nInterface) {
-    String c10nPackage = c10nInterface.getPackage().getName();
-    String configPackage = config.getConfigurationPackage();
-    return c10nPackage.startsWith(configPackage);
-  }
-
-  private static final class C10NConfigBaseComparator implements Comparator<C10NConfigBase> {
     @Override
-    public int compare(C10NConfigBase o1, C10NConfigBase o2) {
-      //reverse the comparison order for package names
-      int cmp = -1 * o1.getConfigurationPackage().compareTo(o2.getConfigurationPackage());
-      if (0 == cmp) {
-        cmp = o1.getClass().getSimpleName().compareTo(o2.getClass().getSimpleName());
-      }
-      return cmp;
+    public List<C10NConfigBase> resolve(Class<?> c10nInterface) {
+        List<C10NConfigBase> res = new ArrayList<C10NConfigBase>();
+        traverse(parentConfig, c10nInterface, res);
+        Collections.sort(res, cmpByConfPkgName);
+        return res;
     }
-  }
+
+    private void traverse(C10NConfigBase config, Class<?> c10nInterface, List<C10NConfigBase> result) {
+        result.add(config);
+        for (C10NConfigBase childConfig : config.getChildConfigs()) {
+            if (isPackageAncestorOf(childConfig, c10nInterface)) {
+                traverse(childConfig, c10nInterface, result);
+            }
+        }
+    }
+
+    private boolean isPackageAncestorOf(C10NConfigBase config, Class<?> c10nInterface) {
+        String c10nPackage = c10nInterface.getPackage().getName();
+        String configPackage = config.getConfigurationPackage();
+        return c10nPackage.startsWith(configPackage);
+    }
+
+    private static final class C10NConfigBaseComparator implements Comparator<C10NConfigBase> {
+        @Override
+        public int compare(C10NConfigBase o1, C10NConfigBase o2) {
+            //reverse the comparison order for package names
+            int cmp = -1 * o1.getConfigurationPackage().compareTo(o2.getConfigurationPackage());
+            if (0 == cmp) {
+                cmp = o1.getClass().getSimpleName().compareTo(o2.getClass().getSimpleName());
+            }
+            return cmp;
+        }
+    }
 }

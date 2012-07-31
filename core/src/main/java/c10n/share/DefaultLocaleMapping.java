@@ -27,35 +27,35 @@ import java.util.Set;
  */
 class DefaultLocaleMapping implements LocaleMapping {
 
-  @Override
-  public Locale findClosestMatch(Set<Locale> fromSet, Locale forLocale) {
-    String variant = forLocale.getDisplayVariant();
-    String country = forLocale.getCountry();
-    String language = forLocale.getLanguage();
-    Locale[] c = new Locale[4];
-    if (null != variant && !variant.isEmpty()) {
-      c[0] = forLocale;
+    @Override
+    public Locale findClosestMatch(Set<Locale> fromSet, Locale forLocale) {
+        String variant = forLocale.getDisplayVariant();
+        String country = forLocale.getCountry();
+        String language = forLocale.getLanguage();
+        Locale[] c = new Locale[4];
+        if (null != variant && !variant.isEmpty()) {
+            c[0] = forLocale;
+        }
+        if (null != country && !country.isEmpty()) {
+            c[1] = new Locale(language, country);
+        }
+        if (null != language && !language.isEmpty()) {
+            c[2] = new Locale(language);
+        }
+        c[3] = Locale.ROOT;
+        for (Locale candidateLocale : c) {
+            if (fromSet.contains(candidateLocale)) {
+                return candidateLocale;
+            }
+        }
+        //This code intentionally uses Locale.getDefault()
+        //in order to behave in the same was as the default
+        //resource bundle locale search mechanism.
+        //source: http://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html
+        Locale systemDefaultLocale = Locale.getDefault();
+        if (!systemDefaultLocale.equals(forLocale)) {
+            return findClosestMatch(fromSet, systemDefaultLocale);
+        }
+        return null;
     }
-    if (null != country && !country.isEmpty()) {
-      c[1] = new Locale(language, country);
-    }
-    if (null != language && !language.isEmpty()) {
-      c[2] = new Locale(language);
-    }
-    c[3] = Locale.ROOT;
-    for (Locale candidateLocale : c) {
-      if (fromSet.contains(candidateLocale)) {
-        return candidateLocale;
-      }
-    }
-    //This code intentionally uses Locale.getDefault()
-    //in order to behave in the same was as the default
-    //resource bundle locale search mechanism.
-    //source: http://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html
-    Locale systemDefaultLocale = Locale.getDefault();
-    if (!systemDefaultLocale.equals(forLocale)) {
-      return findClosestMatch(fromSet, systemDefaultLocale);
-    }
-    return null;
-  }
 }

@@ -27,56 +27,56 @@ import org.junit.rules.TestRule;
 import java.util.Locale;
 
 public class RuleUtils {
-  public static TestRule tmpC10NConfiguration() {
-    return new TmpC10NConfiguration();
-  }
-
-  public static TestRule tmpLocale() {
-    return new TmpLocale(null);
-  }
-
-  public static TestRule tmpLocale(Locale tmpLocale) {
-    return new TmpLocale(tmpLocale);
-  }
-
-  public static UsingTmpDir tmpDir(String testDirName) {
-    return new UsingTmpDir(testDirName);
-  }
-
-  public static UsingTmpDir tmpDir(Class<?> clazz) {
-    return new UsingTmpDir(clazz);
-  }
-
-  public static UsingTmpDir tmpDir() {
-    return new UsingTmpDir();
-  }
-
-  private static final class TmpC10NConfiguration extends ExternalResource {
-    @Override
-    protected void after() {
-      C10N.setRootFactory(new C10NCoreModule().defaultC10NMsgFactory());
-    }
-  }
-
-  private static final class TmpLocale extends ExternalResource {
-    private Locale oldLocale = null;
-    private final Locale tmpLocale;
-
-    TmpLocale(Locale tmpLocale) {
-      this.tmpLocale = tmpLocale;
+    public static TestRule tmpC10NConfiguration() {
+        return new TmpC10NConfiguration();
     }
 
-    @Override
-    protected void before() throws Throwable {
-      oldLocale = Locale.getDefault();
-      if (null != tmpLocale) {
-        Locale.setDefault(tmpLocale);
-      }
+    public static TestRule tmpLocale() {
+        return new TmpLocale(null);
     }
 
-    @Override
-    protected void after() {
-      Locale.setDefault(oldLocale);
+    public static TestRule tmpLocale(Locale tmpLocale) {
+        return new TmpLocale(tmpLocale);
     }
-  }
+
+    public static UsingTmpDir tmpDir(String testDirName) {
+        return new UsingTmpDir(testDirName);
+    }
+
+    public static UsingTmpDir tmpDir(Class<?> clazz) {
+        return new UsingTmpDir(clazz);
+    }
+
+    public static UsingTmpDir tmpDir() {
+        return new UsingTmpDir();
+    }
+
+    private static final class TmpC10NConfiguration extends ExternalResource {
+        @Override
+        protected void after() {
+            C10N.setRootFactory(new C10NCoreModule().defaultC10NMsgFactory());
+        }
+    }
+
+    private static final class TmpLocale extends ExternalResource {
+        private Locale oldLocale = null;
+        private final Locale tmpLocale;
+
+        TmpLocale(Locale tmpLocale) {
+            this.tmpLocale = tmpLocale;
+        }
+
+        @Override
+        protected void before() throws Throwable {
+            oldLocale = Locale.getDefault();
+            if (null != tmpLocale) {
+                Locale.setDefault(tmpLocale);
+            }
+        }
+
+        @Override
+        protected void after() {
+            Locale.setDefault(oldLocale);
+        }
+    }
 }

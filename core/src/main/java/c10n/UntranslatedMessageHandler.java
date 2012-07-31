@@ -25,8 +25,9 @@ import java.lang.reflect.Method;
 /**
  * <p>Determines how untranslated c10n interface methods are
  * rendered to String.</p>
+ *
  * @author rodion
  */
 public interface UntranslatedMessageHandler {
-  String render(Class<?> c10nInterface, Method method, Object[] methodArgs);
+    String render(Class<?> c10nInterface, Method method, Object[] methodArgs);
 }

@@ -25,5 +25,5 @@ import java.util.Locale;
  * @author rodion
  */
 public interface LocaleProvider {
-  Locale getLocale();
+    Locale getLocale();
 }
