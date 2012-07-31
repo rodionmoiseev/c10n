@@ -36,13 +36,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.CharBuffer;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,6 +62,24 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
             C10NInvocationHandler.create(this, conf, localeMapping, c10nInterface));
   }
 
+  private static final class C10NString {
+    final String text;
+    final boolean raw;
+
+    public static C10NString def(String text) {
+      return new C10NString(text, false);
+    }
+
+    public static C10NString raw(String text) {
+      return new C10NString(text, true);
+    }
+
+    private C10NString(String text, boolean raw) {
+      this.text = text;
+      this.raw = raw;
+    }
+  }
+
   private static final class C10NInvocationHandler implements
           InvocationHandler {
     private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
@@ -74,7 +87,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     private final ConfiguredC10NModule conf;
     private final LocaleMapping localeMapping;
     private final Class<?> proxiedClass;
-    private final Map<String, Map<Locale, String>> translationsByMethod;
+    private final Map<String, Map<Locale, C10NString>> translationsByMethod;
     //private final Set<Locale> availableLocales;
     private final Set<Locale> availableImplLocales;
     private final Map<AnnotatedClass, C10NFilterProvider<?>> filters;
@@ -83,7 +96,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                           ConfiguredC10NModule conf,
                           LocaleMapping localeMapping,
                           Class<?> proxiedClass,
-                          Map<String, Map<Locale, String>> translationsByMethod) {
+                          Map<String, Map<Locale, C10NString>> translationsByMethod) {
       this.c10nFactory = c10nFactory;
       this.conf = conf;
       this.localeMapping = localeMapping;
@@ -95,15 +108,15 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
 
     static C10NInvocationHandler create(C10NMsgFactory c10nFactory,
                                         ConfiguredC10NModule conf, LocaleMapping localeMapping, Class<?> c10nInterface) {
-      Map<String, Map<Locale, String>> translationsByMethod = new HashMap<String, Map<Locale, String>>();
+      Map<String, Map<Locale, C10NString>> translationsByMethod = new HashMap<String, Map<Locale, C10NString>>();
 
       //Translations defined in @C10NDef annotation are
       //always considered a fallback
       for (Method m : c10nInterface.getMethods()) {
         C10NDef c10nDef = m.getAnnotation(C10NDef.class);
         if (null != c10nDef) {
-          Map<Locale, String> defMapping = new HashMap<Locale, String>();
-          defMapping.put(C10N.FALLBACK_LOCALE, c10nDef.value());
+          Map<Locale, C10NString> defMapping = new HashMap<Locale, C10NString>();
+          defMapping.put(C10N.FALLBACK_LOCALE, C10NString.def(c10nDef.value()));
           translationsByMethod.put(m.toString(), defMapping);
         }
       }
@@ -116,10 +129,10 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           Annotation a = m.getAnnotation(annotationClass);
           if (null != a) {
             try {
-              String translation = getAnnotationValue(c10nInterface, annotationClass, a);
-              Map<Locale, String> translationsByLocale = translationsByMethod.get(m.toString());
+              C10NString translation = getAnnotationValue(c10nInterface, annotationClass, a);
+              Map<Locale, C10NString> translationsByLocale = translationsByMethod.get(m.toString());
               if (null == translationsByLocale) {
-                translationsByLocale = new HashMap<Locale, String>();
+                translationsByLocale = new HashMap<Locale, C10NString>();
                 translationsByMethod.put(m.toString(), translationsByLocale);
               }
               for (Locale locale : entry.getValue()) {
@@ -148,10 +161,11 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
               translationsByMethod);
     }
 
-    private static String getAnnotationValue(Class<?> c10nInterface,
-                                             Class<? extends Annotation> annotationClass,
-                                             Annotation a)
+    private static C10NString getAnnotationValue(Class<?> c10nInterface,
+                                                 Class<? extends Annotation> annotationClass,
+                                                 Annotation a)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+      boolean raw = extractAnnotationValue(annotationClass, "raw", a, false);
       Object valueTranslation = annotationClass.getMethod("value").invoke(a);
       if (valueTranslation.equals(Constants.UNDEF)) {
         //check for external resource declarations
@@ -163,11 +177,26 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                     c10nInterface.getCanonicalName() +
                     " class does not have any of 'value' or 'extRes' or 'intRes' specified.");
           }
-          return readTextFromInternalResource(replaceSystemProps(String.valueOf(intRes)));
+          return new C10NString(readTextFromInternalResource(replaceSystemProps(String.valueOf(intRes))), raw);
         }
-        return readTextFromUrl(replaceSystemProps(String.valueOf(extRes)));
+        return new C10NString(readTextFromUrl(replaceSystemProps(String.valueOf(extRes))), raw);
       }
-      return String.valueOf(valueTranslation);
+      return new C10NString(String.valueOf(valueTranslation), raw);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <R> R extractAnnotationValue(Class<? extends Annotation> annotationClass, String method,
+                                                Annotation annotation, R defaultValue) {
+      try {
+        return (R) annotationClass.getMethod(method).invoke(annotation);
+      } catch (InvocationTargetException e) {
+        return defaultValue;
+      } catch (NoSuchMethodException e) {
+        return defaultValue;
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Failed to extract value of '" + method + "' from annotation" +
+                "class " + annotationClass.getCanonicalName(), e);
+      }
     }
 
     private static String replaceSystemProps(String string) {
@@ -274,7 +303,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
           }
         }
 
-        String res = findTranslationFromAnnotations(method, locale);
+        C10NString res = findTranslationFromAnnotations(method, locale);
         if (null == res) {
           return conf.getUntranslatedMessageString(proxiedClass, method, args);
         }
@@ -288,15 +317,28 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
       return null;
     }
 
-    private String findTranslationFromAnnotations(Method method, Locale locale) {
-      Map<Locale, String> translationsByLocale = translationsByMethod.get(method.toString());
+    private C10NString findTranslationFromAnnotations(Method method, Locale locale) {
+      Map<Locale, C10NString> translationsByLocale = translationsByMethod.get(method.toString());
       if (null != translationsByLocale) {
         return translationsByLocale.get(localeMapping.findClosestMatch(translationsByLocale.keySet(), locale));
       }
       return null;
     }
 
+    private String format(C10NString message, Method method, Object... args) {
+      return format(message.text, message.raw, method, args);
+    }
+
     private String format(String message, Method method, Object... args) {
+      return format(message, false, method, args);
+    }
+
+    private String format(String message, boolean raw, Method method, Object... args) {
+      if (raw) {
+        //Raw messages accept no parameters
+        return message;
+      }
+
       Annotation[][] argAnnotations = method.getParameterAnnotations();
       Class[] argTypes = method.getParameterTypes();
       if (args != null && args.length > 0) {

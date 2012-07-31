@@ -39,4 +39,6 @@ public @interface Zh {
   String extRes() default Constants.UNDEF;
 
   String intRes() default Constants.UNDEF;
+
+  boolean raw() default false;
 }

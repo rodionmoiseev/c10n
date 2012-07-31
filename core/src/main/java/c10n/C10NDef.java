@@ -38,5 +38,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface C10NDef {
-  String value();
+    String value();
+
+    boolean raw() default false;
 }

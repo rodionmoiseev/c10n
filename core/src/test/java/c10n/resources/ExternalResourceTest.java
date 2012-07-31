@@ -146,6 +146,38 @@ public class ExternalResourceTest {
         C10N.get(NonExistingInternalResource.class).nonExistingFile();
     }
 
+    @Test
+    public void parameterisationIsDisabledWhenRawFalseIsPresentForInternalResources() {
+        C10N.configure(new DefaultC10NAnnotations());
+        RawInternalMessages msg = C10N.get(RawInternalMessages.class);
+
+        Locale.setDefault(Locale.ENGLISH);
+        assertThat(msg.rawResource("ignored"), is("This text can contain {} {0} {USER}." + NL + "without any problems!"));
+
+        Locale.setDefault(Locale.JAPANESE);
+        assertThat(msg.rawResource("ignored"), is("{} {0} {ユーザー}など含んでいても"+NL+"問題ない!"));
+    }
+
+    @Test
+    public void parameterisationIsDisabledWhenRawFalseIsPresentForExternalResources() throws IOException {
+        C10N.configure(new DefaultC10NAnnotations());
+
+        File englishText = new File(tmp.dir, "english.txt");
+        FileUtils.writeStringToFile(englishText, "{hello} {}"+NL+"{world}!");
+
+        File japaneseText = new File(tmp.dir, "japanese.txt");
+        FileUtils.writeStringToFile(japaneseText, "{konnichiwa} {}" + NL + "{world}!");
+
+        RawExtMessages msg = C10N.get(RawExtMessages.class);
+
+        Locale.setDefault(Locale.ENGLISH);
+        assertThat(msg.fromTextFile("ignored"), is("{hello} {}"+NL+"{world}!"));
+
+        Locale.setDefault(Locale.JAPANESE);
+        assertThat(msg.fromTextFile("ignored"), is("{konnichiwa} {}" + NL + "{world}!"));
+    }
+
+
     private HttpServer serveTextOverHttp(final String text, String path, int port) throws IOException {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
         HttpHandler handler = new HttpHandler() {
@@ -192,5 +224,17 @@ public class ExternalResourceTest {
     interface NonExistingInternalResource {
         @En(intRes = "c10n/does/not/exist.txt")
         String nonExistingFile();
+    }
+
+    interface RawInternalMessages {
+        @En(intRes = "c10n/text/raw_english.md", raw = true)
+        @Ja(intRes = "c10n/text/raw_japanese.md", raw = true)
+        String rawResource(String argIgnored);
+    }
+
+    interface RawExtMessages {
+        @En(extRes = "file:///${java.io.tmpdir}/ExtResTest/english.txt", raw = true)
+        @Ja(extRes = "file:///${java.io.tmpdir}/ExtResTest/japanese.txt", raw = true)
+        String fromTextFile(String ignored);
     }
 }
