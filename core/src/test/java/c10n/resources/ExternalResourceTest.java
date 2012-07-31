@@ -21,9 +21,11 @@
 package c10n.resources;
 
 import c10n.C10N;
+import c10n.C10NConfigBase;
 import c10n.annotations.DefaultC10NAnnotations;
 import c10n.annotations.En;
 import c10n.annotations.Ja;
+import c10n.share.Constants;
 import c10n.share.util.RuleUtils;
 import c10n.share.util.UsingTmpDir;
 import com.sun.net.httpserver.HttpExchange;
@@ -37,6 +39,10 @@ import org.junit.rules.TestRule;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.text.MessageFormat;
@@ -177,8 +183,50 @@ public class ExternalResourceTest {
         assertThat(msg.fromTextFile("ignored"), is("{konnichiwa} {}" + NL + "{world}!"));
     }
 
+    @Test
+    public void customAnnotationsWithNoIntResOrExtResAndNotValuesSetThrowsAnException(){
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("class does not have any of 'value' or 'extRes' or 'intRes'");
 
-    private HttpServer serveTextOverHttp(final String text, String path, int port) throws IOException {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            protected void configure() {
+               bindAnnotation(Custom.class);
+            }
+        });
+
+        C10N.get(CustomTest.class).customString();
+    }
+
+    @Test
+    public void customAnnotationWithOnlyIntResDeclared(){
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            protected void configure() {
+               bindAnnotation(CustomWithIntResOnly.class);
+            }
+        });
+
+        assertThat(C10N.get(CustomTest.class).internalResource(),
+                is("Internal resource test!" + NL + "english.txt {0}"));
+    }
+
+  @Test
+  public void customAnnotationWithOnlyExtResDeclared() throws IOException {
+      C10N.configure(new C10NConfigBase() {
+          @Override
+          protected void configure() {
+              bindAnnotation(CustomWithExtResOnly.class);
+          }
+      });
+
+      File englishText = new File(tmp.dir, "english.txt");
+      FileUtils.writeStringToFile(englishText, "hello, external world!");
+
+      assertThat(C10N.get(CustomTest.class).externalResource(), is("hello, external world!"));
+  }
+
+  private HttpServer serveTextOverHttp(final String text, String path, int port) throws IOException {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
         HttpHandler handler = new HttpHandler() {
             @Override
@@ -236,5 +284,34 @@ public class ExternalResourceTest {
         @En(extRes = "file:///${java.io.tmpdir}/ExtResTest/english.txt", raw = true)
         @Ja(extRes = "file:///${java.io.tmpdir}/ExtResTest/japanese.txt", raw = true)
         String fromTextFile(String ignored);
+    }
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Custom {
+        String value();
+    }
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface CustomWithIntResOnly {
+        String intRes();
+    }
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface CustomWithExtResOnly {
+        String extRes();
+    }
+
+    interface CustomTest {
+        @Custom(Constants.UNDEF)
+        String customString();
+
+        @CustomWithIntResOnly(intRes = "c10n/text/english.txt")
+        String internalResource();
+
+        @CustomWithExtResOnly(extRes = "file:///${java.io.tmpdir}/ExtResTest/english.txt")
+        String externalResource();
     }
 }

@@ -166,12 +166,12 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                                                  Annotation a)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
       boolean raw = extractAnnotationValue(annotationClass, "raw", a, false);
-      Object valueTranslation = annotationClass.getMethod("value").invoke(a);
+      Object valueTranslation = extractAnnotationValue(annotationClass, "value", a, Constants.UNDEF);
       if (valueTranslation.equals(Constants.UNDEF)) {
         //check for external resource declarations
-        Object extRes = annotationClass.getMethod("extRes").invoke(a);
+        Object extRes = extractAnnotationValue(annotationClass, "extRes", a, Constants.UNDEF);
         if (extRes.equals(Constants.UNDEF)) {
-          Object intRes = annotationClass.getMethod("intRes").invoke(a);
+          Object intRes = extractAnnotationValue(annotationClass, "intRes", a, Constants.UNDEF);
           if (intRes.equals(Constants.UNDEF)) {
             throw new RuntimeException("One of @" + annotationClass.getSimpleName() + " annotations on the " +
                     c10nInterface.getCanonicalName() +
