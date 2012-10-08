@@ -22,6 +22,7 @@ package c10n;
 /**
  * @author rodion
  */
+@SuppressWarnings("serial")
 public class C10NConfigException extends C10NException {
     public C10NConfigException(String message) {
         super(message);

@@ -22,6 +22,7 @@ package c10n;
 /**
  * @author rodion
  */
+@SuppressWarnings("serial")
 public class C10NException extends RuntimeException {
     public C10NException(String message) {
         super(message);

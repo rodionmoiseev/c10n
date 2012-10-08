@@ -38,6 +38,7 @@ public class LocaleMappingTest {
     @Rule
     public TestRule tmpLocale = RuleUtils.tmpLocale();
 
+    @SuppressWarnings("serial")
     private final Set<Locale> candidateLocales = new HashSet<Locale>() {{
         add(new Locale("a", "b", "c"));
         add(new Locale("a", "b", "d"));

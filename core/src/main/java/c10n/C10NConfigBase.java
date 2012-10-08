@@ -416,7 +416,7 @@ public abstract class C10NConfigBase {
          * @param annotation annotation class to restrict filter application to
          * @return this DLS object for method chaining
          */
-        public C10NFilterBinder annotatedWith(Class<? extends Annotation> annotation) {
+        public C10NFilterBinder<T> annotatedWith(Class<? extends Annotation> annotation) {
             this.annotatedWith.add(annotation);
             return this;
         }
