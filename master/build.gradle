@@ -82,6 +82,8 @@ subprojects{
     archives sourcesJar
   }
 
+  test.exclude '**/AllTests.class'
+
   sourceSets.main.compileClasspath += configurations.provided
   eclipse.classpath.plusConfigurations += configurations.provided 
   idea.module.scopes.PROVIDED.plus += configurations.provided
