@@ -58,6 +58,7 @@ subprojects{
 
   sourceCompatibility = '1.6'
   [compileJava,compileTestJava]*.options*.encoding = 'UTF-8'
+  //[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:all']
 
   repositories{
     mavenCentral()
