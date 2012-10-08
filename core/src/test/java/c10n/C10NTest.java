@@ -27,6 +27,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+import java.util.Locale;
+
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -45,6 +47,7 @@ public class C10NTest {
     public void parameterisationIsDisabledWhenRawFalseIsPresent() {
         C10N.configure(new DefaultC10NAnnotations());
         Messages msg = C10N.get(Messages.class);
+        Locale.setDefault(Locale.ENGLISH);
         assertThat(msg.text("ignored"), is("{} {0} {hello}"));
     }
 
