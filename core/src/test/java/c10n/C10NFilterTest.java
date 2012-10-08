@@ -32,9 +32,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -162,40 +160,6 @@ public class C10NFilterTest {
 
     private static final class StatusFilter implements C10NFilter<Status> {
         private final StatusTr statusTr = C10N.get(StatusTr.class);
-
-        @Override
-        public Object apply(Status arg) {
-            switch (arg) {
-                case Open:
-                    return statusTr.open();
-                case Closed:
-                    return statusTr.closed();
-                case Pending:
-                    return statusTr.status_pending();
-                default:
-                    throw new IllegalArgumentException("Unexpected status type: " + arg);
-            }
-        }
-    }
-
-    private static abstract class MapFilter<T> implements C10NFilter<T> {
-        public abstract Map<T, String> mapping();
-
-        @Override
-        public Object apply(T arg) {
-            return mapping().get(arg);
-        }
-    }
-
-    private static final class MapStatusFilter extends MapFilter<Status> {
-        private final StatusTr statusTr = C10N.get(StatusTr.class);
-
-        @Override
-        public Map<Status, String> mapping() {
-            Map<Status, String> map = new HashMap<Status, String>();
-            map.put(Status.Open, statusTr.open());
-            return map;
-        }
 
         @Override
         public Object apply(Status arg) {
