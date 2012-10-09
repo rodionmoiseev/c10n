@@ -23,6 +23,6 @@ mainClassName = 'c10n.tools.codegen.Main'
 
 dependencies{
   compile project(':core')
-  compile group: "org.reflections", name: "reflections", version: "0.9.5"
+  compile group: "org.reflections", name: "reflections", version: "0.9.8"
   compile group: "com.google.code.javaparser", name: "javaparser", version: "1.0.8"
 }
