@@ -21,9 +21,17 @@ package c10n.guice;
 
 import c10n.C10N;
 import c10n.C10NMessages;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Set;
 
 public class C10NModule extends AbstractModule {
@@ -44,11 +52,34 @@ public class C10NModule extends AbstractModule {
   @SuppressWarnings("unchecked")
   @Override
   protected void configure() {
-    Set<Class<?>> c10nTypes = new Reflections(packagePrefixes)
+    Set<Class<?>> c10nTypes =
+            new Reflections(new ConfigurationBuilder().filterInputsBy(getPackageInputFilter()).setUrls(getPackageURLs()))
             .getTypesAnnotatedWith(C10NMessages.class);
     for (Class<?> c10nType : c10nTypes) {
       bind((Class<Object>) c10nType)
               .toInstance(C10N.get(c10nType));
     }
+  }
+
+  private Set<URL> getPackageURLs() {
+    Iterable<URL> packages = Iterables.concat(Iterables.transform(
+            Arrays.asList(packagePrefixes), new Function<String, Set<URL>>() {
+      @Override
+      public Set<URL> apply(String prefix) {
+        return ClasspathHelper.forPackage(prefix);
+      }
+    }));
+
+    return Sets.newHashSet(packages);
+  }
+
+  private FilterBuilder getPackageInputFilter() {
+    final FilterBuilder inputFilter = new FilterBuilder();
+
+    for (String prefix : packagePrefixes) {
+      inputFilter.include(FilterBuilder.prefix(prefix));
+    }
+
+    return inputFilter;
   }
 }
