@@ -150,6 +150,17 @@ public abstract class C10NConfigBase {
     }
 
     /**
+     * <p>Fixes the {@link java.util.Locale} to the specified locale.</p>
+     *
+     * <p>Generally useful when your application needs to create separate
+     * {@link C10NMsgFactory} instances for each locale.</p>
+     * @param locale Locale to use
+     */
+    protected void setLocale(Locale locale){
+        this.localeProvider = new FixedLocaleProvider(locale);
+    }
+
+    /**
      * <p>Customise placeholder value for unresolved translations.</p>
      * <p/>
      * <p>The default behaviour is to return a string in format:
@@ -435,6 +446,23 @@ public abstract class C10NConfigBase {
             }
             return annotatedWith;
 
+        }
+    }
+
+    /**
+     * <p>{@link LocaleProvider} that always returns the given
+     * {@link java.util.Locale} instance.</p>
+     */
+    private static final class FixedLocaleProvider implements LocaleProvider{
+        private final Locale locale;
+
+        FixedLocaleProvider(Locale locale){
+            this.locale = locale;
+        }
+
+        @Override
+        public Locale getLocale() {
+            return locale;
         }
     }
 }

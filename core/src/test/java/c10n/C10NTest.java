@@ -22,6 +22,7 @@ package c10n;
 
 import c10n.annotations.DefaultC10NAnnotations;
 import c10n.annotations.En;
+import c10n.annotations.Ja;
 import c10n.share.util.RuleUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,8 +30,8 @@ import org.junit.rules.TestRule;
 
 import java.util.Locale;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * <p>Created: 7/31/12 11:33 AM</p>
@@ -51,8 +52,33 @@ public class C10NTest {
         assertThat(msg.text("ignored"), is("{} {0} {hello}"));
     }
 
+    @Test
+    public void multipleC10NMsgFactoriesCanBeCreatedAndUsedIndividually() {
+        C10NMsgFactory enC10nFactory = C10N.configure(new C10NConfigBase() {
+            @Override
+            protected void configure() {
+                install(new DefaultC10NAnnotations());
+                setLocale(Locale.ENGLISH);
+            }
+        });
+        assertThat(enC10nFactory.get(Messages.class).text(), is("english"));
+
+        C10NMsgFactory jpC10nFactory = C10N.configure(new C10NConfigBase() {
+            @Override
+            protected void configure() {
+                install(new DefaultC10NAnnotations());
+                setLocale(Locale.JAPANESE);
+            }
+        });
+        assertThat(jpC10nFactory.get(Messages.class).text(), is("japanese"));
+    }
+
     interface Messages {
         @En(value = "{} {0} {hello}", raw = true)
         String text(String ignored);
+
+        @En("english")
+        @Ja("japanese")
+        String text();
     }
 }
