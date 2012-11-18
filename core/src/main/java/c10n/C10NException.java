@@ -22,7 +22,7 @@ package c10n;
 /**
  * @author rodion
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "WeakerAccess"})//rationale: public API
 public class C10NException extends RuntimeException {
     public C10NException(String message) {
         super(message);

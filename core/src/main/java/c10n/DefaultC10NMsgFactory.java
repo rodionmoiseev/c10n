@@ -36,8 +36,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.CharBuffer;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,10 +75,6 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
             return new C10NString(text, false);
         }
 
-        public static C10NString raw(String text) {
-            return new C10NString(text, true);
-        }
-
         private C10NString(String text, boolean raw) {
             this.text = text;
             this.raw = raw;
@@ -91,12 +92,14 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
         //private final Set<Locale> availableLocales;
         private final Set<Locale> availableImplLocales;
         private final Map<AnnotatedClass, C10NFilterProvider<?>> filters;
+        private final Map<Method, String> bundleKeys;
 
         C10NInvocationHandler(C10NMsgFactory c10nFactory,
                               ConfiguredC10NModule conf,
                               LocaleMapping localeMapping,
                               Class<?> proxiedClass,
-                              Map<String, Map<Locale, C10NString>> translationsByMethod) {
+                              Map<String, Map<Locale, C10NString>> translationsByMethod,
+                              Map<Method, String> bundleKeys) {
             this.c10nFactory = c10nFactory;
             this.conf = conf;
             this.localeMapping = localeMapping;
@@ -104,11 +107,13 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
             this.translationsByMethod = translationsByMethod;
             this.availableImplLocales = conf.getImplementationBindings(proxiedClass);
             this.filters = conf.getFilterBindings(proxiedClass);
+            this.bundleKeys = bundleKeys;
         }
 
         static C10NInvocationHandler create(C10NMsgFactory c10nFactory,
                                             ConfiguredC10NModule conf, LocaleMapping localeMapping, Class<?> c10nInterface) {
             Map<String, Map<Locale, C10NString>> translationsByMethod = new HashMap<String, Map<Locale, C10NString>>();
+            Map<Method, String> bundleKeys = new HashMap<Method, String>();
 
             //Translations defined in @C10NDef annotation are
             //always considered a fallback
@@ -119,6 +124,19 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                     defMapping.put(C10N.FALLBACK_LOCALE, C10NString.def(c10nDef.value()));
                     translationsByMethod.put(m.toString(), defMapping);
                 }
+                String key = ReflectionUtils.getC10NKey(m);
+                if (null == key) {
+                    //fallback to default key based on class FQDN and method name
+                    key = ReflectionUtils.getDefaultKey(m);
+                }
+                if (conf.getKeyPrefix().length() > 0) {
+                    key = conf.getKeyPrefix() + "." + key;
+                }
+                if (conf.isDebug()) {
+                    System.out.println("c10n: method " + ReflectionUtils.getDefaultKey(m)
+                            + " was bound to bundle key '" + key + "'");
+                }
+                bundleKeys.put(m, key);
             }
 
             // Process custom bound annotations
@@ -142,10 +160,6 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                             throw new RuntimeException("Annotation "
                                     + annotationClass.getName()
                                     + " value() method is not accessible", e);
-                        } catch (NoSuchMethodException e) {
-                            throw new RuntimeException("Annotation "
-                                    + annotationClass.getName()
-                                    + " must declare value() method");
                         } catch (RuntimeException e) {
                             throw e;
                         } catch (Exception e) {
@@ -157,14 +171,17 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                 }
             }
 
-            return new C10NInvocationHandler(c10nFactory, conf, localeMapping, c10nInterface,
-                    translationsByMethod);
+            return new C10NInvocationHandler(c10nFactory,
+                    conf,
+                    localeMapping,
+                    c10nInterface,
+                    translationsByMethod,
+                    bundleKeys);
         }
 
         private static C10NString getAnnotationValue(Class<?> c10nInterface,
                                                      Class<? extends Annotation> annotationClass,
-                                                     Annotation a)
-                throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+                                                     Annotation a) {
             boolean raw = extractAnnotationValue(annotationClass, "raw", a, false);
             Object valueTranslation = extractAnnotationValue(annotationClass, "value", a, Constants.UNDEF);
             if (valueTranslation.equals(Constants.UNDEF)) {
@@ -295,12 +312,12 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
 
                 List<ResourceBundle> bundles = conf.getBundleBindings(proxiedClass, locale);
                 for (ResourceBundle bundle : bundles) {
-                    StringBuilder sb = new StringBuilder();
-                    ReflectionUtils.getDefaultKey(proxiedClass, method, sb);
-                    String key = sb.toString();
-                    if (bundle.containsKey(key)) {
-                        return format(bundle.getString(key), method, args);
-                    }
+                    String key = bundleKeys.get(method);
+                    if (null != key) {
+                        if (bundle.containsKey(key)) {
+                            return format(bundle.getString(key), method, args);
+                        }
+                    }//else: should never happen!
                 }
 
                 C10NString res = findTranslationFromAnnotations(method, locale);

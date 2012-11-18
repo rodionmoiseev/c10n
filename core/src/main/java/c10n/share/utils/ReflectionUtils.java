@@ -19,20 +19,103 @@
 
 package c10n.share.utils;
 
+import c10n.C10NKey;
+
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 public final class ReflectionUtils {
-    public static String getDefaultKey(Class<?> clazz, Method method) {
+    /**
+     * <p>Work out method's bundle key.</p>
+     * <p/>
+     * <h2>Bundle key resolution</h2>
+     * <p>Bundle key is generated as follows:
+     * <ul>
+     * <li>If there are no {@link C10NKey} annotations, key is the <code>Class FQDN '.' Method Name</code>.
+     * If method has arguments, method name is post-fixed with argument types delimited
+     * with '_', e.g. <code>myMethod_String_int</code></li>
+     * <p/>
+     * <li>If declaring interface or any of the super-interfaces contain {@link C10NKey}
+     * annotation <code>C</code> then
+     * <ul>
+     * <li>For methods without {@link C10NKey} annotation, key becomes <code>C '.' Method Name</code></li>
+     * <li>For methods with {@link C10NKey} annotation <code>M</code>, key is <code>C '.' M</code></li>
+     * <li>For methods with {@link C10NKey} annotation <code>M</code>, value for which starts with
+     * a '.', the key is just <code>M</code> (i.e. key is assumed to be absolute)</li>
+     * </ul>
+     * </li>
+     * <li>If no declaring interfaces have {@link C10NKey} annotation, but a method contains annotation
+     * <code>M</code>, then key is just <code>M</code>.</li>
+     * </ul>
+     * </p>
+     * <p/>
+     * <h2>Looking for c10n key in parent interfaces</h2>
+     * <p>The lookup of c10n key in parent interfaces is done breadth-first, starting from the declaring class.
+     * That is, if the declaring class does not have c10n key, all interfaces it extends are checked in declaration
+     * order first. If no key is found, this check is repeated for each of the super interfaces in the same order.
+     * </p>
+     *
+     * @param method method to extract the key from
+     * @return method c10n bundle key, or null if no {@link C10NKey} annotation were declared
+     */
+    public static String getC10NKey(Method method) {
+        String parentKey = findParentKey(method);
+        C10NKey c10NKey = method.getAnnotation(C10NKey.class);
+        if (null == parentKey && null == c10NKey) {
+            //C10NKey-based key is not available
+            return null;
+        }
+
+        String methodKey;
+        if (null != c10NKey) {
+            methodKey = c10NKey.value();
+            if (methodKey.startsWith(".")) {
+                //found an absolute key. Get rid of the
+                //leading dot and look no further
+                return methodKey.substring(1, methodKey.length());
+            }
+        } else {
+            //method key based on methodName & arguments
+            methodKey = getMethodKey(method);
+        }
+        if (parentKey != null) {
+            return parentKey + "." + methodKey;
+        }
+        return methodKey;
+    }
+
+    /**
+     * <p>Works out the non-{@link C10NKey} bundle key for method, based on its
+     * class FQDN and method name (plus argument types),
+     * e.g. <code>com.myCompany.MyClass.myMethod_String_boolean</code></p>
+     *
+     * @param method the method for which to work out the key(not null)
+     * @return method's default bundle key(not null)
+     */
+    public static String getDefaultKey(Method method) {
         StringBuilder sb = new StringBuilder();
-        getDefaultKey(clazz, method, sb);
+        getDefaultKey(method, sb);
         return sb.toString();
     }
 
-    public static void getDefaultKey(Class<?> clazz, Method method, StringBuilder sb) {
+    public static void getDefaultKey(Method method, StringBuilder sb) {
         getFQNString(method.getDeclaringClass(), sb);
-        sb.append('.').append(method.getName());
+        sb.append('.');
+        getMethodKey(method, sb);
+    }
+
+    private static String getMethodKey(Method method) {
+        StringBuilder sb = new StringBuilder();
+        getMethodKey(method, sb);
+        return sb.toString();
+    }
+
+    private static void getMethodKey(Method method, StringBuilder sb) {
+        sb.append(method.getName());
 
         Class<?>[] params = method.getParameterTypes();
         if (params.length > 0) {
@@ -58,17 +141,49 @@ public final class ReflectionUtils {
     }
 
     private static void getClassFQNString(Class<?> clazz, StringBuilder sb, char delim) {
-        Class<?> parent = clazz;
-        LinkedList<String> typeHierarchy = new LinkedList<String>();
-        do {
-            typeHierarchy.add(parent.getSimpleName());
-        } while ((parent = parent.getEnclosingClass()) != null);
-
-        Iterator<String> it = typeHierarchy.descendingIterator();
+        Iterator<Class<?>> it = typeEnclosureHierarchy(clazz).descendingIterator();
         while (it.hasNext()) {
-            sb.append(it.next());
+            sb.append(it.next().getSimpleName());
             if (it.hasNext()) {
                 sb.append(delim);
+            }
+        }
+    }
+
+    private static String findParentKey(Method method) {
+        for (Class<?> clazz : expandInterfaceHierarchy(method.getDeclaringClass())) {
+            C10NKey key = clazz.getAnnotation(C10NKey.class);
+            if (null != key) {
+                return key.value();
+            }
+        }
+        return null;
+    }
+
+    private static LinkedList<Class<?>> typeEnclosureHierarchy(Class<?> clazz) {
+        LinkedList<Class<?>> typeHierarchy = new LinkedList<Class<?>>();
+        do {
+            typeHierarchy.add(clazz);
+        } while ((clazz = clazz.getEnclosingClass()) != null);
+        return typeHierarchy;
+    }
+
+    /*
+     * Returns a list of super-interface breadth-first.
+     */
+    private static List<Class<?>> expandInterfaceHierarchy(Class<?> clazz) {
+        List<Class<?>> res = new ArrayList<Class<?>>();
+        res.add(clazz);
+        expandInterfaceHierarchy(clazz, res);
+        return res;
+    }
+
+    private static void expandInterfaceHierarchy(Class<?> clazz, List<Class<?>> res) {
+        Class<?>[] intfs = clazz.getInterfaces();
+        if (null != intfs) {
+            Collections.addAll(res, intfs);
+            for (Class<?> intf : intfs) {
+                expandInterfaceHierarchy(intf, res);
             }
         }
     }

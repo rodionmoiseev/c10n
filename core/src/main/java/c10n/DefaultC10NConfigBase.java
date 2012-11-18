@@ -19,6 +19,8 @@
 
 package c10n;
 
+@SuppressWarnings("UnusedDeclaration")
+//rationale: public API
 class DefaultC10NConfigBase extends C10NConfigBase {
     @Override
     public void configure() {

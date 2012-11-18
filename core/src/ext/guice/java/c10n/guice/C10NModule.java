@@ -34,52 +34,53 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
 
+@SuppressWarnings("WeakerAccess")//rationale: public API
 public class C10NModule extends AbstractModule {
-  private final String[] packagePrefixes;
+    private final String[] packagePrefixes;
 
-  public static C10NModule scanAllPackages() {
-    return scanPackages("");
-  }
-
-  public static C10NModule scanPackages(String... packagePrefixes) {
-    return new C10NModule(packagePrefixes);
-  }
-
-  private C10NModule(String[] packagePrefixes) {
-    this.packagePrefixes = packagePrefixes;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  protected void configure() {
-    Set<Class<?>> c10nTypes =
-            new Reflections(new ConfigurationBuilder().filterInputsBy(getPackageInputFilter()).setUrls(getPackageURLs()))
-            .getTypesAnnotatedWith(C10NMessages.class);
-    for (Class<?> c10nType : c10nTypes) {
-      bind((Class<Object>) c10nType)
-              .toInstance(C10N.get(c10nType));
-    }
-  }
-
-  private Set<URL> getPackageURLs() {
-    Iterable<URL> packages = Iterables.concat(Iterables.transform(
-            Arrays.asList(packagePrefixes), new Function<String, Set<URL>>() {
-      @Override
-      public Set<URL> apply(String prefix) {
-        return ClasspathHelper.forPackage(prefix);
-      }
-    }));
-
-    return Sets.newHashSet(packages);
-  }
-
-  private FilterBuilder getPackageInputFilter() {
-    final FilterBuilder inputFilter = new FilterBuilder();
-
-    for (String prefix : packagePrefixes) {
-      inputFilter.include(FilterBuilder.prefix(prefix));
+    public static C10NModule scanAllPackages() {
+        return scanPackages("");
     }
 
-    return inputFilter;
-  }
+    public static C10NModule scanPackages(String... packagePrefixes) {
+        return new C10NModule(packagePrefixes);
+    }
+
+    private C10NModule(String[] packagePrefixes) {
+        this.packagePrefixes = packagePrefixes;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void configure() {
+        Set<Class<?>> c10nTypes =
+                new Reflections(new ConfigurationBuilder().filterInputsBy(getPackageInputFilter()).setUrls(getPackageURLs()))
+                        .getTypesAnnotatedWith(C10NMessages.class);
+        for (Class<?> c10nType : c10nTypes) {
+            bind((Class<Object>) c10nType)
+                    .toInstance(C10N.get(c10nType));
+        }
+    }
+
+    private Set<URL> getPackageURLs() {
+        Iterable<URL> packages = Iterables.concat(Iterables.transform(
+                Arrays.asList(packagePrefixes), new Function<String, Set<URL>>() {
+            @Override
+            public Set<URL> apply(String prefix) {
+                return ClasspathHelper.forPackage(prefix);
+            }
+        }));
+
+        return Sets.newHashSet(packages);
+    }
+
+    private FilterBuilder getPackageInputFilter() {
+        final FilterBuilder inputFilter = new FilterBuilder();
+
+        for (String prefix : packagePrefixes) {
+            inputFilter.include(FilterBuilder.prefix(prefix));
+        }
+
+        return inputFilter;
+    }
 }

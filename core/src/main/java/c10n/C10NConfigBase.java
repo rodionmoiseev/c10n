@@ -23,11 +23,19 @@ import c10n.share.EncodedResourceControl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import static c10n.share.utils.Preconditions.assertNotNull;
 
+@SuppressWarnings("WeakerAccess")//rationale: designed for 3rd party usage
 public abstract class C10NConfigBase {
     //DI
     private final C10NCoreModule coreModule = new C10NCoreModule();
@@ -38,6 +46,9 @@ public abstract class C10NConfigBase {
     private final Map<Class<? extends Annotation>, C10NAnnotationBinder> annotationBinders = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder>();
     private final List<C10NFilterBinder<?>> filterBinders = new ArrayList<C10NFilterBinder<?>>();
     private final List<C10NConfigBase> childConfigs = new ArrayList<C10NConfigBase>();
+    private String keyPrefix = "";
+
+    private boolean debug = false;
 
     private boolean configured = false;
 
@@ -52,6 +63,7 @@ public abstract class C10NConfigBase {
      * <li>{@link #setLocaleProvider(LocaleProvider)} - customises the locale retrieval logic</li>
      * <li>{@link #setUntranslatedMessageHandler(UntranslatedMessageHandler)} - customises the placeholder for
      * unresolved translation mappings</li>
+     * <li>{@link #setKeyPrefix(String)} - sets global key prefix to auto-prepend to all bundle keys</li>
      * </ul>
      * </p>
      */
@@ -151,12 +163,13 @@ public abstract class C10NConfigBase {
 
     /**
      * <p>Fixes the {@link java.util.Locale} to the specified locale.</p>
-     *
+     * <p/>
      * <p>Generally useful when your application needs to create separate
      * {@link C10NMsgFactory} instances for each locale.</p>
+     *
      * @param locale Locale to use
      */
-    protected void setLocale(Locale locale){
+    protected void setLocale(Locale locale) {
         this.localeProvider = new FixedLocaleProvider(locale);
     }
 
@@ -252,31 +265,59 @@ public abstract class C10NConfigBase {
         return filterBinder;
     }
 
+    /**
+     * <p>Set global key prefix. All other keys will be automatically prepended with the global key.</p>
+     * <p>Settings key prefix to an empty string resets to default behaviour (no prefix).</p>
+     *
+     * @param key the key to use at configuration scope (not null)
+     */
+    protected void setKeyPrefix(String key) {
+        assertNotNull(key, "key");
+        keyPrefix = key;
+    }
+
+    String getKeyPrefix() {
+        return keyPrefix;
+    }
+
+    /**
+     * <p>If set to 'true', c10n will output debugging information to std-out at configuration and lookup time.</p>
+     *
+     * @param debug debug flag
+     */
+    protected void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    boolean isDebug() {
+        return debug;
+    }
+
     List<C10NFilterBinder<?>> getFilterBinders() {
         return filterBinders;
     }
 
     private void checkAnnotationInterface(Class<? extends Annotation> annotationClass) {
-        if (!hasMethod(annotationClass, "value") &&
-                !hasMethod(annotationClass, "intRes") &&
-                !hasMethod(annotationClass, "extRes"))
+        if (noMethod(annotationClass, "value") &&
+                noMethod(annotationClass, "intRes") &&
+                noMethod(annotationClass, "extRes"))
             throw new C10NConfigException("Annotation could not be bound because it's missing any of value()," +
                     " intRes() or extRes() methods that return String. " +
                     "Please add at least one of those methods with return type of String. " +
                     "annotationClass=" + annotationClass.getName());
     }
 
-    private boolean hasMethod(Class<? extends Annotation> annotationClass, String methodName) {
+    private boolean noMethod(Class<? extends Annotation> annotationClass, String methodName) {
         Method valueMethod;
         try {
             valueMethod = annotationClass.getMethod(methodName);
             if (!valueMethod.getReturnType().isAssignableFrom(String.class)) {
-                return false;
+                return true;
             }
         } catch (NoSuchMethodException e) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     protected C10NBundleBinder bindBundle(String baseName) {
@@ -411,7 +452,7 @@ public abstract class C10NConfigBase {
      */
     protected static final class C10NFilterBinder<T> {
         private final C10NFilterProvider<T> filter;
-        private Class<T> type;
+        private final Class<T> type;
         private final List<Class<? extends Annotation>> annotatedWith = new ArrayList<Class<? extends Annotation>>();
 
         private C10NFilterBinder(C10NFilterProvider<T> filter, Class<T> type) {
@@ -420,7 +461,7 @@ public abstract class C10NConfigBase {
         }
 
         /**
-         * <p>Restrict filter application only to argumets annotated with the
+         * <p>Restrict filter application only to arguments annotated with the
          * given annotation.</p>
          * <p>Multiple annotations can be specified using method chaining.</p>
          *
@@ -453,10 +494,10 @@ public abstract class C10NConfigBase {
      * <p>{@link LocaleProvider} that always returns the given
      * {@link java.util.Locale} instance.</p>
      */
-    private static final class FixedLocaleProvider implements LocaleProvider{
+    private static final class FixedLocaleProvider implements LocaleProvider {
         private final Locale locale;
 
-        FixedLocaleProvider(Locale locale){
+        FixedLocaleProvider(Locale locale) {
             this.locale = locale;
         }
 

@@ -23,14 +23,12 @@ import c10n.share.ShareModule;
 
 import java.util.Locale;
 
-import static c10n.share.utils.Preconditions.assertNotNull;
-
 /**
  * @author rodion
  */
 public class C10NCoreModule {
-    public static final LocaleProvider defaultLocaleProvider = new DefaultLocaleProvider();
-    public static final UntranslatedMessageHandler defaultUnknownMessageHandler = new DefaultUntranslatedMessageHandler();
+    private static final LocaleProvider defaultLocaleProvider = new DefaultLocaleProvider();
+    private static final UntranslatedMessageHandler defaultUnknownMessageHandler = new DefaultUntranslatedMessageHandler();
     //DI
     private final ShareModule shareModule = new ShareModule();
 
@@ -59,12 +57,6 @@ public class C10NCoreModule {
 
     public UntranslatedMessageHandler defaultUnknownMessageHandler() {
         return defaultUnknownMessageHandler;
-    }
-
-    public ConfiguredC10NModule createDefaultConfiguredModule(C10NConfigBase parentConfig, ConfigChainResolver chainResolver) {
-        assertNotNull(parentConfig, "parentConfig");
-        assertNotNull(chainResolver, "chainResolver");
-        return new DefaultConfiguredC10NModule(parentConfig, chainResolver);
     }
 
     private static final class DefaultLocaleProvider implements LocaleProvider {

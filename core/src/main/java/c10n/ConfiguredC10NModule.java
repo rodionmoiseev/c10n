@@ -22,7 +22,11 @@ package c10n;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * @author rodion
@@ -41,17 +45,22 @@ interface ConfiguredC10NModule {
     String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs);
 
     Map<AnnotatedClass, C10NFilterProvider<?>> getFilterBindings(Class<?> c10nInterface);
+
+    String getKeyPrefix();
+
+    boolean isDebug();
 }
 
 class AnnotatedClass {
-    final Class<?> clazz;
-    final Class<? extends Annotation> annotation;
+    private final Class<?> clazz;
+    private final Class<? extends Annotation> annotation;
 
     AnnotatedClass(Class<?> clazz, Class<? extends Annotation> annotation) {
         this.clazz = clazz;
         this.annotation = annotation;
     }
 
+    @SuppressWarnings("RedundantIfStatement")//rationale: generated code
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

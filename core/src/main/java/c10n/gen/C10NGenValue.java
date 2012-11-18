@@ -35,9 +35,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface C10NGenValue {
     /**
-     * Translated string value.
-     *
-     * @return
+     * @return Translated string value.
      */
     String value();
 
@@ -45,7 +43,7 @@ public @interface C10NGenValue {
      * Whether translated string value actually
      * appears in the bundle
      *
-     * @return
+     * @return true if string value appears in the bundle, false otherwise
      */
     boolean defined() default true;
 }

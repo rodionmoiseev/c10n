@@ -48,8 +48,8 @@ import java.net.InetSocketAddress;
 import java.text.MessageFormat;
 import java.util.Locale;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author rodion
@@ -153,7 +153,7 @@ public class ExternalResourceTest {
     }
 
     @Test
-    public void parameterisationIsDisabledWhenRawFalseIsPresentForInternalResources() {
+    public void parametrisationIsDisabledWhenRawFalseIsPresentForInternalResources() {
         C10N.configure(new DefaultC10NAnnotations());
         RawInternalMessages msg = C10N.get(RawInternalMessages.class);
 
@@ -165,7 +165,7 @@ public class ExternalResourceTest {
     }
 
     @Test
-    public void parameterisationIsDisabledWhenRawFalseIsPresentForExternalResources() throws IOException {
+    public void parametrisationIsDisabledWhenRawFalseIsPresentForExternalResources() throws IOException {
         C10N.configure(new DefaultC10NAnnotations());
 
         File englishText = new File(tmp.dir, "english.txt");

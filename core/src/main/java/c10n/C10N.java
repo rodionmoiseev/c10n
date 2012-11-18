@@ -117,6 +117,7 @@ public final class C10N {
      *
      * @param classloader the classloader to use for loading c10n-interface proxies (not-null)
      */
+    @SuppressWarnings("UnusedDeclaration")//rationale: public API
     public static void setProxyClassloader(ClassLoader classloader) {
         if (null == classloader) {
             throw new IllegalArgumentException("classloader is null");

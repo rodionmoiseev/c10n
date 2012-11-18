@@ -35,9 +35,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface C10NGenMessages {
     /**
-     * String representation of the locale instance
-     *
-     * @return
+     * @return String representation of the locale instance
      */
     String value();
 }

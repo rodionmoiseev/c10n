@@ -36,10 +36,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author rodion
@@ -233,7 +237,7 @@ public class C10NConfigBaseInstallTest {
 
     private static String keyFor(Class<?> clazz, String methodName) {
         try {
-            return ReflectionUtils.getDefaultKey(clazz, clazz.getMethod(methodName));
+            return ReflectionUtils.getDefaultKey(clazz.getMethod(methodName));
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

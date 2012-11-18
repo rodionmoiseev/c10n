@@ -45,7 +45,7 @@ public class C10NTest {
     public static TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
     @Test
-    public void parameterisationIsDisabledWhenRawFalseIsPresent() {
+    public void parametrisationIsDisabledWhenRawFalseIsPresent() {
         C10N.configure(new DefaultC10NAnnotations());
         Messages msg = C10N.get(Messages.class);
         Locale.setDefault(Locale.ENGLISH);

@@ -32,6 +32,8 @@ import org.junit.runners.Suite;
         c10n.resources.AllTests.class,
         c10n.share.AllTests.class,
         AnnotationBindingConfigurationErrorTest.class,
+        BundleKeyGlobalKeyPrefixTest.class,
+        BundleKeysTest.class,
         C10NConfigBaseInstallTest.class,
         C10NFiltersTest.class,
         C10NFilterTest.class,

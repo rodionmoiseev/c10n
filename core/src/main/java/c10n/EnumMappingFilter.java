@@ -47,11 +47,11 @@ final class EnumMappingFilter<E extends Enum<?>> implements C10NFilter<E> {
         for (Enum<?> enumValue : enumClass.getEnumConstants()) {
             //1. Check of methods for pattern: ClassName_EnumValue()
             Method m = allMethods.get(enumClass.getSimpleName().toLowerCase() + "_" + enumValue.name().toLowerCase());
-            if (null == m || !noArgMethod(m) || !returnsObject(m)) {
+            if (null == m || hasOneOrMoreParams(m) || returnsNonObjectType(m)) {
                 //no good ...
                 //2. Check for methods for pattern: EnumValue()
                 m = allMethods.get(enumValue.name().toLowerCase());
-                if (null == m || !noArgMethod(m) || !returnsObject(m)) {
+                if (null == m || hasOneOrMoreParams(m) || returnsNonObjectType(m)) {
                     throw new IllegalStateException("method mapping for " +
                             enumClass.getSimpleName() + "." + enumValue.name() + " was not found!!");
                 }
@@ -61,13 +61,13 @@ final class EnumMappingFilter<E extends Enum<?>> implements C10NFilter<E> {
         return res;
     }
 
-    private static boolean returnsObject(Method m) {
-        return !m.getReturnType().equals(Void.TYPE);
+    private static boolean returnsNonObjectType(Method m) {
+        return m.getReturnType().equals(Void.TYPE);
     }
 
-    private static boolean noArgMethod(Method m) {
+    private static boolean hasOneOrMoreParams(Method m) {
         Class[] paramTypes = m.getParameterTypes();
-        return paramTypes == null || paramTypes.length == 0;
+        return paramTypes != null && paramTypes.length != 0;
     }
 
     @Override

@@ -22,7 +22,15 @@ package c10n;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * @author rodion
@@ -109,5 +117,15 @@ class DefaultConfiguredC10NModule implements ConfiguredC10NModule {
     @Override
     public String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs) {
         return parentConfig.getUntranslatedMessageString(c10nInterface, method, methodArgs);
+    }
+
+    @Override
+    public String getKeyPrefix() {
+        return this.parentConfig.getKeyPrefix();
+    }
+
+    @Override
+    public boolean isDebug() {
+        return this.parentConfig.isDebug();
     }
 }
