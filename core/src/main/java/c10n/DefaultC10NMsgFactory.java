@@ -46,7 +46,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class DefaultC10NMsgFactory implements C10NMsgFactory {
+class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
     private final ConfiguredC10NModule conf;
     private final LocaleMapping localeMapping;
     private final ClassLoader proxyClassloader;
@@ -59,12 +59,17 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
 
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> c10nInterface) {
+        return get(c10nInterface, null);
+    }
+
+    @Override
+    public <T> T get(Class<T> c10nInterface, String delegatingValue) {
         if (null == c10nInterface) {
             throw new NullPointerException("c10nInterface is null");
         }
         return (T) Proxy.newProxyInstance(proxyClassloader,
                 new Class[]{c10nInterface},
-                C10NInvocationHandler.create(this, conf, localeMapping, c10nInterface));
+                C10NInvocationHandler.create(this, delegatingValue, conf, localeMapping, c10nInterface));
     }
 
     private static final class C10NString {
@@ -84,7 +89,8 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
     private static final class C10NInvocationHandler implements
             InvocationHandler {
         private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
-        private final C10NMsgFactory c10nFactory;
+        private final InternalC10NMsgFactory c10nFactory;
+        private final String delegatingValue;
         private final ConfiguredC10NModule conf;
         private final LocaleMapping localeMapping;
         private final Class<?> proxiedClass;
@@ -94,13 +100,15 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
         private final Map<AnnotatedClass, C10NFilterProvider<?>> filters;
         private final Map<Method, String> bundleKeys;
 
-        C10NInvocationHandler(C10NMsgFactory c10nFactory,
+        C10NInvocationHandler(InternalC10NMsgFactory c10nFactory,
+                              String delegatingValue,
                               ConfiguredC10NModule conf,
                               LocaleMapping localeMapping,
                               Class<?> proxiedClass,
                               Map<String, Map<Locale, C10NString>> translationsByMethod,
                               Map<Method, String> bundleKeys) {
             this.c10nFactory = c10nFactory;
+            this.delegatingValue = delegatingValue;
             this.conf = conf;
             this.localeMapping = localeMapping;
             this.proxiedClass = proxiedClass;
@@ -110,7 +118,8 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
             this.bundleKeys = bundleKeys;
         }
 
-        static C10NInvocationHandler create(C10NMsgFactory c10nFactory,
+        static C10NInvocationHandler create(InternalC10NMsgFactory c10nFactory,
+                                            String delegatingValue,
                                             ConfiguredC10NModule conf, LocaleMapping localeMapping, Class<?> c10nInterface) {
             Map<String, Map<Locale, C10NString>> translationsByMethod = new HashMap<String, Map<Locale, C10NString>>();
             Map<Method, String> bundleKeys = new HashMap<Method, String>();
@@ -172,6 +181,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
             }
 
             return new C10NInvocationHandler(c10nFactory,
+                    delegatingValue,
                     conf,
                     localeMapping,
                     c10nInterface,
@@ -292,8 +302,7 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
         }
 
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args)
-                throws Throwable {
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Locale locale = conf.getCurrentLocale();
 
             Locale implLocale = localeMapping.findClosestMatch(availableImplLocales, locale);
@@ -306,32 +315,45 @@ class DefaultC10NMsgFactory implements C10NMsgFactory {
                 return method.invoke(instance, args);
             }
 
+            String stringValue = getStringValue(method, args, locale);
+
             Class<?> returnType = method.getReturnType();
             if (returnType.isAssignableFrom(String.class)) {
                 // For methods returning String or CharSequence
-
-                List<ResourceBundle> bundles = conf.getBundleBindings(proxiedClass, locale);
-                for (ResourceBundle bundle : bundles) {
-                    String key = bundleKeys.get(method);
-                    if (null != key) {
-                        if (bundle.containsKey(key)) {
-                            return format(bundle.getString(key), method, args);
-                        }
-                    }//else: should never happen!
-                }
-
-                C10NString res = findTranslationFromAnnotations(method, locale);
-                if (null == res) {
-                    return conf.getUntranslatedMessageString(proxiedClass, method, args);
-                }
-                return format(res, method, args);
+                return stringValue;
             } else if (returnType.isInterface()) {
                 if (null != returnType.getAnnotation(C10NMessages.class)) {
-                    return c10nFactory.get(returnType);
+                    return c10nFactory.get(returnType, stringValue);
                 }
             }
             // don't know how to handle this return type
             return null;
+        }
+
+        private boolean isObjectToString(Method method, Object[] args) {
+            return method.getName().equals("toString") &&
+                    (args == null || args.length == 0);
+        }
+
+        private String getStringValue(Method method, Object[] args, Locale locale) {
+            List<ResourceBundle> bundles = conf.getBundleBindings(proxiedClass, locale);
+            for (ResourceBundle bundle : bundles) {
+                String key = bundleKeys.get(method);
+                if (null != key) {
+                    if (bundle.containsKey(key)) {
+                        return format(bundle.getString(key), method, args);
+                    }
+                }//else: should never happen!
+            }
+
+            C10NString res = findTranslationFromAnnotations(method, locale);
+            if (null == res) {
+                if (delegatingValue != null && isObjectToString(method, args)) {
+                    return delegatingValue;
+                }
+                return conf.getUntranslatedMessageString(proxiedClass, method, args);
+            }
+            return format(res, method, args);
         }
 
         private C10NString findTranslationFromAnnotations(Method method, Locale locale) {

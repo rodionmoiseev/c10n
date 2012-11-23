@@ -19,12 +19,25 @@
 
 package c10n;
 
+import c10n.annotations.DefaultC10NAnnotations;
+import c10n.annotations.En;
+import c10n.annotations.Ja;
+import c10n.share.util.RuleUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import java.util.Locale;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class DelegationTest {
+    @Rule
+    public TestRule tmpLocale = RuleUtils.tmpLocale();
+    @Rule
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+
     @Test
     public void generatedClassesCanBeDelegated() {
         Window msg = C10N.get(Window.class);
@@ -40,6 +53,31 @@ public class DelegationTest {
 
     }
 
+    @Test
+    public void delegateToStringIsEvaluatedToDefaultUntranslatedMessageOfTheDelegatingMethod() {
+        assertThat(C10N.get(Window.class).buttons().toString(), is("Window.buttons"));
+    }
+
+    @Test
+    public void delegateToStringDefaultsToDelegatingMethodAnnotationValueWhenPresent() {
+        assertThat(C10N.get(Window.class).buttonsWithDef().toString(), is("buttons-def"));
+    }
+
+    @Test
+    public void delegateToStringBehavesLikeANormalStringMethod() {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            protected void configure() {
+                install(new DefaultC10NAnnotations());
+            }
+        });
+        Window msg = C10N.get(Window.class);
+        Locale.setDefault(Locale.ENGLISH);
+        assertThat(msg.buttonsInternationalised().toString(), is("buttons-en"));
+        Locale.setDefault(Locale.JAPANESE);
+        assertThat(msg.buttonsInternationalised().toString(), is("buttons-ja"));
+    }
+
     @C10NMessages
     interface Buttons {
         @C10NDef("OK")
@@ -51,6 +89,13 @@ public class DelegationTest {
     @C10NMessages
     interface Window {
         Buttons buttons();
+
+        @C10NDef("buttons-def")
+        Buttons buttonsWithDef();
+
+        @En("buttons-en")
+        @Ja("buttons-ja")
+        Buttons buttonsInternationalised();
 
         @C10NDef("MyApp")
         String title();
