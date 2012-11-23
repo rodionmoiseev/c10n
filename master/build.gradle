@@ -17,6 +17,10 @@
  *  under the License.
  */
 
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.3'
+}
+
 group = "c10n"
 
 allprojects{
