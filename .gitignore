@@ -24,3 +24,6 @@ out/
 #
 .gradle
 build/
+gradlew
+gradlew.bat
+master/gradle
