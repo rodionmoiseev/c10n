@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class ReflectionUtils {
+    private static final String KEY_DELIM = ".";
+
     /**
      * <p>Work out method's bundle key.</p>
      * <p/>
@@ -73,7 +75,7 @@ public final class ReflectionUtils {
         String methodKey;
         if (null != c10NKey) {
             methodKey = c10NKey.value();
-            if (methodKey.startsWith(".")) {
+            if (methodKey.startsWith(KEY_DELIM)) {
                 //found an absolute key. Get rid of the
                 //leading dot and look no further
                 return methodKey.substring(1, methodKey.length());
@@ -83,7 +85,7 @@ public final class ReflectionUtils {
             methodKey = getMethodKey(method);
         }
         if (parentKey != null) {
-            return parentKey + "." + methodKey;
+            return parentKey + KEY_DELIM + methodKey;
         }
         return methodKey;
     }
@@ -104,7 +106,7 @@ public final class ReflectionUtils {
 
     public static void getDefaultKey(Method method, StringBuilder sb) {
         getFQNString(method.getDeclaringClass(), sb);
-        sb.append('.');
+        sb.append(KEY_DELIM);
         getMethodKey(method, sb);
     }
 
@@ -136,16 +138,16 @@ public final class ReflectionUtils {
     }
 
     public static void getFQNString(Class<?> clazz, StringBuilder sb) {
-        sb.append(clazz.getPackage().getName()).append('.');
-        getClassFQNString(clazz, sb, '.');
+        sb.append(clazz.getPackage().getName()).append(KEY_DELIM);
+        getClassFQNString(clazz, sb);
     }
 
-    private static void getClassFQNString(Class<?> clazz, StringBuilder sb, char delim) {
+    private static void getClassFQNString(Class<?> clazz, StringBuilder sb) {
         Iterator<Class<?>> it = typeEnclosureHierarchy(clazz).descendingIterator();
         while (it.hasNext()) {
             sb.append(it.next().getSimpleName());
             if (it.hasNext()) {
-                sb.append(delim);
+                sb.append(KEY_DELIM);
             }
         }
     }

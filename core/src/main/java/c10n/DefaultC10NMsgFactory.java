@@ -57,12 +57,13 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
         this.proxyClassloader = proxyClassloader;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public <T> T get(Class<T> c10nInterface) {
         return get(c10nInterface, null);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T get(Class<T> c10nInterface, String delegatingValue) {
         if (null == c10nInterface) {
             throw new NullPointerException("c10nInterface is null");
