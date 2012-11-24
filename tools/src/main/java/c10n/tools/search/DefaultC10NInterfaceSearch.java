@@ -36,7 +36,7 @@ class DefaultC10NInterfaceSearch implements C10NInterfaceSearch {
     @Override
     public Set<Class<?>> find(Class<? extends Annotation> annotationClass, String... packagePrefixes) {
         return new Reflections(new ConfigurationBuilder()
-                .filterInputsBy(getPackageInputFilter())
+                .filterInputsBy(getPackageInputFilter(packagePrefixes))
                 .setUrls(getPackageURLs(packagePrefixes)))
                 .getTypesAnnotatedWith(annotationClass);
     }
