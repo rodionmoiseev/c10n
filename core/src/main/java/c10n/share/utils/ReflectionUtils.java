@@ -52,6 +52,7 @@ public final class ReflectionUtils {
      * </li>
      * <li>If no declaring interfaces have {@link C10NKey} annotation, but a method contains annotation
      * <code>M</code>, then key is just <code>M</code>.</li>
+     * <li>Lastly, if global key prefix is specified, it is always prepended to the final key, delimited by '.'</li>
      * </ul>
      * </p>
      * <p/>
@@ -61,12 +62,25 @@ public final class ReflectionUtils {
      * order first. If no key is found, this check is repeated for each of the super interfaces in the same order.
      * </p>
      *
-     * @param method method to extract the key from
-     * @return method c10n bundle key, or null if no {@link C10NKey} annotation were declared
+     * @param keyPrefix global key prefix
+     * @param method    method to extract the key from
+     * @return method c10n bundle key (not null)
      */
-    public static String getC10NKey(Method method) {
+    public static String getC10NKey(String keyPrefix, Method method) {
+        String key = getKeyAnnotationBasedKey(method);
+        if (null == key) {
+            //fallback to default key based on class FQDN and method name
+            key = ReflectionUtils.getDefaultKey(method);
+        }
+        if (keyPrefix.length() > 0) {
+            key = keyPrefix + "." + key;
+        }
+        return key;
+    }
+
+    static String getKeyAnnotationBasedKey(Method method) {
         String parentKey = findParentKey(method);
-        C10NKey c10NKey = method.getAnnotation(C10NKey.class);
+        String c10NKey = getKeyAnnotationValue(method);
         if (null == parentKey && null == c10NKey) {
             //C10NKey-based key is not available
             return null;
@@ -74,7 +88,7 @@ public final class ReflectionUtils {
 
         String methodKey;
         if (null != c10NKey) {
-            methodKey = c10NKey.value();
+            methodKey = c10NKey;
             if (methodKey.startsWith(KEY_DELIM)) {
                 //found an absolute key. Get rid of the
                 //leading dot and look no further
@@ -88,6 +102,21 @@ public final class ReflectionUtils {
             return parentKey + KEY_DELIM + methodKey;
         }
         return methodKey;
+    }
+
+    /**
+     * <p>Get the value provided with the {@link c10n.C10NKey} annotation. If annotation
+     * is not declared returns <code>null</code></p>
+     *
+     * @param method method for which to retrieve the value {@link c10n.C10NKey} annotation
+     * @return value of the declared annotation. <code>null</code> if not present.
+     */
+    static String getKeyAnnotationValue(Method method) {
+        C10NKey c10NKey = method.getAnnotation(C10NKey.class);
+        if (null != c10NKey) {
+            return c10NKey.value();
+        }
+        return null;
     }
 
     /**

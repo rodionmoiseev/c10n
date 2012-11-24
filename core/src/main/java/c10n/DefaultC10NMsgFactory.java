@@ -134,14 +134,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                     defMapping.put(C10N.FALLBACK_LOCALE, C10NString.def(c10nDef.value()));
                     translationsByMethod.put(m.toString(), defMapping);
                 }
-                String key = ReflectionUtils.getC10NKey(m);
-                if (null == key) {
-                    //fallback to default key based on class FQDN and method name
-                    key = ReflectionUtils.getDefaultKey(m);
-                }
-                if (conf.getKeyPrefix().length() > 0) {
-                    key = conf.getKeyPrefix() + "." + key;
-                }
+                String key = ReflectionUtils.getC10NKey(conf.getKeyPrefix(), m);
                 if (conf.isDebug()) {
                     System.out.println("c10n: method " + ReflectionUtils.getDefaultKey(m)
                             + " was bound to bundle key '" + key + "'");

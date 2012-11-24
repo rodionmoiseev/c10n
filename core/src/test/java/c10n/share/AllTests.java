@@ -26,6 +26,8 @@ import org.junit.runners.Suite;
  * @author rodion
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses(LocaleMappingTest.class)
+@Suite.SuiteClasses({
+        c10n.share.utils.AllTests.class,
+        LocaleMappingTest.class})
 public class AllTests {
 }
