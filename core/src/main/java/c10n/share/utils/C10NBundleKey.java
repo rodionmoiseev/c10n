@@ -89,6 +89,7 @@ public class C10NBundleKey {
         return declaredKey;
     }
 
+    @SuppressWarnings("RedundantIfStatement")//rationale: generated code
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
