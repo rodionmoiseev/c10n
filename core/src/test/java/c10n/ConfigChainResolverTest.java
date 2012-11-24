@@ -26,7 +26,7 @@ import c10n.inner.sub1.Sub1Config2;
 import c10n.inner.sub1.Sub1Interface;
 import c10n.inner.sub1.sub11.Sub11Interface;
 import c10n.inner.sub1.sub12.Sub12Interface;
-import c10n.share.util.RuleUtils;
+import c10n.test.utils.RuleUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author rodion

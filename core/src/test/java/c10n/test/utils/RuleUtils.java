@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package c10n.share.util;
+package c10n.test.utils;
 
 import c10n.C10N;
 import c10n.C10NCoreModule;

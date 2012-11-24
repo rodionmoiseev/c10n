@@ -18,7 +18,7 @@
  *
  */
 
-package c10n.share.util;
+package c10n.test.utils;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;

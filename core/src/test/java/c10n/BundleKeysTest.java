@@ -21,7 +21,7 @@
 package c10n;
 
 import c10n.annotations.DefaultC10NAnnotations;
-import c10n.share.util.RuleUtils;
+import c10n.test.utils.RuleUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

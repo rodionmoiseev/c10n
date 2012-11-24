@@ -22,15 +22,15 @@ package c10n;
 import c10n.annotations.DefaultC10NAnnotations;
 import c10n.annotations.En;
 import c10n.annotations.Ja;
-import c10n.share.util.RuleUtils;
+import c10n.test.utils.RuleUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import java.util.Locale;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class FallbackC10NFactoryTest {
     @Rule
