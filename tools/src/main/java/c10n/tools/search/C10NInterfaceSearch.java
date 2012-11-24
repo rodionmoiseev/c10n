@@ -23,6 +23,5 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 
 public interface C10NInterfaceSearch {
-	Set<Class<?>> find(String packagePrefix,
-			Class<? extends Annotation> annotationClass);
+    Set<Class<?>> find(Class<? extends Annotation> annotationClass, String... packagePrefixes);
 }

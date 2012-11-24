@@ -19,44 +19,48 @@
 
 package c10n.tools.search;
 
-import java.lang.annotation.Annotation;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
+import java.lang.annotation.Annotation;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Set;
 
 class DefaultC10NInterfaceSearch implements C10NInterfaceSearch {
-	private final Set<URL> cp;
+    @Override
+    public Set<Class<?>> find(Class<? extends Annotation> annotationClass, String... packagePrefixes) {
+        return new Reflections(new ConfigurationBuilder()
+                .filterInputsBy(getPackageInputFilter())
+                .setUrls(getPackageURLs(packagePrefixes)))
+                .getTypesAnnotatedWith(annotationClass);
+    }
 
-	DefaultC10NInterfaceSearch() {
-		this(ClasspathHelper.forJavaClassPath());
-	}
 
-	DefaultC10NInterfaceSearch(Set<URL> cp) {
-		this.cp = cp;
-	}
+    private Set<URL> getPackageURLs(String... packagePrefixes) {
+        Iterable<URL> packages = Iterables.concat(Iterables.transform(
+                Arrays.asList(packagePrefixes), new Function<String, Set<URL>>() {
+            @Override
+            public Set<URL> apply(String prefix) {
+                return ClasspathHelper.forPackage(prefix);
+            }
+        }));
 
-	@Override
-	public Set<Class<?>> find(String packagePrefix, Class<? extends Annotation> annotationClass) {
-		final Predicate<String> filter = new FilterBuilder.Include(
-				FilterBuilder.prefix(packagePrefix));
-		Reflections reflections = new Reflections(new ConfigurationBuilder()
-				.setUrls(cp)
-				.filterInputsBy(filter)
-				.setScanners(
-						new TypeAnnotationsScanner().filterResultsBy(filter),
-						new SubTypesScanner().filterResultsBy(filter)));
-		Set<String> types = reflections.getStore().getTypesAnnotatedWith(annotationClass.getName());
-		URL[] urls = cp.toArray(new URL[cp.size()]);
-		return ImmutableSet.copyOf(Reflections.forNames(types, new URLClassLoader(urls)));
-	}
+        return Sets.newHashSet(packages);
+    }
+
+    private FilterBuilder getPackageInputFilter(String... packagePrefixes) {
+        final FilterBuilder inputFilter = new FilterBuilder();
+
+        for (String prefix : packagePrefixes) {
+            inputFilter.include(FilterBuilder.prefix(prefix));
+        }
+
+        return inputFilter;
+    }
 }

@@ -20,6 +20,7 @@
 package c10n.share.utils;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,6 +40,10 @@ public final class BundleKeyUtils {
     }
 
     public static Set<C10NBundleKey> allBundleKeys(String globalPrefix, Class<?>... c10nInterfaces) {
+        return allBundleKeys(globalPrefix, Arrays.asList(c10nInterfaces));
+    }
+
+    public static Set<C10NBundleKey> allBundleKeys(String globalPrefix, Iterable<Class<?>> c10nInterfaces) {
         Set<C10NBundleKey> res = new HashSet<C10NBundleKey>();
         for (Class<?> c10nInterface : c10nInterfaces) {
             for (Method method : c10nInterface.getDeclaredMethods()) {
