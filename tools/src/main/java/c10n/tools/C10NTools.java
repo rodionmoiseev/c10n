@@ -19,8 +19,15 @@
 
 package c10n.tools;
 
+import c10n.ConfiguredC10NModule;
+import c10n.tools.inspector.C10NInspector;
+import c10n.tools.inspector.InspectorModule;
 import c10n.tools.search.C10NBundleKeySearch;
 import c10n.tools.search.SearchModule;
+import com.google.common.collect.Sets;
+
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * @author rodion
@@ -43,5 +50,29 @@ public final class C10NTools {
      */
     public static C10NBundleKeySearch bundleKeySearch(String keyPrefix) {
         return SearchModule.reflectionsBundleKeySearch(keyPrefix);
+    }
+
+    /**
+     * <p>Creates a new c10n translation inspector</p>
+     *
+     * @param configuredC10NModule c10n module to inspect (not null)
+     * @param localesToCheck       a list of locales to check (not null)
+     * @return c10n translation inspector implementation (not null)
+     */
+    public static C10NInspector inspector(ConfiguredC10NModule configuredC10NModule,
+                                          Locale... localesToCheck) {
+        return inspector(configuredC10NModule, Sets.newHashSet(localesToCheck));
+    }
+
+    /**
+     * <p>Creates a new c10n translation inspector</p>
+     *
+     * @param configuredC10NModule c10n module to inspect (not null)
+     * @param localesToCheck       a list of locales to check (not null)
+     * @return c10n translation inspector implementation (not null)
+     */
+    public static C10NInspector inspector(ConfiguredC10NModule configuredC10NModule,
+                                          Set<Locale> localesToCheck) {
+        return InspectorModule.defaultInspector(configuredC10NModule, localesToCheck);
     }
 }
