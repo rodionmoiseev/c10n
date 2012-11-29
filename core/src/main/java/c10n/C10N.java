@@ -102,8 +102,14 @@ public final class C10N {
         return root.get(c10nInterface);
     }
 
-    public static C10NMsgFactory configure(C10NConfigBase conf) {
-        return root = coreModule.defaultC10NMsgFactory(conf);
+    public static ConfiguredC10NModule configure(C10NConfigBase conf) {
+        ConfiguredC10NModule configuredModule = coreModule.resolve(conf);
+        root = coreModule.defaultC10NMsgFactory(configuredModule);
+        return configuredModule;
+    }
+
+    public static C10NMsgFactory createMsgFactory(ConfiguredC10NModule configuredModule) {
+        return coreModule.defaultC10NMsgFactory(configuredModule);
     }
 
     /**

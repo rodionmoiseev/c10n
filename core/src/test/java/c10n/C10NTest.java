@@ -54,22 +54,22 @@ public class C10NTest {
 
     @Test
     public void multipleC10NMsgFactoriesCanBeCreatedAndUsedIndividually() {
-        C10NMsgFactory enC10nFactory = C10N.configure(new C10NConfigBase() {
+        C10NMsgFactory enC10nFactory = C10N.createMsgFactory(C10N.configure(new C10NConfigBase() {
             @Override
             protected void configure() {
                 install(new DefaultC10NAnnotations());
                 setLocale(Locale.ENGLISH);
             }
-        });
+        }));
         assertThat(enC10nFactory.get(Messages.class).text(), is("english"));
 
-        C10NMsgFactory jpC10nFactory = C10N.configure(new C10NConfigBase() {
+        C10NMsgFactory jpC10nFactory = C10N.createMsgFactory(C10N.configure(new C10NConfigBase() {
             @Override
             protected void configure() {
                 install(new DefaultC10NAnnotations());
                 setLocale(Locale.JAPANESE);
             }
-        });
+        }));
         assertThat(jpC10nFactory.get(Messages.class).text(), is("japanese"));
     }
 

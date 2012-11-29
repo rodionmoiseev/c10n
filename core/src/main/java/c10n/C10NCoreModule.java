@@ -33,13 +33,16 @@ public class C10NCoreModule {
     private final ShareModule shareModule = new ShareModule();
 
     public C10NMsgFactory defaultC10NMsgFactory() {
-        return defaultC10NMsgFactory(new UnconfiguredC10NConfig());
+        return defaultC10NMsgFactory(resolve(new UnconfiguredC10NConfig()));
     }
 
-    public C10NMsgFactory defaultC10NMsgFactory(C10NConfigBase rootConfig) {
+    public ConfiguredC10NModule resolve(C10NConfigBase rootConfig) {
         rootConfig.doConfigure();
-        return new DefaultC10NMsgFactory(
-                new DefaultConfiguredC10NModule(rootConfig, new DefaultConfigChainResolver(rootConfig)),
+        return new DefaultConfiguredC10NModule(rootConfig, new DefaultConfigChainResolver(rootConfig));
+    }
+
+    public C10NMsgFactory defaultC10NMsgFactory(ConfiguredC10NModule configuredModule) {
+        return new DefaultC10NMsgFactory(configuredModule,
                 shareModule.defaultLocaleMapping(),
                 C10N.getProxyClassloader());
     }
