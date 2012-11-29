@@ -17,19 +17,11 @@
  * under the License.
  */
 
-package c10n.tools;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+package c10n.tools.inspector;
 
 /**
  * @author rodion
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        c10n.AllTests.class,
-        c10n.tools.inspector.AllTests.class,
-        c10n.tools.search.AllTests.class
-})
-public class AllTests {
+public interface C10NInspector {
+    Iterable<C10NUnit> inspect(String... packagePrefixes);
 }

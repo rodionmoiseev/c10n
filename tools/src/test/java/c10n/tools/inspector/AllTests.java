@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package c10n.tools;
+package c10n.tools.inspector;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -26,10 +26,6 @@ import org.junit.runners.Suite;
  * @author rodion
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-        c10n.AllTests.class,
-        c10n.tools.inspector.AllTests.class,
-        c10n.tools.search.AllTests.class
-})
+@Suite.SuiteClasses(DefaultC10NBundleCheckerTest.class)
 public class AllTests {
 }

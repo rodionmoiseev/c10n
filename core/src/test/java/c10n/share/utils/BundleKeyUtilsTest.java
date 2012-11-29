@@ -20,9 +20,12 @@
 package c10n.share.utils;
 
 import c10n.C10NKey;
+import c10n.annotations.En;
 import org.junit.Test;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,11 +39,14 @@ import static org.junit.Assert.assertThat;
 public class BundleKeyUtilsTest {
     @Test
     public void customGeneratedAndAbsoluteKeysOnSingleInterface() {
-        assertThat(BundleKeyUtils.allBundleKeys(Msg1.class), is(set(
-                customKey(Msg1.class, "customKey", "custom.key"),
-                customKey(Msg1.class, "absoluteKey", "absolute.key", ".absolute.key"),
-                genKey(Msg1.class, "generatedKey", "c10n.share.utils.BundleKeyUtilsTest.Msg1.generatedKey")
-        )));
+        assertThat(BundleKeyUtils.allBundleKeys("", Collections.<Class<?>>singleton(Msg1.class)),
+                is(set(
+                        customKey(Msg1.class, "customKey", "custom.key"),
+                        customKey(Msg1.class, "absoluteKey", "absolute.key", ".absolute.key"),
+                        genKey(Msg1.class, "generatedKey", "c10n.share.utils.BundleKeyUtilsTest.Msg1.generatedKey"),
+                        genKey(Msg1.class, "annotated", "c10n.share.utils.BundleKeyUtilsTest.Msg1.annotated",
+                                Collections.<Class<? extends Annotation>>singleton(En.class))
+                )));
     }
 
     @Test
@@ -49,6 +55,8 @@ public class BundleKeyUtilsTest {
                 customKey(Msg1.class, "customKey", "custom.key"),
                 customKey(Msg1.class, "absoluteKey", "absolute.key", ".absolute.key"),
                 genKey(Msg1.class, "generatedKey", "c10n.share.utils.BundleKeyUtilsTest.Msg1.generatedKey"),
+                genKey(Msg1.class, "annotated", "c10n.share.utils.BundleKeyUtilsTest.Msg1.annotated",
+                        Collections.<Class<? extends Annotation>>singleton(En.class)),
                 customKey(Msg2.class, "customKey2", "msg2.custom.key2", "custom.key2"),
                 customKey(Msg2.class, "absoluteKey2", "absolute.key2", ".absolute.key2"),
                 customKey(Msg2.class, "semiGeneratedKey", "msg2.semiGeneratedKey", null)
@@ -60,29 +68,37 @@ public class BundleKeyUtilsTest {
         assertThat(BundleKeyUtils.allBundleKeys("prefix", Msg1.class), is(set(
                 customKey(Msg1.class, "customKey", "prefix.custom.key", "custom.key"),
                 customKey(Msg1.class, "absoluteKey", "prefix.absolute.key", ".absolute.key"),
-                genKey(Msg1.class, "generatedKey", "prefix.c10n.share.utils.BundleKeyUtilsTest.Msg1.generatedKey")
+                genKey(Msg1.class, "generatedKey", "prefix.c10n.share.utils.BundleKeyUtilsTest.Msg1.generatedKey"),
+                genKey(Msg1.class, "annotated", "prefix.c10n.share.utils.BundleKeyUtilsTest.Msg1.annotated",
+                        Collections.<Class<? extends Annotation>>singleton(En.class))
         )));
     }
 
-    private static Set<C10NBundleKey> set(C10NBundleKey... keys) {
-        Set<C10NBundleKey> res = new HashSet<C10NBundleKey>();
-        Collections.addAll(res, keys);
-        return res;
+    private static <T> Set<T> set(T... args) {
+        return new HashSet<T>(Arrays.asList(args));
     }
 
     private static C10NBundleKey customKey(Class<?> c10nInterface, String methodName, String key, String declaredKey) {
-        return c10nBundleKey(c10nInterface, methodName, true, key, declaredKey);
+        return c10nBundleKey(c10nInterface, methodName, true, key, declaredKey,
+                Collections.<Class<? extends Annotation>>emptySet());
     }
 
     private static C10NBundleKey customKey(Class<?> c10nInterface, String methodName, String key) {
-        return c10nBundleKey(c10nInterface, methodName, true, key, key);
+        return c10nBundleKey(c10nInterface, methodName, true, key, key,
+                Collections.<Class<? extends Annotation>>emptySet());
     }
 
     private static C10NBundleKey genKey(Class<?> c10nInterface, String methodName, String key) {
-        return c10nBundleKey(c10nInterface, methodName, false, key, null);
+        return genKey(c10nInterface, methodName, key, Collections.<Class<? extends Annotation>>emptySet());
     }
 
-    private static C10NBundleKey c10nBundleKey(Class<?> c10nInterface, String methodName, boolean isCustom, String key, String declaredKey) {
+    private static C10NBundleKey genKey(Class<?> c10nInterface, String methodName, String key,
+                                        Set<Class<? extends Annotation>> annotations) {
+        return c10nBundleKey(c10nInterface, methodName, false, key, null, annotations);
+    }
+
+    private static C10NBundleKey c10nBundleKey(Class<?> c10nInterface, String methodName, boolean isCustom, String key, String declaredKey,
+                                               Set<Class<? extends Annotation>> annotations) {
         try {
             Method method = c10nInterface.getMethod(methodName);
             return new C10NBundleKey(c10nInterface, method, isCustom, key, declaredKey);
@@ -99,6 +115,9 @@ public class BundleKeyUtilsTest {
         String absoluteKey();
 
         String generatedKey();
+
+        @En("annotated en")
+        String annotated();
     }
 
     @C10NKey("msg2")

@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * @author rodion
  */
-interface ConfiguredC10NModule {
+public interface ConfiguredC10NModule {
     Locale getCurrentLocale();
 
     Map<Class<? extends Annotation>, Set<Locale>> getAnnotationBindings(Class<?> c10nInterface);

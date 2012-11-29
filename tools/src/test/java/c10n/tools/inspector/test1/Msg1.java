@@ -17,19 +17,27 @@
  * under the License.
  */
 
-package c10n.tools;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+package c10n.tools.inspector.test1;
 
 /**
  * @author rodion
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        c10n.AllTests.class,
-        c10n.tools.inspector.AllTests.class,
-        c10n.tools.search.AllTests.class
-})
-public class AllTests {
+
+import c10n.C10NKey;
+import c10n.C10NMessages;
+import c10n.annotations.En;
+import c10n.annotations.Ja;
+
+@C10NKey("msg1")
+@C10NMessages
+interface Msg1 {
+    //bundle lookup
+    String key1();
+
+    //bundle lookup
+    String key2();
+
+    @En("annotated value en")
+    @Ja("annotated value ja")
+    String annotatedValue();
 }

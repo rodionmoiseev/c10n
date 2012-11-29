@@ -17,19 +17,23 @@
  * under the License.
  */
 
-package c10n.tools;
+package c10n.tools.inspector.test1;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import c10n.C10NKey;
+import c10n.C10NMessages;
+import c10n.annotations.En;
 
 /**
  * @author rodion
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        c10n.AllTests.class,
-        c10n.tools.inspector.AllTests.class,
-        c10n.tools.search.AllTests.class
-})
-public class AllTests {
+@C10NKey("msg2")
+@C10NMessages
+public interface Msg2 {
+    String key3();
+
+    String key4();
+
+    @En("annotated value en")
+        //@Ja("annotated value ja")
+    String annotatedValue();
 }
