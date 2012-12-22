@@ -3,8 +3,82 @@ Cosmopolitan -- C10N
 
 A Java library, focused on making internationalisation more modular, easier
 to evolve and maintain, robust-to-change and IDE-friendly without excess of
-external tools. See [the guide][C10NGuide] for some sample code.
+external tools. See [the guide][C10NGuide] for more information.
 
+Motivation
+----------
+
+Compare the traditional approach using resource bundles to C10N:
+
+### Using resource bundles
+
+First, you need to create the individual bundle files with all translations:
+```
+# Messages_en.properties
+com.example.gui.window.title = Hello, {0}!
+com.example.gui.window.buttons.ok = OK
+com.example.gui.window.buttons.cancel = Cancel
+```
+
+```
+# Messages_ru.properties
+com.example.gui.window.title = Привет, {0}!
+com.example.gui.window.buttons.ok = Да
+com.example.gui.window.buttons.cancel = Отмена
+```
+
+Then reference messages by their keys from the source code:
+
+```java
+ResourceBundle msg =  ResourceBundle.getBundle("Messages");
+//get the message
+String ok = msg.getString("com.example.gui.window.buttons.ok");
+//get message with parameters
+String title = MessageFormat.format(
+  msg.getString("com.example.gui.window.buttons.ok"), "James");
+```
+
+Doable, but clumsy, and needs extra maintenance for keys.
+
+### Using C10N
+
+C10N uses a more java-esque approach: each message is declared as a
+method on an interface, with all translations stored in annotations.
+
+```java
+package com.example.gui;
+
+public interface Window{
+  @En("Hello, {0}!")
+  @Ru("Привет, {0}!")
+  String title(String userName);
+  
+  @En("OK")
+  @Ru("Да")
+  String ok();
+  
+  @En("Cancel")
+  @Ru("")
+  String cancel();
+}
+```
+
+To retrieve messages
+
+```java
+Window msg = C10N.get(Window.class);
+//get message
+String ok = msg.ok();
+//get message with parameter
+String title = msg.title("James");
+```
+
+Not only it is much simpler, you will never make a spelling mistake in your key, or miss a message parameter.
+
+If required, you can opt to store all or some of you translations in resource bundles. For more details see the documentation.
+
+Documentation
+-------------
 
 Download the latest 1.0 release from the [download section][C10NDownload]. 
 
