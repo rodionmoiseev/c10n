@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author rodion
  */
-public class DefaultC10NBundleCheckerTest {
+public class DefaultC10NInspectorTest {
     /*
      * Test all possible variations of keys:
      * - key with at least one annotation but not in any bundle (considered OK)

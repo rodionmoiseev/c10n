@@ -20,6 +20,7 @@
 package c10n.tools.search;
 
 import c10n.share.utils.C10NBundleKey;
+import c10n.tools.C10NTools;
 import c10n.tools.search.test1.Buttons;
 import c10n.tools.search.test1.Window;
 import c10n.tools.search.test1.labels.Labels1;
@@ -36,7 +37,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @author rodion
  */
-public class DefaultC10NBundleKeySearchTest {
+public class        DefaultC10NBundleKeySearchTest {
     @Test
     public void c10nInterfaceSearchIntegration() {
         C10NBundleKeySearch bundleKeySearch = new DefaultC10NBundleKeySearch(new DefaultC10NInterfaceSearch(), "");

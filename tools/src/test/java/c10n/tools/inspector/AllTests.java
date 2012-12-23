@@ -26,6 +26,6 @@ import org.junit.runners.Suite;
  * @author rodion
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses(DefaultC10NBundleCheckerTest.class)
+@Suite.SuiteClasses(DefaultC10NInspectorTest.class)
 public class AllTests {
 }
