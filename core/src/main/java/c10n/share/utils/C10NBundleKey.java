@@ -19,42 +19,21 @@
 
 package c10n.share.utils;
 
-import java.lang.reflect.Method;
+import static c10n.share.utils.Preconditions.assertNotNull;
 
 /**
  * @author rodion
  */
 public class C10NBundleKey {
-    private final Class<?> declaringInterface;
-    private final Method declaringMethod;
     private final boolean customKey;
     private final String key;
     private final String declaredKey;
 
-    public C10NBundleKey(Class<?> declaringInterface, Method declaringMethod, boolean customKey, String key, String declaredKey) {
-        this.declaringInterface = declaringInterface;
-        this.declaringMethod = declaringMethod;
+    public C10NBundleKey(boolean customKey, String key, String declaredKey) {
+        assertNotNull(key, "key");
         this.customKey = customKey;
         this.key = key;
         this.declaredKey = declaredKey;
-    }
-
-    /**
-     * <p>c10n interface declaring the method to which this key is bound.</p>
-     *
-     * @return c10n interface class (not null)
-     */
-    public Class<?> getDeclaringInterface() {
-        return declaringInterface;
-    }
-
-    /**
-     * <p>Method to which this key is bound</p>
-     *
-     * @return bound method (not null)
-     */
-    public Method getDeclaringMethod() {
-        return declaringMethod;
     }
 
     /**
@@ -99,8 +78,6 @@ public class C10NBundleKey {
 
         if (customKey != that.customKey) return false;
         if (declaredKey != null ? !declaredKey.equals(that.declaredKey) : that.declaredKey != null) return false;
-        if (!declaringInterface.equals(that.declaringInterface)) return false;
-        if (!declaringMethod.equals(that.declaringMethod)) return false;
         if (!key.equals(that.key)) return false;
 
         return true;
@@ -108,9 +85,7 @@ public class C10NBundleKey {
 
     @Override
     public int hashCode() {
-        int result = declaringInterface.hashCode();
-        result = 31 * result + declaringMethod.hashCode();
-        result = 31 * result + (customKey ? 1 : 0);
+        int result = (customKey ? 1 : 0);
         result = 31 * result + key.hashCode();
         result = 31 * result + (declaredKey != null ? declaredKey.hashCode() : 0);
         return result;
@@ -119,9 +94,7 @@ public class C10NBundleKey {
     @Override
     public String toString() {
         return "C10NBundleKey{" +
-                "declaringInterface=" + declaringInterface.getSimpleName() +
-                ", declaringMethod=" + declaringMethod.getName() +
-                ", customKey=" + customKey +
+                "customKey=" + customKey +
                 ", key='" + key + '\'' +
                 ", declaredKey='" + declaredKey + '\'' +
                 '}';

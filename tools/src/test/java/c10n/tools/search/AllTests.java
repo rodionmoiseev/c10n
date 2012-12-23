@@ -26,9 +26,6 @@ import org.junit.runners.Suite;
  * @author rodion
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-        C10NInterfaceSearchTest.class,
-        DefaultC10NBundleKeySearchTest.class
-})
+@Suite.SuiteClasses(C10NInterfaceSearchTest.class)
 public class AllTests {
 }

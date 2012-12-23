@@ -31,6 +31,6 @@ import java.util.Set;
 public class InspectorModule {
     public static C10NInspector defaultInspector(ConfiguredC10NModule configuredC10NModule,
                                                  Set<Locale> localesToCheck) {
-        return new DefaultC10NInspector(SearchModule.reflectionsBundleKeySearch(configuredC10NModule.getKeyPrefix()), configuredC10NModule, localesToCheck);
+        return new DefaultC10NInspector(SearchModule.reflectionsSearch(), configuredC10NModule, localesToCheck);
     }
 }

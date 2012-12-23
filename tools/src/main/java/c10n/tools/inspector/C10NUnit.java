@@ -22,24 +22,58 @@ package c10n.tools.inspector;
 import c10n.share.utils.C10NBundleKey;
 import com.google.common.collect.Maps;
 
+import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import static c10n.share.utils.Preconditions.assertNotNull;
 
 /**
  * @author rodion
  */
 public final class C10NUnit {
+    private final Class<?> declaringInterface;
+    private final Method declaringMethod;
     private final C10NBundleKey key;
     private final Map<Locale, C10NTranslations> translations = Maps.newHashMap();
 
-    C10NUnit(C10NBundleKey key, Set<Locale> initLocales) {
+    C10NUnit(Class<?> declaringInterface, Method declaringMethod, C10NBundleKey key, Set<Locale> initLocales) {
+        assertNotNull(declaringInterface, "declaringInterface");
+        assertNotNull(declaringMethod, "declaringMethod");
+        assertNotNull(key, "key");
+        assertNotNull(initLocales, "initLocales");
+        this.declaringInterface = declaringInterface;
+        this.declaringMethod = declaringMethod;
         this.key = key;
         for (Locale locale : initLocales) {
             this.translations.put(locale, new C10NTranslations());
         }
     }
 
+    /**
+     * <p>c10n interface declaring the method to which this key is bound.</p>
+     *
+     * @return c10n interface class (not null)
+     */
+    public Class<?> getDeclaringInterface() {
+        return declaringInterface;
+    }
+
+    /**
+     * <p>Method to which this key is bound</p>
+     *
+     * @return bound method (not null)
+     */
+    public Method getDeclaringMethod() {
+        return declaringMethod;
+    }
+
+    /**
+     * <p>Resource bundle key bound to this unit</p>
+     *
+     * @return bound bundle key (not null)
+     */
     public C10NBundleKey getKey() {
         return key;
     }
@@ -51,7 +85,9 @@ public final class C10NUnit {
     @Override
     public String toString() {
         return "C10NUnit{" +
-                "key=" + key +
+                "declaringInterface=" + declaringInterface +
+                ", declaringMethod=" + declaringMethod +
+                ", key=" + key +
                 ", translations=" + translations +
                 '}';
     }
@@ -63,6 +99,8 @@ public final class C10NUnit {
 
         C10NUnit c10NUnit = (C10NUnit) o;
 
+        if (!declaringInterface.equals(c10NUnit.declaringInterface)) return false;
+        if (!declaringMethod.equals(c10NUnit.declaringMethod)) return false;
         if (!key.equals(c10NUnit.key)) return false;
         if (!translations.equals(c10NUnit.translations)) return false;
 
@@ -71,7 +109,9 @@ public final class C10NUnit {
 
     @Override
     public int hashCode() {
-        int result = key.hashCode();
+        int result = declaringInterface.hashCode();
+        result = 31 * result + declaringMethod.hashCode();
+        result = 31 * result + key.hashCode();
         result = 31 * result + translations.hashCode();
         return result;
     }

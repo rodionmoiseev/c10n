@@ -30,7 +30,7 @@ import c10n.annotations.Ja;
 
 @C10NKey("msg1")
 @C10NMessages
-interface Msg1 {
+public interface Msg1 {
     //bundle lookup
     String key1();
 

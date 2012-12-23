@@ -19,73 +19,70 @@
 
 package c10n.tools.inspector;
 
+import c10n.C10NMessages;
 import c10n.ConfiguredC10NModule;
 import c10n.share.utils.C10NBundleKey;
-import c10n.tools.search.C10NBundleKeySearch;
-import com.google.common.base.Function;
+import c10n.share.utils.ReflectionUtils;
+import c10n.tools.search.C10NInterfaceSearch;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
-import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * @author rodion
  */
 class DefaultC10NInspector implements C10NInspector {
-    private final C10NBundleKeySearch bundleKeySearch;
+    private final C10NInterfaceSearch c10NInterfaceSearch;
     private final ConfiguredC10NModule configuredC10NModule;
     private final Set<Locale> localesToCheck;
 
-    DefaultC10NInspector(C10NBundleKeySearch bundleKeySearch,
+    DefaultC10NInspector(C10NInterfaceSearch c10NInterfaceSearch,
                          ConfiguredC10NModule configuredC10NModule,
                          Set<Locale> localesToCheck) {
-        this.bundleKeySearch = bundleKeySearch;
+        this.c10NInterfaceSearch = c10NInterfaceSearch;
         this.configuredC10NModule = configuredC10NModule;
         this.localesToCheck = localesToCheck;
     }
 
     @Override
-    public Iterable<C10NUnit> inspect(String... packagePrefixes) {
+    public List<C10NUnit> inspect(String... packagePrefixes) {
         Map<C10NBundleKey, C10NUnit> c10NUnitsByKey = Maps.newHashMap();
 
-        Iterable<C10NBundleKey> allKeys = bundleKeySearch.findAllKeys(packagePrefixes);
-        Multimap<Class<?>, C10NBundleKey> keysByClass = Multimaps.index(allKeys, new Function<C10NBundleKey, Class<?>>() {
-            @Override
-            public Class<?> apply(@Nullable C10NBundleKey input) {
-                if (null != input) {
-                    return input.getDeclaringInterface();
-                }
-                return null;
-            }
-        });
-
-        for (Class<?> c10nInterface : keysByClass.keySet()) {
+        Set<Class<?>> c10nInterfaces = c10NInterfaceSearch.find(C10NMessages.class, packagePrefixes);
+        for (Class<?> c10nInterface : c10nInterfaces) {
             Set<Map.Entry<Class<? extends Annotation>, Set<Locale>>> annotationEntries =
                     configuredC10NModule.getAnnotationBindings(c10nInterface).entrySet();
 
-            for (C10NBundleKey key : keysByClass.get(c10nInterface)) {
+            List<C10NBundleKey> keysForInterface = Lists.newArrayList();
+
+            for (Method method : c10nInterface.getDeclaredMethods()) {
+                String keyAnnotationValue = ReflectionUtils.getKeyAnnotationValue(method);
+                String bundleKey = ReflectionUtils.getC10NKey(configuredC10NModule.getKeyPrefix(), method);
+                boolean isCustom = ReflectionUtils.getKeyAnnotationBasedKey(method) != null;
+                C10NBundleKey key = new C10NBundleKey(isCustom, bundleKey, keyAnnotationValue);
+
                 for (Map.Entry<Class<? extends Annotation>, Set<Locale>> entry : annotationEntries) {
                     Class<? extends Annotation> annotation = entry.getKey();
                     for (Locale locale : entry.getValue()) {
-                        C10NTranslations trs = addC10NUnit(c10NUnitsByKey, key, locale);
-                        if (key.getDeclaringMethod().getAnnotation(annotation) != null) {
+                        C10NUnit unit = addC10NUnit(c10NUnitsByKey, c10nInterface, method, key);
+                        C10NTranslations trs = addTranslations(unit, locale);
+                        if (method.getAnnotation(annotation) != null) {
                             trs.getAnnotations().add(annotation);
                         }
                     }
                 }
+
+                keysForInterface.add(key);
             }
 
             for (Locale locale : localesToCheck) {
                 List<ResourceBundle> bundles = configuredC10NModule.getBundleBindings(c10nInterface, locale);
-                for (C10NBundleKey key : keysByClass.get(c10nInterface)) {
-                    C10NTranslations trs = addC10NUnit(c10NUnitsByKey, key, locale);
+                for (C10NBundleKey key : keysForInterface) {
+                    C10NUnit unit = c10NUnitsByKey.get(key);
+                    C10NTranslations trs = addTranslations(unit, locale);
                     for (ResourceBundle bundle : bundles) {
                         if (bundle.containsKey(key.getKey())) {
                             trs.getBundles().add(bundle);
@@ -95,15 +92,22 @@ class DefaultC10NInspector implements C10NInspector {
             }
         }
 
-        return c10NUnitsByKey.values();
+        return Lists.newArrayList(c10NUnitsByKey.values());
     }
 
-    private C10NTranslations addC10NUnit(Map<C10NBundleKey, C10NUnit> unitByKey, C10NBundleKey key, Locale locale) {
+    private C10NUnit addC10NUnit(Map<C10NBundleKey, C10NUnit> unitByKey,
+                                 Class<?> declaringInterface,
+                                 Method declaringMethod,
+                                 C10NBundleKey key) {
         C10NUnit unit = unitByKey.get(key);
         if (null == unit) {
-            unit = new C10NUnit(key, localesToCheck);
+            unit = new C10NUnit(declaringInterface, declaringMethod, key, localesToCheck);
             unitByKey.put(key, unit);
         }
+        return unit;
+    }
+
+    private C10NTranslations addTranslations(C10NUnit unit, Locale locale) {
         C10NTranslations translations = unit.getTranslations().get(locale);
         if (null == translations) {
             translations = new C10NTranslations();

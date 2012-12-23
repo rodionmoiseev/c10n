@@ -25,15 +25,14 @@ import c10n.ConfiguredC10NModule;
 import c10n.annotations.DefaultC10NAnnotations;
 import c10n.annotations.En;
 import c10n.annotations.Ja;
-import c10n.tools.C10NTools;
+import c10n.share.utils.C10NBundleKey;
+import c10n.tools.search.SearchModule;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.lang.reflect.Method;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -63,10 +62,10 @@ public class DefaultC10NInspectorTest {
             }
         };
         ConfiguredC10NModule confdModule = C10N.configure(conf);
-        C10NInspector checker = new DefaultC10NInspector(C10NTools.bundleKeySearch(confdModule.getKeyPrefix()),
+        C10NInspector checker = new DefaultC10NInspector(SearchModule.reflectionsSearch(),
                 confdModule,
                 localesToCheck);
-        Iterable<C10NUnit> units = checker.inspect("c10n.tools.inspector.test1");
+        List<C10NUnit> units = checker.inspect("c10n.tools.inspector.test1");
 
         for (C10NUnit unit : units) {
             System.out.println(unit);
@@ -74,6 +73,7 @@ public class DefaultC10NInspectorTest {
 
         assertThat(Iterables.size(units), is(6));
         //key in both bundles, without annotations
+        //assertThat(unitFor("msg1.key1", units), is(unit(Msg1.class, "key1", autoKey("c10n.tools.inspector.test1.msg1.key1"))));
         assertThat(unitFor("msg1.key1", units).getTranslations().get(Locale.ENGLISH).getBundles().size(), is(1));
         assertThat(unitFor("msg1.key1", units).getTranslations().get(Locale.JAPANESE).getBundles().size(), is(1));
         assertThat(unitFor("msg1.key1", units).getTranslations().get(Locale.ENGLISH).getAnnotations().size(), is(0));
@@ -110,6 +110,14 @@ public class DefaultC10NInspectorTest {
         assertThat(unitFor("msg2.annotatedValue", units).getTranslations().get(Locale.JAPANESE).getAnnotations().size(), is(0));
     }
 
+    private C10NBundleKey autoKey(String key) {
+        return new C10NBundleKey(false, key, null);
+    }
+
+    private C10NBundleKey customKey(String key, String declaredKey) {
+        return new C10NBundleKey(true, key, declaredKey);
+    }
+
     private static Set<Locale> set(Locale... locales) {
         return new HashSet<Locale>(Arrays.asList(locales));
     }
@@ -121,5 +129,17 @@ public class DefaultC10NInspectorTest {
             }
         }
         throw new RuntimeException("c10n-unit for key '" + key + "' was not found in: " + units);
+    }
+
+    private static C10NUnit unit(Class<?> declaringInterface, String methodName, C10NBundleKey key) {
+        return new C10NUnit(declaringInterface, getMethod(declaringInterface, methodName), key, Sets.newHashSet(Locale.ENGLISH, Locale.JAPANESE));
+    }
+
+    private static Method getMethod(Class<?> clazz, String methodName, Class<?>... args) {
+        try {
+            return clazz.getMethod(methodName, args);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

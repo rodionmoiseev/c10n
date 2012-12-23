@@ -19,9 +19,11 @@
 
 package c10n.tools.inspector;
 
+import java.util.List;
+
 /**
  * @author rodion
  */
 public interface C10NInspector {
-    Iterable<C10NUnit> inspect(String... packagePrefixes);
+    List<C10NUnit> inspect(String... packagePrefixes);
 }

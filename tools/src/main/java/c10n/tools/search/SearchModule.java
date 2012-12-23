@@ -23,15 +23,4 @@ public final class SearchModule {
     public static C10NInterfaceSearch reflectionsSearch() {
         return new DefaultC10NInterfaceSearch();
     }
-
-    /**
-     * <p>Bundle key search implementation based on the
-     * <a href="http://code.google.com/p/reflections">Reflections library</a>.</p>
-     *
-     * @param keyPrefix global bundle key prefix to use
-     * @return bundle key search module implementation (not null)
-     */
-    public static C10NBundleKeySearch reflectionsBundleKeySearch(String keyPrefix) {
-        return new DefaultC10NBundleKeySearch(reflectionsSearch(), keyPrefix);
-    }
 }

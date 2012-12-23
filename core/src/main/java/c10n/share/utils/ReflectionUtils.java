@@ -22,11 +22,7 @@ package c10n.share.utils;
 import c10n.C10NKey;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public final class ReflectionUtils {
     private static final String KEY_DELIM = ".";
@@ -78,7 +74,7 @@ public final class ReflectionUtils {
         return key;
     }
 
-    static String getKeyAnnotationBasedKey(Method method) {
+    public static String getKeyAnnotationBasedKey(Method method) {
         String parentKey = findParentKey(method);
         String c10NKey = getKeyAnnotationValue(method);
         if (null == parentKey && null == c10NKey) {
@@ -111,7 +107,7 @@ public final class ReflectionUtils {
      * @param method method for which to retrieve the value {@link c10n.C10NKey} annotation
      * @return value of the declared annotation. <code>null</code> if not present.
      */
-    static String getKeyAnnotationValue(Method method) {
+    public static String getKeyAnnotationValue(Method method) {
         C10NKey c10NKey = method.getAnnotation(C10NKey.class);
         if (null != c10NKey) {
             return c10NKey.value();

@@ -22,8 +22,6 @@ package c10n.tools;
 import c10n.ConfiguredC10NModule;
 import c10n.tools.inspector.C10NInspector;
 import c10n.tools.inspector.InspectorModule;
-import c10n.tools.search.C10NBundleKeySearch;
-import c10n.tools.search.SearchModule;
 import com.google.common.collect.Sets;
 
 import java.util.Locale;
@@ -33,25 +31,6 @@ import java.util.Set;
  * @author rodion
  */
 public final class C10NTools {
-    /**
-     * <p>Creates new bundle key search implementation instance.</p>
-     *
-     * @return bundle key search module implementation (not null)
-     */
-    public static C10NBundleKeySearch bundleKeySearch() {
-        return bundleKeySearch("");
-    }
-
-    /**
-     * <p>Creates new bundle key search implementation instance.</p>
-     *
-     * @param keyPrefix global bundle key prefix to use (not null)
-     * @return bundle key search module implementation (not null)
-     */
-    public static C10NBundleKeySearch bundleKeySearch(String keyPrefix) {
-        return SearchModule.reflectionsBundleKeySearch(keyPrefix);
-    }
-
     /**
      * <p>Creates a new c10n translation inspector</p>
      *
