@@ -40,9 +40,9 @@ import static org.junit.Assert.assertThat;
  */
 public class C10NTest {
     @Rule
-    public static TestRule tmpLocale = RuleUtils.tmpLocale();
+    public TestRule tmpLocale = RuleUtils.tmpLocale();
     @Rule
-    public static TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
     @Test
     public void parametrisationIsDisabledWhenRawFalseIsPresent() {
@@ -71,6 +71,19 @@ public class C10NTest {
             }
         }));
         assertThat(jpC10nFactory.get(Messages.class).text(), is("japanese"));
+    }
+
+    @Test
+    public void configureTimeLocaleProviderIsIgnoreWhenLocaleIsPassedAtMessageCreationTime() {
+        C10NMsgFactory c10nFactory = C10N.createMsgFactory(C10N.configure(new C10NConfigBase() {
+            @Override
+            protected void configure() {
+                install(new DefaultC10NAnnotations());
+                setLocale(Locale.ENGLISH);
+            }
+        }));
+        assertThat(c10nFactory.get(Messages.class, Locale.JAPANESE).text(), is("japanese"));
+        assertThat(c10nFactory.get(Messages.class, Locale.ENGLISH).text(), is("english"));
     }
 
     interface Messages {

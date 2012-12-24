@@ -19,6 +19,10 @@
 
 package c10n;
 
+import java.util.Locale;
+
 public interface C10NMsgFactory {
     <T> T get(Class<T> c10nInterface);
+
+    <T> T get(Class<T> c10nInterface, Locale locale);
 }

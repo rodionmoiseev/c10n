@@ -37,9 +37,9 @@ import static org.junit.Assert.assertThat;
 
 public class CustomAnnotationBindingTest {
     @Rule
-    public static TestRule tmpLocale = RuleUtils.tmpLocale();
+    public TestRule tmpLocale = RuleUtils.tmpLocale();
     @Rule
-    public static TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
     @Before
     public void fixture() {

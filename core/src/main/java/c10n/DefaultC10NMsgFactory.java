@@ -21,6 +21,7 @@ package c10n;
 
 import c10n.share.Constants;
 import c10n.share.LocaleMapping;
+import c10n.share.utils.Preconditions;
 import c10n.share.utils.ReflectionUtils;
 
 import java.io.BufferedReader;
@@ -46,6 +47,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static c10n.share.utils.Preconditions.assertNotNull;
+
 class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
     private final ConfiguredC10NModule conf;
     private final LocaleMapping localeMapping;
@@ -59,18 +62,28 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
 
     @Override
     public <T> T get(Class<T> c10nInterface) {
-        return get(c10nInterface, null);
+        assertNotNull(c10nInterface, "c10nInterface");
+        return get(c10nInterface, null, new LocaleProvider() {
+            @Override
+            public Locale getLocale() {
+                return conf.getCurrentLocale();
+            }
+        });
+    }
+
+    @Override
+    public <T> T get(Class<T> c10nInterface, Locale locale) {
+        assertNotNull(c10nInterface, "c10nInterface");
+        assertNotNull(locale, "locale");
+        return get(c10nInterface, null, LocaleProviders.fixed(locale));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T get(Class<T> c10nInterface, String delegatingValue) {
-        if (null == c10nInterface) {
-            throw new NullPointerException("c10nInterface is null");
-        }
+    public <T> T get(Class<T> c10nInterface, String delegatingValue, LocaleProvider localeProvider) {
         return (T) Proxy.newProxyInstance(proxyClassloader,
                 new Class[]{c10nInterface},
-                C10NInvocationHandler.create(this, delegatingValue, conf, localeMapping, c10nInterface));
+                C10NInvocationHandler.create(this, delegatingValue, conf, localeProvider, localeMapping, c10nInterface));
     }
 
     private static final class C10NString {
@@ -93,6 +106,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
         private final InternalC10NMsgFactory c10nFactory;
         private final String delegatingValue;
         private final ConfiguredC10NModule conf;
+        private final LocaleProvider localeProvider;
         private final LocaleMapping localeMapping;
         private final Class<?> proxiedClass;
         private final Map<String, Map<Locale, C10NString>> translationsByMethod;
@@ -104,6 +118,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
         C10NInvocationHandler(InternalC10NMsgFactory c10nFactory,
                               String delegatingValue,
                               ConfiguredC10NModule conf,
+                              LocaleProvider localeProvider,
                               LocaleMapping localeMapping,
                               Class<?> proxiedClass,
                               Map<String, Map<Locale, C10NString>> translationsByMethod,
@@ -111,6 +126,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
             this.c10nFactory = c10nFactory;
             this.delegatingValue = delegatingValue;
             this.conf = conf;
+            this.localeProvider = localeProvider;
             this.localeMapping = localeMapping;
             this.proxiedClass = proxiedClass;
             this.translationsByMethod = translationsByMethod;
@@ -121,7 +137,10 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
 
         static C10NInvocationHandler create(InternalC10NMsgFactory c10nFactory,
                                             String delegatingValue,
-                                            ConfiguredC10NModule conf, LocaleMapping localeMapping, Class<?> c10nInterface) {
+                                            ConfiguredC10NModule conf,
+                                            LocaleProvider localeProvider,
+                                            LocaleMapping localeMapping,
+                                            Class<?> c10nInterface) {
             Map<String, Map<Locale, C10NString>> translationsByMethod = new HashMap<String, Map<Locale, C10NString>>();
             Map<Method, String> bundleKeys = new HashMap<Method, String>();
 
@@ -177,6 +196,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
             return new C10NInvocationHandler(c10nFactory,
                     delegatingValue,
                     conf,
+                    localeProvider,
                     localeMapping,
                     c10nInterface,
                     translationsByMethod,
@@ -297,7 +317,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            Locale locale = conf.getCurrentLocale();
+            Locale locale = localeProvider.getLocale();
 
             Locale implLocale = localeMapping.findClosestMatch(availableImplLocales, locale);
 
@@ -317,7 +337,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                 return stringValue;
             } else if (returnType.isInterface()) {
                 if (null != returnType.getAnnotation(C10NMessages.class)) {
-                    return c10nFactory.get(returnType, stringValue);
+                    return c10nFactory.get(returnType, stringValue, localeProvider);
                 }
             }
             // don't know how to handle this return type

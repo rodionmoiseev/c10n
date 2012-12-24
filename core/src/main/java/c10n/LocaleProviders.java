@@ -20,11 +20,30 @@
 
 package c10n;
 
-import java.lang.reflect.Method;
+import java.util.Locale;
 
 /**
  * @author rodion
  */
-interface InternalC10NMsgFactory extends C10NMsgFactory {
-    <T> T get(Class<T> c10nInterface, String delegatingValue, LocaleProvider localeProvider);
+public class LocaleProviders {
+    public static LocaleProvider fixed(Locale locale) {
+        return new FixedLocaleProvider(locale);
+    }
+
+    /**
+     * <p>{@link LocaleProvider} that always returns the given
+     * {@link java.util.Locale} instance.</p>
+     */
+    private static final class FixedLocaleProvider implements LocaleProvider {
+        private final Locale locale;
+
+        FixedLocaleProvider(Locale locale) {
+            this.locale = locale;
+        }
+
+        @Override
+        public Locale getLocale() {
+            return locale;
+        }
+    }
 }

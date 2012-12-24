@@ -170,7 +170,7 @@ public abstract class C10NConfigBase {
      * @param locale Locale to use
      */
     protected void setLocale(Locale locale) {
-        this.localeProvider = new FixedLocaleProvider(locale);
+        this.localeProvider = LocaleProviders.fixed(locale);
     }
 
     /**
@@ -487,23 +487,6 @@ public abstract class C10NConfigBase {
             }
             return annotatedWith;
 
-        }
-    }
-
-    /**
-     * <p>{@link LocaleProvider} that always returns the given
-     * {@link java.util.Locale} instance.</p>
-     */
-    private static final class FixedLocaleProvider implements LocaleProvider {
-        private final Locale locale;
-
-        FixedLocaleProvider(Locale locale) {
-            this.locale = locale;
-        }
-
-        @Override
-        public Locale getLocale() {
-            return locale;
         }
     }
 }

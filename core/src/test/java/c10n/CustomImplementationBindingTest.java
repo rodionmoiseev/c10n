@@ -32,7 +32,7 @@ import static org.junit.Assert.assertThat;
 
 public class CustomImplementationBindingTest {
     @Rule
-    public static TestRule tmpLocale = RuleUtils.tmpLocale();
+    public TestRule tmpLocale = RuleUtils.tmpLocale();
     @Rule
     public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
