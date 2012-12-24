@@ -19,9 +19,12 @@
 
 package c10n.tools.inspector;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import java.lang.annotation.Annotation;
+import java.util.Enumeration;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -43,7 +46,7 @@ public final class C10NTranslations {
     @Override
     public String toString() {
         return "C10NTranslations{" +
-                "bundles=" + bundles +
+                "bundles=" + bundlesToMaps(bundles) +
                 ", annotations=" + annotations +
                 '}';
     }
@@ -66,5 +69,23 @@ public final class C10NTranslations {
         int result = bundles.hashCode();
         result = 31 * result + annotations.hashCode();
         return result;
+    }
+
+    private static Set<Map<String, String>> bundlesToMaps(Set<ResourceBundle> bundles) {
+        Set<Map<String, String>> res = Sets.newHashSet();
+        for (ResourceBundle bundle : bundles) {
+            res.add(bundleToMap(bundle));
+        }
+        return res;
+    }
+
+    private static Map<String, String> bundleToMap(ResourceBundle bundle) {
+        Map<String, String> res = Maps.newHashMap();
+        Enumeration<String> keys = bundle.getKeys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            res.put(key, bundle.getString(key));
+        }
+        return res;
     }
 }
