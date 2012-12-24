@@ -17,13 +17,13 @@
  *  under the License.
  */
 
-configurations{
+configurations {
   guice
   guiceArchives
   testCompile.extendsFrom guice
 }
 
-dependencies{
+dependencies {
   guice group: "org.reflections", name: "reflections", version: "0.9.8"
   guice group: 'com.google.inject', name: 'guice', version: '3.0'
   guice group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'
@@ -33,40 +33,40 @@ dependencies{
 
 eclipse.classpath.plusConfigurations += configurations.guice
 
-idea.module{
+idea.module {
   sourceDirs += file("src/ext/guice/java")
   scopes.COMPILE.plus += configurations.guice
 }
 
-sourceSets{
-  guice{
-    java{
+sourceSets {
+  guice {
+    java {
       srcDir "src/ext/guice/java"
     }
     compileClasspath += sourceSets.main.output
     compileClasspath += configurations.provided
     compileClasspath += configurations.guice
   }
-  test{
+  test {
     compileClasspath += sourceSets.guice.output
     runtimeClasspath += sourceSets.guice.output
   }
 }
 
-jar{
+jar {
   appendix = "core"
 }
 
-sourcesJar{
+sourcesJar {
   appendix = "core"
 }
 
-task guiceJar(type: Jar, dependsOn: guiceClasses){
+task guiceJar(type: Jar, dependsOn: guiceClasses) {
   appendix = "ext-guice"
   from sourceSets.guice.output
 }
 
-task guiceSourcesJar(type: Jar, dependsOn: guiceClasses){
+task guiceSourcesJar(type: Jar, dependsOn: guiceClasses) {
   appendix = "ext-guice"
   classifier = "sources"
   from sourceSets.guice.allSource
@@ -81,7 +81,7 @@ uploadGuiceArchives {
   }
 }
 
-artifacts{
+artifacts {
   guiceArchives guiceJar
   guiceArchives guiceSourcesJar
 }
