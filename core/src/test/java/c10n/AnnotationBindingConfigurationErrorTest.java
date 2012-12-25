@@ -22,9 +22,9 @@ package c10n;
 import c10n.annotations.DefaultC10NAnnotations;
 import c10n.annotations.En;
 import c10n.test.utils.RuleUtils;
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.matchers.JUnitMatchers;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TestRule;
 
@@ -32,6 +32,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static org.hamcrest.CoreMatchers.containsString;
 
 /**
  * @author rodion
@@ -45,7 +47,7 @@ public class AnnotationBindingConfigurationErrorTest {
     @Test
     public void nullAnnotationsAreNotAccepted() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(JUnitMatchers.containsString("is null"));
+        thrown.expectMessage(containsString("is null"));
         C10N.configure(new C10NConfigBase() {
             @Override
             public void configure() {
@@ -57,7 +59,7 @@ public class AnnotationBindingConfigurationErrorTest {
     @Test
     public void annotationsWithoutValueMethodThrowExceptionAtConfigurationTime() {
         thrown.expect(C10NConfigException.class);
-        thrown.expectMessage(JUnitMatchers.containsString("value()"));
+        thrown.expectMessage(containsString("value()"));
         C10N.configure(new C10NConfigBase() {
             @Override
             public void configure() {
@@ -69,8 +71,8 @@ public class AnnotationBindingConfigurationErrorTest {
     @Test
     public void valueMethodMustReturnStringOrElseExceptionIsThrownAtConfigurationTime() {
         thrown.expect(C10NConfigException.class);
-        thrown.expectMessage(JUnitMatchers.containsString("value()"));
-        thrown.expectMessage(JUnitMatchers.containsString("String"));
+        thrown.expectMessage(containsString("value()"));
+        thrown.expectMessage(containsString("String"));
         C10N.configure(new C10NConfigBase() {
             @Override
             public void configure() {
@@ -82,7 +84,7 @@ public class AnnotationBindingConfigurationErrorTest {
     @Test
     public void cannotBindToNullLocale() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(JUnitMatchers.containsString("locale is null"));
+        thrown.expectMessage(containsString("locale is null"));
         C10N.configure(new C10NConfigBase() {
             @Override
             public void configure() {
