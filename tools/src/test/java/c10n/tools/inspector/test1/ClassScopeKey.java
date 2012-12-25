@@ -1,5 +1,5 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
+ *  Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
  * regarding copyright ownership.  The ASF licenses this file
@@ -15,29 +15,32 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ *
  */
 
-package c10n.tools.inspector;
+package c10n.tools.inspector.test1;
 
-import c10n.ConfiguredC10NModule;
-import c10n.tools.search.SearchModule;
-
-import java.util.Locale;
-import java.util.Set;
+import c10n.C10NKey;
+import c10n.C10NMessages;
+import c10n.annotations.En;
+import c10n.annotations.Ja;
 
 /**
  * @author rodion
+ * @since 1.1
  */
-public class InspectorModule {
-    public static DummyInstanceProvider defaultDummyInstanceProvider() {
-        return new DefaultDummyInstanceProvider();
-    }
+@C10NKey("scope.class")
+@C10NMessages
+public interface ClassScopeKey {
+    /*
+     * key: scope.class.both
+     */
+    String both();
 
-    public static C10NInspector defaultInspector(ConfiguredC10NModule configuredC10NModule,
-                                                 Set<Locale> localesToCheck) {
-        return new DefaultC10NInspector(SearchModule.reflectionsSearch(),
-                configuredC10NModule,
-                defaultDummyInstanceProvider(),
-                localesToCheck);
-    }
+    /*
+     * key: scope.class.bothInAnnotationAndInBundle
+     */
+    @En("[en]@annotation ClassScopeKey.bothInAnnotationAndInBundle")
+    @Ja("[ja]@annotation ClassScopeKey.bothInAnnotationAndInBundle")
+    String bothInAnnotationAndInBundle();
 }

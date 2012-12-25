@@ -1,5 +1,5 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
+ *  Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
  * regarding copyright ownership.  The ASF licenses this file
@@ -15,25 +15,24 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ *
  */
 
 package c10n.tools.inspector.test1;
 
 import c10n.C10NKey;
 import c10n.C10NMessages;
-import c10n.annotations.En;
 
 /**
  * @author rodion
+ * @since 1.1
  */
-@C10NKey("msg2")
+@C10NKey("scope.class")
 @C10NMessages
-public interface Msg2 {
-    String key3();
-
-    String key4();
-
-    @En("annotated value en")
-        //@Ja("annotated value ja")
-    String annotatedValue();
+public interface MethodScopeKey {
+    /*
+     * key: scope.class.scope.method.both
+     */
+    @C10NKey("scope.method.both")
+    String both();
 }

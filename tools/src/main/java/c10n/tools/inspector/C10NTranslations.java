@@ -32,14 +32,23 @@ import java.util.Set;
  * @author rodion
  */
 public final class C10NTranslations {
+    private String value = null;
     private final Set<ResourceBundle> bundles = Sets.newHashSet();
-    private final Set<Class<? extends Annotation>> annotations = Sets.newHashSet();
+    private final Set<Annotation> annotations = Sets.newHashSet();
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 
     public Set<ResourceBundle> getBundles() {
         return bundles;
     }
 
-    public Set<Class<? extends Annotation>> getAnnotations() {
+    public Set<Annotation> getAnnotations() {
         return annotations;
     }
 

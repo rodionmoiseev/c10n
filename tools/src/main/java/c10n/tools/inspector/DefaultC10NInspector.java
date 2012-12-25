@@ -19,7 +19,9 @@
 
 package c10n.tools.inspector;
 
+import c10n.C10N;
 import c10n.C10NMessages;
+import c10n.C10NMsgFactory;
 import c10n.ConfiguredC10NModule;
 import c10n.share.utils.C10NBundleKey;
 import c10n.share.utils.ReflectionUtils;
@@ -28,6 +30,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -37,62 +40,102 @@ import java.util.*;
 class DefaultC10NInspector implements C10NInspector {
     private final C10NInterfaceSearch c10NInterfaceSearch;
     private final ConfiguredC10NModule configuredC10NModule;
+    private final DummyInstanceProvider dummyInstanceProvider;
     private final Set<Locale> localesToCheck;
 
     DefaultC10NInspector(C10NInterfaceSearch c10NInterfaceSearch,
                          ConfiguredC10NModule configuredC10NModule,
+                         DummyInstanceProvider dummyInstanceProvider,
                          Set<Locale> localesToCheck) {
         this.c10NInterfaceSearch = c10NInterfaceSearch;
         this.configuredC10NModule = configuredC10NModule;
+        this.dummyInstanceProvider = dummyInstanceProvider;
         this.localesToCheck = localesToCheck;
     }
 
     @Override
     public List<C10NUnit> inspect(String... packagePrefixes) {
-        Map<C10NBundleKey, C10NUnit> c10NUnitsByKey = Maps.newHashMap();
+        List<C10NUnit> res = Lists.newArrayList();
+
+        C10NMsgFactory c10NMsgFactory = C10N.createMsgFactory(configuredC10NModule);
 
         Set<Class<?>> c10nInterfaces = c10NInterfaceSearch.find(C10NMessages.class, packagePrefixes);
         for (Class<?> c10nInterface : c10nInterfaces) {
             Set<Map.Entry<Class<? extends Annotation>, Set<Locale>>> annotationEntries =
                     configuredC10NModule.getAnnotationBindings(c10nInterface).entrySet();
 
-            List<C10NBundleKey> keysForInterface = Lists.newArrayList();
+
+            List<C10NUnit> unitsForInterface = Lists.newArrayList();
 
             for (Method method : c10nInterface.getDeclaredMethods()) {
                 String keyAnnotationValue = ReflectionUtils.getKeyAnnotationValue(method);
                 String bundleKey = ReflectionUtils.getC10NKey(configuredC10NModule.getKeyPrefix(), method);
                 boolean isCustom = ReflectionUtils.getKeyAnnotationBasedKey(method) != null;
                 C10NBundleKey key = new C10NBundleKey(isCustom, bundleKey, keyAnnotationValue);
-
+                C10NUnit unit = new C10NUnit(c10nInterface, method, key, localesToCheck);
                 for (Map.Entry<Class<? extends Annotation>, Set<Locale>> entry : annotationEntries) {
-                    Class<? extends Annotation> annotation = entry.getKey();
+                    Class<? extends Annotation> annotationClass = entry.getKey();
                     for (Locale locale : entry.getValue()) {
-                        C10NUnit unit = addC10NUnit(c10NUnitsByKey, c10nInterface, method, key);
-                        C10NTranslations trs = addTranslations(unit, locale);
-                        if (method.getAnnotation(annotation) != null) {
-                            trs.getAnnotations().add(annotation);
+                        if (localesToCheck.contains(locale)) {
+                            String translatedValue = extractTranslatedValue(c10NMsgFactory,
+                                    c10nInterface,
+                                    method,
+                                    locale);
+                            C10NTranslations trs = addTranslations(unit, locale, translatedValue);
+                            Annotation annotation = method.getAnnotation(annotationClass);
+                            if (null != annotation) {
+                                trs.getAnnotations().add(annotation);
+                            }
                         }
                     }
                 }
-
-                keysForInterface.add(key);
+                unitsForInterface.add(unit);
             }
 
             for (Locale locale : localesToCheck) {
                 List<ResourceBundle> bundles = configuredC10NModule.getBundleBindings(c10nInterface, locale);
-                for (C10NBundleKey key : keysForInterface) {
-                    C10NUnit unit = c10NUnitsByKey.get(key);
-                    C10NTranslations trs = addTranslations(unit, locale);
+                for (C10NUnit unit : unitsForInterface) {
+                    String translatedValue = extractTranslatedValue(c10NMsgFactory,
+                            c10nInterface,
+                            unit.getDeclaringMethod(),
+                            locale);
+                    C10NTranslations trs = addTranslations(unit, locale, translatedValue);
                     for (ResourceBundle bundle : bundles) {
-                        if (bundle.containsKey(key.getKey())) {
+                        if (bundle.containsKey(unit.getKey().getKey())) {
                             trs.getBundles().add(bundle);
                         }
                     }
                 }
             }
+
+            res.addAll(unitsForInterface);
         }
 
-        return Lists.newArrayList(c10NUnitsByKey.values());
+        return res;
+    }
+
+    private String extractTranslatedValue(C10NMsgFactory c10NMsgFactory,
+                                          Class<?> c10nInterface,
+                                          Method method,
+                                          Locale locale) {
+        try {
+            Class<?>[] paramTypes = method.getParameterTypes();
+            Object[] args = new Object[paramTypes.length];
+            for (int i = 0; i < args.length; i++) {
+                args[i] = dummyInstanceProvider.getInstance(c10nInterface, method, paramTypes[i], i);
+                if (null == args[i]) {
+                    throw new C10NInspectorException("Cannot create dummy instance for" +
+                            "type: " + paramTypes[i].getName());
+                }
+            }
+            Object v = method.invoke(c10NMsgFactory.get(c10nInterface, locale), args);
+            if (null != v) {
+                return v.toString();
+            }
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
+        return null;
     }
 
     private C10NUnit addC10NUnit(Map<C10NBundleKey, C10NUnit> unitByKey,
@@ -107,12 +150,20 @@ class DefaultC10NInspector implements C10NInspector {
         return unit;
     }
 
-    private C10NTranslations addTranslations(C10NUnit unit, Locale locale) {
+    private C10NTranslations addTranslations(C10NUnit unit, Locale locale, String value) {
         C10NTranslations translations = unit.getTranslations().get(locale);
         if (null == translations) {
             translations = new C10NTranslations();
             unit.getTranslations().put(locale, translations);
         }
+        translations.setValue(value);
         return translations;
+    }
+
+
+    private static final class C10NInspectorException extends Exception {
+        C10NInspectorException(String message) {
+            super(message);
+        }
     }
 }
