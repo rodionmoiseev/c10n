@@ -35,21 +35,21 @@ class DefaultDummyInstanceProvider implements DummyInstanceProvider {
         if (paramType.isAssignableFrom(String.class) ||
                 paramType.isAssignableFrom(CharSequence.class)) {
             return String.format("{%d}", paramIndex);
-        } else if (paramType.equals(byte.class)) {
+        } else if (paramType.equals(byte.class) || paramType.equals(Byte.class)) {
             return (byte) paramIndex;
-        } else if (paramType.equals(short.class)) {
+        } else if (paramType.equals(short.class) || paramType.equals(Short.class)) {
             return (short) paramIndex;
-        } else if (paramType.equals(int.class)) {
+        } else if (paramType.equals(int.class) || paramType.equals(Integer.class)) {
             return paramIndex;
-        } else if (paramType.equals(long.class)) {
+        } else if (paramType.equals(long.class) || paramType.equals(Long.class)) {
             return (long) paramIndex;
-        } else if (paramType.equals(float.class)) {
+        } else if (paramType.equals(float.class) || paramType.equals(Float.class)) {
             return (float) paramIndex;
-        } else if (paramType.equals(double.class)) {
+        } else if (paramType.equals(double.class) || paramType.equals(Double.class)) {
             return (double) paramIndex;
-        } else if (paramType.equals(boolean.class)) {
+        } else if (paramType.equals(boolean.class) || paramType.equals(Boolean.class)) {
             return false;
-        } else if (paramType.equals(char.class)) {
+        } else if (paramType.equals(char.class) || paramType.equals(Character.class)) {
             return Character.forDigit(paramIndex, 10);
         } else {
             //give up

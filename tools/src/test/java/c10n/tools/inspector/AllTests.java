@@ -26,6 +26,7 @@ import org.junit.runners.Suite;
  * @author rodion
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses(DefaultC10NInspectorTest.class)
+@Suite.SuiteClasses({DefaultC10NInspectorTest.class,
+        DefaultDummyInstanceProviderTest.class})
 public class AllTests {
 }
