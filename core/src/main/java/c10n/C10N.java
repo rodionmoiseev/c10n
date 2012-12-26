@@ -102,6 +102,10 @@ public final class C10N {
         return root.get(c10nInterface);
     }
 
+    public static <T> T get(Class<T> c10nInterface, Locale locale) {
+        return root.get(c10nInterface, locale);
+    }
+
     public static ConfiguredC10NModule configure(C10NConfigBase conf) {
         ConfiguredC10NModule configuredModule = coreModule.resolve(conf);
         root = coreModule.defaultC10NMsgFactory(configuredModule);
