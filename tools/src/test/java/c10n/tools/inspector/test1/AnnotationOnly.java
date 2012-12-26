@@ -37,4 +37,8 @@ public interface AnnotationOnly {
 
     @En("[en]@annotation AnnotationOnly.onlyEn")
     String onlyEn();
+
+    @En("[en]@annotation AnnotationOnly.bothWithParams_{0}_{1}")
+    @Ja("[ja]@annotation AnnotationOnly.bothWithParams_{0}_{1}")
+    String bothWithParams(String param1, int param2);
 }

@@ -43,4 +43,9 @@ public interface ClassScopeKey {
     @En("[en]@annotation ClassScopeKey.bothInAnnotationAndInBundle")
     @Ja("[ja]@annotation ClassScopeKey.bothInAnnotationAndInBundle")
     String bothInAnnotationAndInBundle();
+
+    /*
+     * key: scope.class.bothInBundleWithParams_Integer_byte
+     */
+    String bothInBundleWithParams(Integer param1, byte param2);
 }
