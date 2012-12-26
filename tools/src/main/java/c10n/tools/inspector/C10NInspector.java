@@ -22,8 +22,30 @@ package c10n.tools.inspector;
 import java.util.List;
 
 /**
+ * <p>A tool to discover all c10n enabled translations under the specified
+ * list of package prefixes (searches recursively). The tool is desinged to
+ * be useful for automated testing for missing translations or translations
+ * that do not comply with team conventions.</p>
+ * <p/>
+ * <p/>
+ * <p>Discovered translation units are populated with relevant data regarding
+ * how the translation was declared, and for what locales translations are available.
+ * See {@link C10NUnit} for more details.
+ * </p>
+ * <p/>
+ * <p>Note that only interfaces marked with {@link c10n.C10NMessages} annotation
+ * are currently detectable.</p>
+ *
  * @author rodion
+ * @since 1.1
  */
 public interface C10NInspector {
+    /**
+     * <p>Perform the inspection for the given list of package prefixes.
+     * Packages are searched recursively.</p>
+     *
+     * @param packagePrefixes list of packages to search under
+     * @return a list of all detected translation units
+     */
     List<C10NUnit> inspect(String... packagePrefixes);
 }

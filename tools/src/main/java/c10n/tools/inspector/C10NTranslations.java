@@ -30,12 +30,26 @@ import java.util.Set;
 
 /**
  * @author rodion
+ * @since 1.1
  */
 public final class C10NTranslations {
     private String value = null;
     private final Set<ResourceBundle> bundles = Sets.newHashSet();
     private final Set<Annotation> annotations = Sets.newHashSet();
 
+    /**
+     * <p>Get the actual translated value.</p>
+     * <p>Note that value may not be available (be <code>null</code>) if
+     * it corresponds to a parameterised method with argument types other
+     * than one of {@link String}, {@link CharSequence} or one of primitive
+     * types. However, the behaviour can be customised by providing a custom
+     * {@link DefaultDummyInstanceProvider} (see {@link c10n.tools.C10NTools}.
+     * </p>
+     *
+     * @return the actual translated value, or <code>null</code> if not available
+     * @see DummyInstanceProvider
+     * @see c10n.tools.C10NTools
+     */
     public String getValue() {
         return value;
     }

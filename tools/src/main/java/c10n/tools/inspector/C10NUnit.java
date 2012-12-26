@@ -30,7 +30,10 @@ import java.util.Set;
 import static c10n.share.utils.Preconditions.assertNotNull;
 
 /**
+ * <p>One c10n translation unit, representing one single message.</p>
+ *
  * @author rodion
+ * @since 1.1
  */
 public final class C10NUnit {
     private final Class<?> declaringInterface;
@@ -78,6 +81,12 @@ public final class C10NUnit {
         return key;
     }
 
+    /**
+     * <p>All detected translations and their values for the
+     * given set of locales specified at inspection time.</p>
+     *
+     * @return set of translations per locale
+     */
     public Map<Locale, C10NTranslations> getTranslations() {
         return translations;
     }

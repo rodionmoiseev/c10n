@@ -28,7 +28,48 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
+ * <p>C10N translation inspection tools.</p>
+ * <p>Typical inspector usage:
+ * <p/>
+ * <ol>
+ * <li>Instanciate the inspector:
+ * <pre>
+ *  ConfiguredC10NModule module = C10N.configure(new C10NConfigBase(){
+ *      &#64;Override
+ *      protected void configure(){
+ *          //your configuration
+ *      }
+ *  };
+ *
+ *  //Instanciate the inspector with a list of locales you wish
+ *  //to verify against.
+ *  C10NInspector inspector = C10NTools.inspector(module,
+ *      Locale.ENGLISH,
+ *      Locale.FRENCH,
+ *      Locale.GERMAN);
+ *     </pre>
+ * </li>
+ *
+ * <li>
+ * Invoke inspector with a list of package prefixes to scan.
+ * Packages will be scanned recursively.
+ * <pre>
+ *  List&lt;C10NUnit&gt; units = inspector.inspect("com.example.messages");
+ * </pre></li>
+ *
+ * <li>
+ *     Examine the returned list of c10n units, to determine if any translations
+ *     are missing, or do not comply with your rules. You can also examine
+ *     the actual translation values (see {@link c10n.tools.inspector.C10NTranslations#getValue()}
+ *     obtained via {@link c10n.tools.inspector.C10NUnit#getTranslations()}, with the caveat
+ *     that values for parameterised methods may not be available if paramer types are not one of
+ *     {@link String}, {@link CharSequence} or one of the primitive types.
+ * </li>
+ * </ol>
+ * </p>
+ *
  * @author rodion
+ * @since 1.1
  */
 public final class C10NTools {
     /**

@@ -22,7 +22,16 @@ package c10n.share.utils;
 import static c10n.share.utils.Preconditions.assertNotNull;
 
 /**
+ * <p>A bundle key used to look up the translation in a {@link java.util.ResourceBundle}.</p>
+ * <p/>
+ * <p>Bundle key consists of the the key actually used to look up in the bundle, as well as
+ * the key, declared by the user, using {@link c10n.C10NKey} annotaion, if any.
+ * If the {@link c10n.C10NKey} annotation has in any way affected the bundle key generation
+ * process, i.e. either the annotation was declared on the enclosing class or on the method
+ * itself, then the bundle key is considered custom ({@link #isCustomKey()} will be <code>true</code>).</p>
+ *
  * @author rodion
+ * @since 1.1
  */
 public class C10NBundleKey {
     private final boolean customKey;

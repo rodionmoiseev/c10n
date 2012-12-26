@@ -23,7 +23,11 @@ package c10n.tools.inspector;
 import java.lang.reflect.Method;
 
 /**
+ * <p>Dummy instace generator, used for supplying arguments to parameterised
+ * methods. See {@link #getInstance(Class, java.lang.reflect.Method, Class, int)} for more details.</p>
+ *
  * @author rodion
+ * @since 1.1
  */
 public interface DummyInstanceProvider {
     /**
