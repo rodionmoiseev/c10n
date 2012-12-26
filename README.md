@@ -13,6 +13,7 @@ Compare the traditional approach using resource bundles to C10N:
 ### Using resource bundles
 
 First, you need to create the individual bundle files with all translations:
+
 ```
 # Messages_en.properties
 com.example.gui.window.title = Hello, {0}!
