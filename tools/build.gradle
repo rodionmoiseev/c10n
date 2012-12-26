@@ -28,3 +28,11 @@ dependencies {
 
   testCompile project(':core').sourceSets.test.output
 }
+
+jar {
+  appendix = "tools"
+}
+
+sourcesJar {
+  appendix = "tools"
+}
