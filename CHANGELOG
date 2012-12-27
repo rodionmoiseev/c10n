@@ -8,6 +8,7 @@ Current (1.1) - 2012/05/21
 * Fixed: Bundle key generation problem in inherited interfaces (#6 rodionmoiseev)
 * Feature: Add support for unformatted messages/resources (#7 rodionmoiseev)
 * Fixed: Reflection constructor for compatibility with 0.9.5 and 0.9.8 versions (#8 spikhalsky)
+* Feature: Support for simple debugging of method to bundle key binding (see `C10N.setDebug()`) (rodionmoiseev)
 * Feature: Official support for resource message bundles (#9 rodionmoiseev)
 * Feature: Support annotations directly on delegates (#10 rodionmoiseev)
 * Feature: Utility for detecting missing translations and other testing purposes (#11,12 rodionmoiseev)
