@@ -20,7 +20,6 @@
 package c10n;
 
 import c10n.share.EncodedResourceControl;
-import com.google.common.collect.Sets;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -400,7 +399,7 @@ public abstract class C10NConfigBase {
      * @return set of all bound locales
      */
     Set<Locale> getAllImplementationBoundLocales() {
-        Set<Locale> res = Sets.newHashSet();
+        Set<Locale> res = new HashSet<Locale>();
         for (C10NImplementationBinder<?> binder : binders.values()) {
             res.addAll(binder.bindings.keySet());
         }
