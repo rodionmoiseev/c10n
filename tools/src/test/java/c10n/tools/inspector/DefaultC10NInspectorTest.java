@@ -22,10 +22,13 @@ package c10n.tools.inspector;
 import c10n.C10N;
 import c10n.C10NConfigBase;
 import c10n.annotations.DefaultC10NAnnotations;
+import c10n.test.utils.RuleUtils;
 import c10n.tools.inspector.test1.*;
 import c10n.tools.search.SearchModule;
 import com.google.common.collect.Iterables;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +43,9 @@ import static org.junit.Assert.assertThat;
  * @author rodion
  */
 public class DefaultC10NInspectorTest extends AbstractC10NInspectorTest {
+
+    @Rule
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
 
     private final Set<Locale> localesToCheck = set(Locale.ENGLISH, Locale.JAPANESE);
 
@@ -212,5 +218,40 @@ public class DefaultC10NInspectorTest extends AbstractC10NInspectorTest {
                 customKey("scope.class.bothInBundleWithParams_Integer_byte", null),
                 bundleTr(ENGLISH, "[en]@bundle ClassScopeKey.bothInBundleWithParams_0_1"),
                 bundleTr(JAPANESE, "[ja]@bundle ClassScopeKey.bothInBundleWithParams_0_1"));
+    }
+
+    @Test
+    public void inspectorHonorsGlobalKeyPrefix() {
+        C10NConfigBase conf = new C10NConfigBase() {
+            @Override
+            protected void configure() {
+                install(new DefaultC10NAnnotations());
+                bindBundle("c10n.tools.inspector.test1.Test1");
+                setKeyPrefix("prefix");
+            }
+        };
+
+        C10NInspector checker = new DefaultC10NInspector(SearchModule.reflectionsSearch(),
+                C10N.configure(conf),
+                new DefaultDummyInstanceProvider(),
+                localesToCheck,
+                true);
+
+        List<C10NUnit> units = checker.inspect(testMsgPackage);
+        checkUnit(units,
+                AutoKey.class, "both",
+                autoKey("prefix.c10n.tools.inspector.test1.AutoKey.both"),
+                bundleTr(ENGLISH, "[en]@bundle AutoKey.both (prefix)"),
+                bundleTr(JAPANESE, "[ja]@bundle AutoKey.both (prefix)"));
+        checkUnit(units,
+                ClassScopeKey.class, "both",
+                customKey("prefix.scope.class.both", null),
+                bundleTr(ENGLISH, "[en]@bundle ClassScopeKey.both (prefix)"),
+                bundleTr(JAPANESE, "[ja]@bundle ClassScopeKey.both (prefix)"));
+        checkUnit(units,
+                MethodScopeKey.class, "both",
+                customKey("prefix.scope.class.scope.method.both", "scope.method.both"),
+                bundleTr(ENGLISH, "[en]@bundle MethodScopeKey.both (prefix)"),
+                bundleTr(JAPANESE, "[ja]@bundle MethodScopeKey.both (prefix)"));
     }
 }
