@@ -29,7 +29,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         c10n.AllTests.class,
         c10n.tools.inspector.AllTests.class,
-        c10n.tools.search.AllTests.class
+        c10n.tools.search.AllTests.class,
+        C10NToolsTest.class
 })
 public class AllTests {
 }

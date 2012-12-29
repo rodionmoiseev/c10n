@@ -27,10 +27,8 @@ import c10n.share.utils.C10NBundleKey;
 import c10n.share.utils.ReflectionUtils;
 import c10n.tools.search.C10NInterfaceSearch;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -42,15 +40,18 @@ class DefaultC10NInspector implements C10NInspector {
     private final ConfiguredC10NModule configuredC10NModule;
     private final DummyInstanceProvider dummyInstanceProvider;
     private final Set<Locale> localesToCheck;
+    private final boolean fetchTranslations;
 
     DefaultC10NInspector(C10NInterfaceSearch c10NInterfaceSearch,
                          ConfiguredC10NModule configuredC10NModule,
                          DummyInstanceProvider dummyInstanceProvider,
-                         Set<Locale> localesToCheck) {
+                         Set<Locale> localesToCheck,
+                         boolean fetchTranslations) {
         this.c10NInterfaceSearch = c10NInterfaceSearch;
         this.configuredC10NModule = configuredC10NModule;
         this.dummyInstanceProvider = dummyInstanceProvider;
         this.localesToCheck = localesToCheck;
+        this.fetchTranslations = fetchTranslations;
     }
 
     @Override
@@ -118,22 +119,28 @@ class DefaultC10NInspector implements C10NInspector {
                                           Class<?> c10nInterface,
                                           Method method,
                                           Locale locale) {
-        try {
+        if (fetchTranslations) {
             Class<?>[] paramTypes = method.getParameterTypes();
             Object[] args = new Object[paramTypes.length];
-            for (int i = 0; i < args.length; i++) {
-                args[i] = dummyInstanceProvider.getInstance(c10nInterface, method, paramTypes[i], i);
-                if (null == args[i]) {
-                    throw new C10NInspectorException("Cannot create dummy instance for" +
-                            "type: " + paramTypes[i].getName());
+            try {
+                for (int i = 0; i < args.length; i++) {
+                    args[i] = dummyInstanceProvider.getInstance(c10nInterface, method, paramTypes[i], i);
+                    if (null == args[i]) {
+                        throw new C10NInspectorException("Cannot create dummy instance for" +
+                                "type: " + paramTypes[i].getName());
+                    }
                 }
+                Object v = method.invoke(c10NMsgFactory.get(c10nInterface, locale), args);
+                if (null != v) {
+                    return v.toString();
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to fetch translated value for method='"
+                        + method.toGenericString()
+                        + "' with arguments="
+                        + Arrays.toString(args));
+                e.printStackTrace(System.err);
             }
-            Object v = method.invoke(c10NMsgFactory.get(c10nInterface, locale), args);
-            if (null != v) {
-                return v.toString();
-            }
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
         }
         return null;
     }

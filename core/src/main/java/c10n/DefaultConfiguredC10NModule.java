@@ -20,17 +20,12 @@
 
 package c10n;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author rodion
@@ -127,5 +122,30 @@ class DefaultConfiguredC10NModule implements ConfiguredC10NModule {
     @Override
     public boolean isDebug() {
         return this.parentConfig.isDebug();
+    }
+
+    @Override
+    public Set<Locale> getAllBoundLocales() {
+        Set<Locale> res = Sets.newHashSet();
+        for (C10NConfigBase config : traverseConfigs(parentConfig)) {
+            res.addAll(config.getAllImplementationBoundLocales());
+            for (Set<Locale> locales : config.getAnnotationToLocaleMapping().values()) {
+                res.addAll(locales);
+            }
+        }
+        return res;
+    }
+
+    private List<C10NConfigBase> traverseConfigs(C10NConfigBase config) {
+        List<C10NConfigBase> res = Lists.newArrayList();
+        traverseConfigs(config, res);
+        return res;
+    }
+
+    private void traverseConfigs(C10NConfigBase config, List<C10NConfigBase> result) {
+        result.add(config);
+        for (C10NConfigBase childConfig : config.getChildConfigs()) {
+            traverseConfigs(childConfig, result);
+        }
     }
 }

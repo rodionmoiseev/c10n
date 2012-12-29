@@ -22,35 +22,26 @@ package c10n.tools.inspector;
 import c10n.C10N;
 import c10n.C10NConfigBase;
 import c10n.annotations.DefaultC10NAnnotations;
-import c10n.annotations.En;
-import c10n.annotations.Ja;
-import c10n.share.utils.C10NBundleKey;
 import c10n.tools.inspector.test1.*;
 import c10n.tools.search.SearchModule;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import org.junit.Test;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
 import static java.util.Locale.JAPANESE;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author rodion
  */
-public class DefaultC10NInspectorTest {
+public class DefaultC10NInspectorTest extends AbstractC10NInspectorTest {
 
-    private final Map<Locale, Class<? extends Annotation>> locale2annotationClass = ImmutableMap.of(
-            ENGLISH, En.class,
-            JAPANESE, Ja.class);
-
-    private final Set<Locale> localesToCheck = locale2annotationClass.keySet();
+    private final Set<Locale> localesToCheck = set(Locale.ENGLISH, Locale.JAPANESE);
 
     private final C10NConfigBase conf = new C10NConfigBase() {
         @Override
@@ -63,7 +54,8 @@ public class DefaultC10NInspectorTest {
     private final C10NInspector checker = new DefaultC10NInspector(SearchModule.reflectionsSearch(),
             C10N.configure(conf),
             new DefaultDummyInstanceProvider(),
-            localesToCheck);
+            localesToCheck,
+            true);
 
     private static final String testMsgPackage = "c10n.tools.inspector.test1";
 
@@ -216,150 +208,5 @@ public class DefaultC10NInspectorTest {
                 customKey("scope.class.bothInBundleWithParams_Integer_byte", null),
                 bundleTr(ENGLISH, "[en]@bundle ClassScopeKey.bothInBundleWithParams_0_1"),
                 bundleTr(JAPANESE, "[ja]@bundle ClassScopeKey.bothInBundleWithParams_0_1"));
-    }
-
-    private C10NBundleKey anyKey() {
-        return null;
-    }
-
-    private C10NBundleKey autoKey(String key) {
-        return new C10NBundleKey(false, key, null);
-    }
-
-    private C10NBundleKey customKey(String key, String declaredKey) {
-        return new C10NBundleKey(true, key, declaredKey);
-    }
-
-    private static Set<Locale> set(Locale... locales) {
-        return new HashSet<Locale>(Arrays.asList(locales));
-    }
-
-    private static C10NUnit unitFor(String key, Iterable<C10NUnit> units) {
-        for (C10NUnit unit : units) {
-            if (unit.getKey().getKey().equals(key)) {
-                return unit;
-            }
-        }
-        throw new RuntimeException("c10n-unit for key '" + key + "' was not found in: " + units);
-    }
-
-    private void checkUnit(List<C10NUnit> units, Class<?> declaringInterface, String methodName, C10NBundleKey key, Translation... translations) {
-        checkUnit(units, declaringInterface, method(methodName), key, translations);
-    }
-
-    private void checkUnit(List<C10NUnit> units, Class<?> declaringInterface, Method2 method, C10NBundleKey key, Translation... translations) {
-        C10NUnit actual = findActualUnit(units, declaringInterface, method.name);
-        if (null != key) {
-            assertThat(actual.getKey(), is(equalTo(key)));
-        }
-        assertEquals(actual.getDeclaringInterface(), declaringInterface);
-        assertThat(actual.getDeclaringMethod(), is(equalTo(getMethod(declaringInterface, method))));
-        boolean shouldHaveAnnotations = false;
-        boolean shouldhaveBundles = false;
-        for (Translation tr : translations) {
-            C10NTranslations c10NTranslations = actual.getTranslations().get(tr.locale);
-            assertThat(c10NTranslations.getValue(), is(tr.renderedValue));
-            if (tr.inBundle) {
-                shouldhaveBundles = true;
-                assertThat(c10NTranslations.getBundles().size(), is(greaterThan(0)));
-            }
-            if (tr.annotationClass != null) {
-                shouldHaveAnnotations = true;
-                boolean ok = false;
-                for (Annotation annotation : c10NTranslations.getAnnotations()) {
-                    if (annotation.annotationType().equals(tr.annotationClass)) {
-                        ok = true;
-                        if (tr.valueInAnnotation != null) {
-                            assertThat(getAnnotaionValue(annotation), is(tr.valueInAnnotation));
-                        }
-                    }
-                }
-                if (!ok) {
-                    fail("Expected to find annotation of type=" + tr.annotationClass.getSimpleName()
-                            + " but found=" + c10NTranslations.getAnnotations());
-                }
-            }
-        }
-        for (Translation tr : translations) {
-            C10NTranslations c10NTranslations = actual.getTranslations().get(tr.locale);
-            if (!shouldHaveAnnotations) {
-                assertThat(c10NTranslations.getAnnotations().size(), is(0));
-            }
-            if (!shouldhaveBundles) {
-                assertThat(c10NTranslations.getBundles().size(), is(0));
-            }
-        }
-    }
-
-    private String getAnnotaionValue(Annotation annotation) {
-        if (annotation instanceof En) {
-            return ((En) annotation).value();
-        } else if (annotation instanceof Ja) {
-            return ((Ja) annotation).value();
-        }
-        fail("Annotation value could not be retrieved: annotation.class=" + annotation.getClass());
-        return null;
-    }
-
-    private C10NUnit findActualUnit(List<C10NUnit> units, Class<?> declaringInterface, String methodName) {
-        for (C10NUnit unit : units) {
-            if (unit.getDeclaringInterface().equals(declaringInterface) &&
-                    unit.getDeclaringMethod().getName().equals(methodName)) {
-                return unit;
-            }
-        }
-        throw new RuntimeException("c10n-unit for interface '" + declaringInterface.getSimpleName()
-                + "' method '" + methodName
-                + "' was not found in: " + units);
-    }
-
-    private static Method getMethod(Class<?> clazz, Method2 ref) {
-        try {
-            return clazz.getMethod(ref.name, ref.argTypes);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Translation bundleTr(Locale locale, String value) {
-        return new Translation(locale, value, true, null, null);
-    }
-
-    private Translation annotationTr(Locale locale, String value) {
-        return new Translation(locale, value, false, locale2annotationClass.get(locale), null);
-    }
-
-    private Translation annotationTr(Locale locale, String renderedValue, String valueInAnnotation) {
-        return new Translation(locale, renderedValue, false, locale2annotationClass.get(locale), valueInAnnotation);
-    }
-
-    private Method2 method(String name, Class<?>... argTypes) {
-        return new Method2(name, argTypes);
-    }
-
-    private static final class Translation {
-        final Locale locale;
-        final String renderedValue;
-        final boolean inBundle;
-        final Class<? extends Annotation> annotationClass;
-        final String valueInAnnotation;
-
-        private Translation(Locale locale, String renderedValue, boolean inBundle, Class<? extends Annotation> annotationClass, String valueInAnnotation) {
-            this.locale = locale;
-            this.renderedValue = renderedValue;
-            this.inBundle = inBundle;
-            this.annotationClass = annotationClass;
-            this.valueInAnnotation = valueInAnnotation;
-        }
-    }
-
-    private static final class Method2 {
-        final String name;
-        final Class<?>[] argTypes;
-
-        private Method2(String name, Class<?>[] argTypes) {
-            this.name = name;
-            this.argTypes = argTypes;
-        }
     }
 }

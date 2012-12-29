@@ -35,9 +35,17 @@ public class InspectorModule {
 
     public static C10NInspector defaultInspector(ConfiguredC10NModule configuredC10NModule,
                                                  Set<Locale> localesToCheck) {
+        return defaultInspector(defaultDummyInstanceProvider(), configuredC10NModule, localesToCheck, true);
+    }
+
+    public static C10NInspector defaultInspector(DummyInstanceProvider dummyInstanceProvider,
+                                                 ConfiguredC10NModule configuredC10NModule,
+                                                 Set<Locale> localesToCheck,
+                                                 boolean fetchTranslations) {
         return new DefaultC10NInspector(SearchModule.reflectionsSearch(),
                 configuredC10NModule,
-                defaultDummyInstanceProvider(),
-                localesToCheck);
+                dummyInstanceProvider,
+                localesToCheck,
+                fetchTranslations);
     }
 }

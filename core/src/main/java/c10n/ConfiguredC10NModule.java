@@ -22,11 +22,7 @@ package c10n;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author rodion
@@ -49,6 +45,8 @@ public interface ConfiguredC10NModule {
     String getKeyPrefix();
 
     boolean isDebug();
+
+    Set<Locale> getAllBoundLocales();
 }
 
 class AnnotatedClass {

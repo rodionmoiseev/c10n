@@ -81,13 +81,18 @@ public final class C10N {
 
     //DI
     private static final C10NCoreModule coreModule = new C10NCoreModule();
-    private static C10NMsgFactory root = coreModule.defaultC10NMsgFactory();
+    private static ConfiguredC10NModule rootConfiguredModule = coreModule.resolve(coreModule.defaultConfig());
+    private static C10NMsgFactory root = coreModule.defaultC10NMsgFactory(rootConfiguredModule);
 
     /**
      * Internal locale object used as a fallback when current locale does not
      * match any of the user-defined locale mappings.
      */
     public static final Locale FALLBACK_LOCALE = Locale.ROOT;
+
+    public static ConfiguredC10NModule getRootConfiguredModule() {
+        return rootConfiguredModule;
+    }
 
     @SuppressWarnings("unused")
     public static C10NMsgFactory getRootFactory() {
@@ -107,9 +112,9 @@ public final class C10N {
     }
 
     public static ConfiguredC10NModule configure(C10NConfigBase conf) {
-        ConfiguredC10NModule configuredModule = coreModule.resolve(conf);
-        root = coreModule.defaultC10NMsgFactory(configuredModule);
-        return configuredModule;
+        rootConfiguredModule = coreModule.resolve(conf);
+        root = coreModule.defaultC10NMsgFactory(rootConfiguredModule);
+        return rootConfiguredModule;
     }
 
     public static C10NMsgFactory createMsgFactory(ConfiguredC10NModule configuredModule) {

@@ -20,18 +20,12 @@
 package c10n;
 
 import c10n.share.EncodedResourceControl;
+import com.google.common.collect.Sets;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
 
 import static c10n.share.utils.Preconditions.assertNotNull;
 
@@ -395,6 +389,19 @@ public abstract class C10NConfigBase {
         Set<Locale> res = new HashSet<Locale>();
         C10NImplementationBinder<?> binder = binders.get(c10nInterface);
         if (binder != null) {
+            res.addAll(binder.bindings.keySet());
+        }
+        return res;
+    }
+
+    /**
+     * <p>Get a set of all locales explicitly declared in implementation bindings</p>
+     *
+     * @return set of all bound locales
+     */
+    Set<Locale> getAllImplementationBoundLocales() {
+        Set<Locale> res = Sets.newHashSet();
+        for (C10NImplementationBinder<?> binder : binders.values()) {
             res.addAll(binder.bindings.keySet());
         }
         return res;

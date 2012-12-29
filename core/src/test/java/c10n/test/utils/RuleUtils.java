@@ -54,7 +54,7 @@ public class RuleUtils {
     private static final class TmpC10NConfiguration extends ExternalResource {
         @Override
         protected void after() {
-            C10N.setRootFactory(new C10NCoreModule().defaultC10NMsgFactory());
+            C10N.configure(new C10NCoreModule().defaultConfig());
         }
     }
 

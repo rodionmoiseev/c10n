@@ -32,8 +32,8 @@ public class C10NCoreModule {
     //DI
     private final ShareModule shareModule = new ShareModule();
 
-    public C10NMsgFactory defaultC10NMsgFactory() {
-        return defaultC10NMsgFactory(resolve(new UnconfiguredC10NConfig()));
+    public C10NConfigBase defaultConfig() {
+        return new UnconfiguredC10NConfig();
     }
 
     public ConfiguredC10NModule resolve(C10NConfigBase rootConfig) {

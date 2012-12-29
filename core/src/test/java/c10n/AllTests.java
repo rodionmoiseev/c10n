@@ -39,6 +39,7 @@ import org.junit.runners.Suite;
         C10NFilterTest.class,
         C10NTest.class,
         ConfigChainResolverTest.class,
+        ConfiguredC10NModuleTest.class,
         CustomAnnotationBindingTest.class,
         CustomImplementationBindingTest.class,
         DelegationTest.class,
