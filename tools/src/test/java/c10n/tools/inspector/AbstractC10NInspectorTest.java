@@ -25,10 +25,11 @@ import c10n.annotations.En;
 import c10n.annotations.Fr;
 import c10n.annotations.Ja;
 import c10n.share.utils.C10NBundleKey;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import com.google.common.base.Function;
+import com.google.common.collect.*;
 import org.junit.Ignore;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -49,6 +50,12 @@ public class AbstractC10NInspectorTest {
             JAPANESE, Ja.class,
             FRENCH, Fr.class,
             GERMAN, De.class);
+
+    private final Set<Locale> expectedLocalesToCheck;
+
+    protected AbstractC10NInspectorTest(Locale... expectedLocalesToCheck) {
+        this.expectedLocalesToCheck = Sets.newHashSet(expectedLocalesToCheck);
+    }
 
     protected C10NBundleKey anyKey() {
         return null;
@@ -78,29 +85,43 @@ public class AbstractC10NInspectorTest {
         assertEquals(actual.getDeclaringInterface(), declaringInterface);
         assertThat(actual.getDeclaringMethod(), is(equalTo(getMethod(declaringInterface, method))));
         Map<Locale, C10NTranslations> actualTranslations = Maps.newHashMap(actual.getTranslations());
-        for (Translation tr : translations) {
-            C10NTranslations c10NTranslations = actualTranslations.remove(tr.locale);
-            assertThat(c10NTranslations.getValue(), is(tr.renderedValue));
-            if (tr.inBundle) {
-                assertThat(c10NTranslations.getBundles().size(), is(greaterThan(0)));
+        Multimap<Locale, Translation> translationsByLocale = Multimaps.index(Arrays.asList(translations), new Function<Translation, Locale>() {
+            @Override
+            public Locale apply(@Nullable Translation input) {
+                return input.locale;
             }
-            if (tr.annotationClass != null) {
-                boolean ok = false;
-                for (Annotation annotation : c10NTranslations.getAnnotations()) {
-                    if (annotation.annotationType().equals(tr.annotationClass)) {
-                        ok = true;
-                        if (tr.valueInAnnotation != null) {
-                            assertThat(getAnnotaionValue(annotation), is(tr.valueInAnnotation));
+        });
+        for (Locale locale : translationsByLocale.keySet()) {
+            C10NTranslations c10NTranslations = actualTranslations.remove(locale);
+            for (Translation tr : translationsByLocale.get(locale)) {
+                assertThat(c10NTranslations.getValue(), is(tr.renderedValue));
+                if (tr.inBundle) {
+                    assertThat(c10NTranslations.getBundles().size(), is(greaterThan(0)));
+                }
+                if (tr.annotationClass != null) {
+                    boolean ok = false;
+                    for (Annotation annotation : c10NTranslations.getAnnotations()) {
+                        if (annotation.annotationType().equals(tr.annotationClass)) {
+                            ok = true;
+                            if (tr.valueInAnnotation != null) {
+                                assertThat(getAnnotaionValue(annotation), is(tr.valueInAnnotation));
+                            }
                         }
                     }
-                }
-                if (!ok) {
-                    fail("Expected to find annotation of type=" + tr.annotationClass.getSimpleName()
-                            + " but found=" + c10NTranslations.getAnnotations());
+                    if (!ok) {
+                        fail("Expected to find annotation of type=" + tr.annotationClass.getSimpleName()
+                                + " but found=" + c10NTranslations.getAnnotations());
+                    }
                 }
             }
         }
-        assertThat(actualTranslations, is(Collections.<Locale, C10NTranslations>emptyMap()));
+        for (Map.Entry<Locale, C10NTranslations> entry : actualTranslations.entrySet()) {
+            Locale locale = entry.getKey();
+            C10NTranslations tr = entry.getValue();
+            assertThat(expectedLocalesToCheck, hasItem(locale));
+            assertThat(tr.getAnnotations().isEmpty(), is(true));
+            assertThat(tr.getBundles().isEmpty(), is(true));
+        }
     }
 
     protected String getAnnotaionValue(Annotation annotation) {

@@ -59,6 +59,10 @@ public class DefaultC10NInspectorTest extends AbstractC10NInspectorTest {
 
     private static final String testMsgPackage = "c10n.tools.inspector.test1";
 
+    public DefaultC10NInspectorTest() {
+        super(Locale.ENGLISH, Locale.JAPANESE);
+    }
+
     @Test
     public void allKeysAreDiscovered() {
         assertThat(Iterables.size(checker.inspect(testMsgPackage)), is(17));
