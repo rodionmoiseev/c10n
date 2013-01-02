@@ -1,0 +1,19 @@
+Current (1.1) - 2012/05/21
+
+* Feature: Loading locale-sensitive external resources - partial support (#2 rodionmoiseev)
+* Feature: Support specifying custom class-loader for proxy classes (#3 rodionmoiseev)
+* Fixed: Fallback does not work when there is at least one non-fallback method declared (#4 rodionmoiseev) 
+* Feature: Argument filters. Now you can inject custom transformation logic to c10n interface method arguments.
+  One useful example includes an Enum mapper. See C10NFilters.enumMapping javadoc. (rodionmoiseev)
+* Fixed: Bundle key generation problem in inherited interfaces (#6 rodionmoiseev)
+* Feature: Add support for unformatted messages/resources (#7 rodionmoiseev)
+* Fixed: Reflection constructor for compatibility with 0.9.5 and 0.9.8 versions (#8 spikhalsky)
+* Feature: Support for simple debugging of method to bundle key binding (see `C10N.setDebug()`) (rodionmoiseev)
+* Feature: Official support for resource message bundles (#9 rodionmoiseev)
+* Feature: Support annotations directly on delegates (#10 rodionmoiseev)
+* Feature: Utility for detecting missing translations and other testing purposes (#11,12 rodionmoiseev)
+* Feature: Support for specifying locale at message proxy creation time (#13 rodionmoiseev)
+
+Version 1.0 - 2012/04/28
+
+* See wiki overview plage for initial release (1.0) features.

@@ -1,0 +1,29 @@
+#
+# Output files
+#
+*.class
+
+#
+# Eclipse settings files
+#
+.metadata
+.classpath
+.project
+.settings
+
+#
+# IntelliJ IDEA settings files
+#
+*.ipr
+*.iml
+*.iws
+out/
+
+#
+# Gradle temporary files
+#
+.gradle
+build/
+gradlew
+gradlew.bat
+master/gradle
