@@ -15,14 +15,14 @@ Compare the traditional approach using resource bundles to C10N:
 First, you need to create the individual bundle files with all translations:
 
 ```
-# Messages_en.properties
+ # Messages_en.properties
 com.example.gui.window.title = Hello, {0}!
 com.example.gui.window.buttons.ok = OK
 com.example.gui.window.buttons.cancel = Cancel
 ```
 
 ```
-# Messages_ru.properties
+ # Messages_ru.properties
 com.example.gui.window.title = Привет, {0}!
 com.example.gui.window.buttons.ok = Да
 com.example.gui.window.buttons.cancel = Отмена
