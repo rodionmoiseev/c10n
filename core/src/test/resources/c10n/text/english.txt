@@ -1,2 +1,0 @@
-Internal resource test!
-english.txt {0}
