@@ -1,0 +1,200 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cosmopolitan = c10n by rodionmoiseev</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Cosmopolitan</h1>
+<!--
+        <p class="header">A Java library, focused on making internationalisation more modular, easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.</p>
+-->
+	<ul class="links">
+          <li>
+              <a href="index.html">Introduction</a>
+	  </li>
+          <li>
+              <a href="overview.html">Guide</a>
+	  </li>
+          <li>
+              <a href="features.html">All Features</a>
+	  </li>
+          <li>
+              <a href="download.html">Download</a>
+	  </li>
+          <li>
+              <a href="contributing.html">Contributing</a>
+          </li>
+	</ul>
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/rodionmoiseev/c10n">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/tarball/master">Download TAR</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/rodionmoiseev">rodionmoiseev</a></p>
+
+
+      </header>
+      <section>
+	<h1 id="toc_50">Integrating C10N with Play Framework 2.0</h1><p>A example of integrating c10n with <a href="http://www.playframework.org/" title="Play Framework 2.0">Play Framework 2.0</a> with support for dynamically changing locale.</p>
+<h2 id="toc_51">Step 1: Add c10n dependency to Build.scala</h2><div class="highlight"><pre><code class="scala"><span class="k">object</span> <span class="nc">ApplicationBuild</span> <span class="k">extends</span> <span class="nc">Build</span> <span class="o">{</span>
+    <span class="c1">// ...</span>
+
+    <span class="k">val</span> <span class="n">appDependencies</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
+      <span class="c1">// Add c10n dependency</span>
+      <span class="s">&quot;c10n&quot;</span> <span class="o">%</span> <span class="s">&quot;c10n-core&quot;</span> <span class="o">%</span> <span class="s">&quot;1.0&quot;</span>
+    <span class="o">)</span>
+
+    <span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="nc">PlayProject</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">,</span> <span class="n">mainLang</span> <span class="k">=</span> <span class="nc">JAVA</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
+      <span class="c1">// Add c10n repository</span>
+      <span class="n">resolvers</span> <span class="o">+=</span> <span class="s">&quot;C10N&quot;</span> <span class="n">at</span> <span class="s">&quot;https://raw.github.com/rodionmoiseev/c10n/master/c10n-mvn-repo/releases&quot;</span>
+      <span class="c1">// ...</span>
+    <span class="o">)</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h2 id="toc_52">Step 2: Configure c10n at Application Startup</h2>
+<p>In your application global settings initialize c10n. If you don&#39;t have global settings object <a href="https://github.com/playframework/Play20/wiki/JavaGlobal" title="Play Framework 2.0 Global Application Settings">set one up first</a>.</p>
+<div class="highlight"><pre><code class="java"><span class="kn">import</span> <span class="nn">c10n.*</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Global</span> <span class="kd">extends</span> <span class="n">GlobalSettings</span> <span class="o">{</span>
+     <span class="c1">//...</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * {@inheritDoc}</span>
+<span class="cm">     */</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onStart</span><span class="o">(</span><span class="n">Application</span> <span class="n">app</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//...</span>
+        <span class="n">initializeC10N</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Set up c10n</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">initializeC10N</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10NConfigBase</span><span class="o">()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+                <span class="c1">//... your custom c10n configuration ...</span>
+
+                <span class="c1">//Tell Play to use our custom LocaleProvider</span>
+                <span class="n">setLocaleProvider</span><span class="o">(</span><span class="k">new</span> <span class="n">PlayLocaleProvider</span><span class="o">());</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h2 id="toc_53">Step 3: Create Your Locale Provider</h2>
+<p>An example of how you can dynamically switch to the best possible language, using the <a href="overview.html#c10n-locale-provider">LocaleProvider</a>.</p>
+
+<p>For illustration purposes, the example assumes that your application contains a language selection box,
+which, on change, will set the <code>&quot;C10NLocale&quot;</code> session attribute to one of the languages supported by 
+<code>Locale</code> object (see <a href="http://docs.oracle.com/javase/6/docs/api/java/util/Locale.html#Locale(java.lang.String)" title="JDK6 Locale(String language) constructor API"><code>Locale(String lang)</code></a>).</p>
+<div class="highlight"><pre><code class="java"><span class="kn">import</span> <span class="nn">java.util.Locale</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">play.i18n.Lang</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">c10n.LocaleProvider</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">controllers.*</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PlayLocaleProvider</span> <span class="kd">implements</span> <span class="n">LocaleProvider</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Locale</span> <span class="nf">getLocale</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">language</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">//Retrieve the language set in the GUI</span>
+            <span class="n">language</span> <span class="o">=</span> <span class="n">MyAppController</span><span class="o">.</span><span class="na">session</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;C10NLocale&quot;</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">RuntimeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">//Handle [RuntimeException: There is no HTTP Context available from here.]</span>
+            <span class="c1">//Since there is no context available, </span>
+            <span class="c1">//try to use http header to choose best locale</span>
+            <span class="n">Locale</span> <span class="n">best</span> <span class="o">=</span> <span class="n">Lang</span><span class="o">.</span><span class="na">preferred</span><span class="o">(</span><span class="n">Lang</span><span class="o">.</span><span class="na">availables</span><span class="o">()).</span><span class="na">toLocale</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">best</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">best</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">language</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">//If no preferred language could be determined.</span>
+            <span class="c1">//Just fallback to some default locale of your choice</span>
+            <span class="k">return</span> <span class="n">Locale</span><span class="o">.</span><span class="na">ENGLISH</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">Locale</span><span class="o">(</span><span class="n">language</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h2 id="toc_54">Step 4: Use C10N in Controllers and Views</h2>
+<p>Using c10n interfaces from controllers works as one would expect, for instance:</p>
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyController</span> <span class="kd">extends</span> <span class="n">Controller</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">MyMessages</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">C10N</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">MyMessages</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+  <span class="kd">public</span> <span class="kd">static</span> <span class="n">Result</span> <span class="nf">c10nExample</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="nf">ok</span><span class="o">(</span><span class="n">msg</span><span class="o">.</span><span class="na">sayHello</span><span class="o">());</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>To use c10n interfaces from view, you can pass the c10n interface to the
+view as an argument:</p>
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyController</span> <span class="kd">extends</span> <span class="n">Controller</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="n">Result</span> <span class="nf">c10nExample</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="nf">ok</span><span class="o">(</span><span class="n">index</span><span class="o">.</span><span class="na">render</span><span class="o">(</span><span class="n">C10N</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">MyMessages</span><span class="o">.</span><span class="na">class</span><span class="o">)));</span>
+  <span class="o">}</span>
+<span class="o">}</span>  
+</code></pre>
+</div>
+
+<p>... and then reference it from the view:</p>
+<div class="highlight"><pre><code class="scala"><span class="o">@(</span><span class="n">msg</span><span class="k">:</span> <span class="kt">MyMessages</span><span class="o">)</span>
+
+<span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span>
+ <span class="nd">@msg</span><span class="o">.</span><span class="n">sayHello</span>
+<span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</code></pre>
+</div>
+
+<p>Or create and use the c10n interface instance directly in the template:</p>
+<div class="highlight"><pre><code class="scala"><span class="nd">@import</span> <span class="n">c10n</span><span class="o">.</span><span class="k">_</span>
+
+<span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span>
+ <span class="nd">@C10N</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">classOf</span><span class="o">[</span><span class="kt">MyMessages</span><span class="o">]).</span><span class="n">sayHello</span>
+<span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</code></pre>
+</div>
+
+<p>See also: <a href="scala-integration.html"> Scala Integration </a></p>
+
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a></small></p>
+	<p><small>Gen. with <a href="https://github.com/mojombo/jekyll">Jekyll</a> on 2013/01/02</small></p>
+        <p><small>[Dinky theme]</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-36523975-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>

@@ -1,0 +1,215 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cosmopolitan = c10n by rodionmoiseev</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Cosmopolitan</h1>
+<!--
+        <p class="header">A Java library, focused on making internationalisation more modular, easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.</p>
+-->
+	<ul class="links">
+          <li>
+              <a href="index.html">Introduction</a>
+	  </li>
+          <li>
+              <a href="overview.html">Guide</a>
+	  </li>
+          <li>
+              <a href="features.html">All Features</a>
+	  </li>
+          <li>
+              <a href="download.html">Download</a>
+	  </li>
+          <li>
+              <a href="contributing.html">Contributing</a>
+          </li>
+	</ul>
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/rodionmoiseev/c10n">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/tarball/master">Download TAR</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/rodionmoiseev">rodionmoiseev</a></p>
+
+
+      </header>
+      <section>
+	<h1 id="toc_27">Parameter Filters</h1><p><em>Since 1.1</em></p>
+
+<p>C10N filters allow you to execute custom logic on method parameters 
+before the get substituted in the message. </p>
+
+<p>Here is a simple example that will append <code>&quot;.00&quot;</code> to all integers 
+values in our messages.</p>
+
+<p>1) Define a filter:</p>
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">IntFormattingFilter</span> <span class="kd">implements</span> <span class="n">C10NFilter</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Object</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Integer</span> <span class="n">arg</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">arg</span><span class="o">)</span> <span class="o">+</span> <span class="s">&quot;.00&quot;</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>2) Tell C10N to apply filter to all parameters of type <code>int</code></p>
+<div class="highlight"><pre><code class="java"><span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10NConfigBase</span><span class="o">()</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">//... other configuration ...</span>
+    <span class="n">bindFilter</span><span class="o">(</span><span class="k">new</span> <span class="n">IntFormattingFilter</span><span class="o">(),</span> <span class="kt">int</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">});</span>
+</code></pre>
+</div>
+
+<p>3) Try it</p>
+<div class="highlight"><pre><code class="java"><span class="kd">interface</span> <span class="nc">Balance</span><span class="o">{</span>
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Your balance is ${0}&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">balance</span><span class="o">(</span><span class="kt">int</span> <span class="n">amount</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="c1">// somewhere in your code</span>
+<span class="n">Balance</span> <span class="n">balance</span> <span class="o">=</span> <span class="n">C10N</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">Balance</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">balance</span><span class="o">.</span><span class="na">balance</span><span class="o">(</span><span class="mi">123</span><span class="o">));</span>
+
+<span class="c1">//will print</span>
+<span class="c1">// Your balance is 123.00</span>
+</code></pre>
+</div>
+<h3 id="toc_28">Restricting Filter Application</h3>
+<p>You can restrict filter application only to method arguments 
+annotated with a given annotation, or one of the given annotations 
+from a list, by using <code>annotatedWith(Class)</code> method when binding. </p>
+
+<p>Let&#39;s enhance the above example, to only apply our filter to
+method parameters annotated with <code>@Precise</code>.</p>
+<div class="highlight"><pre><code class="java"><span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+  <span class="n">bindFilter</span><span class="o">(</span><span class="k">new</span> <span class="n">IntFormattingFilter</span><span class="o">(),</span> <span class="kt">int</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">annotatedWith</span><span class="o">(</span><span class="n">Precise</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>Now, our filter will only be applied in methods declared as:</p>
+<div class="highlight"><pre><code class="java"><span class="kd">interface</span> <span class="nc">Balance</span><span class="o">{</span>
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Your balance is ${0}&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">balance</span><span class="o">(</span><span class="nd">@Precise</span> <span class="kt">int</span> <span class="n">amount</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h2 id="toc_29">Localising Enums in Method Parameters</h2><h3 id="toc_30">Motivation</h3>
+<p>Sometimes you need to have a localised representation for a set of
+values, usually defined as java Enums. For instance, consider the
+following case:</p>
+<div class="highlight"><pre><code class="java"><span class="kd">enum</span> <span class="n">Language</span><span class="o">{</span>
+  <span class="n">English</span><span class="o">,</span> 
+  <span class="n">Russian</span><span class="o">,</span>
+  <span class="c1">// more languages ...</span>
+<span class="o">}</span>
+
+<span class="kd">interface</span> <span class="nc">Profile</span><span class="o">{</span>
+  <span class="cm">/**</span>
+<span class="cm">   * We wish to call this method as</span>
+<span class="cm">   *   iSpeak(Language.Russian)</span>
+<span class="cm">   * to produce:</span>
+<span class="cm">   *   &quot;I speak Russian&quot;</span>
+<span class="cm">   * in English locale and</span>
+<span class="cm">   *   &quot;Я говорю по-русски&quot;</span>
+<span class="cm">   * in Russian locale.</span>
+<span class="cm">   */</span>
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;I speak {0}&quot;</span><span class="o">)</span>
+  <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Я говорю по-{0}&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">iSpeak</span><span class="o">(</span><span class="n">Language</span> <span class="n">lang</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h3 id="toc_31">Enum Filter Mapping</h3>
+<p>This can be achieved using the built-in enum filter (<a href="https://github.com/rodionmoiseev/c10n/blob/master/core/src/main/java/c10n/C10NFilters.java#L114">C10NFilters.enumMapping</a>).
+Enum translation will be looked up from typical C10N interface methods, using a predefined
+enum-name-to-method-name mapping convention.</p>
+
+<p>The full set-up would look like this:</p>
+
+<p>1) Create a c10n interface containing your enum translations. Note that enum names and method names match.</p>
+<div class="highlight"><pre><code class="java"><span class="nd">@C10NMessages</span>
+<span class="kd">interface</span> <span class="nc">LanguageMsg</span><span class="o">{</span>
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;English&quot;</span><span class="o">)</span>
+  <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;английски&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">english</span><span class="o">();</span>
+
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Russian&quot;</span><span class="o">)</span>
+  <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;русски&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">russian</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>2) Tell C10N to apply enum filter (see javadoc for more explanation)</p>
+<div class="highlight"><pre><code class="java"><span class="kt">void</span> <span class="nf">configure</span><span class="o">(){</span>
+  <span class="n">bindFilter</span><span class="o">(</span><span class="n">C10NFilters</span><span class="o">.</span><span class="na">enumMapping</span><span class="o">(</span><span class="n">Language</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">LanguageMsg</span><span class="o">.</span><span class="na">class</span><span class="o">),</span> <span class="n">Language</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>3) Try it</p>
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(){</span>
+  <span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10NConfigBase</span><span class="o">(){</span>
+    <span class="c1">//... filter binding as above ...</span>
+  <span class="o">});</span>
+
+  <span class="n">Profile</span> <span class="n">profile</span> <span class="o">=</span> <span class="n">C10N</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">Profile</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">profile</span><span class="o">.</span><span class="na">iSpeak</span><span class="o">(</span><span class="n">Language</span><span class="o">.</span><span class="na">Russian</span><span class="o">));</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h3 id="toc_32">Method Mapping Rules</h3>
+<p>Enum values are mapped to c10n interface methods in the following order:</p>
+
+<ol>
+<li>Method name matches <code>&lt;Enum class name&gt;_&lt;Enum value&gt;</code>. e.g <code>language_russian()</code></li>
+<li>Method name matches <code>&lt;Enum value&gt;</code> e.g. <code>russian()</code></li>
+</ol>
+
+<p><em>Restrictions:</em></p>
+
+<ul>
+<li>Method mapping is case-insensitive.</li>
+<li>Mapped methods cannot take any arguments. Methods with arguments will be excluded from mapping.</li>
+<li>If mapping for one or more values is not found, a run-time exception will be thrown.</li>
+</ul>
+
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a></small></p>
+	<p><small>Gen. with <a href="https://github.com/mojombo/jekyll">Jekyll</a> on 2013/01/02</small></p>
+        <p><small>[Dinky theme]</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-36523975-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>

@@ -1,0 +1,221 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cosmopolitan = c10n by rodionmoiseev</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Cosmopolitan</h1>
+<!--
+        <p class="header">A Java library, focused on making internationalisation more modular, easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.</p>
+-->
+	<ul class="links">
+          <li>
+              <a href="index.html">Introduction</a>
+	  </li>
+          <li>
+              <a href="overview.html">Guide</a>
+	  </li>
+          <li>
+              <a href="features.html">All Features</a>
+	  </li>
+          <li>
+              <a href="download.html">Download</a>
+	  </li>
+          <li>
+              <a href="contributing.html">Contributing</a>
+          </li>
+	</ul>
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/rodionmoiseev/c10n">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/tarball/master">Download TAR</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/rodionmoiseev">rodionmoiseev</a></p>
+
+
+      </header>
+      <section>
+	<h1 id="toc_14">Downloading C10N</h1><ul class="toc"><ul><li><a href="#toc_15">Latest Release Version: 1.1</a><ul><li><a href="#toc_16">Maven</a></li></ul>
+<ul><li><a href="#toc_17">Gradle</a></li></ul>
+<ul><li><a href="#toc_18">SBT</a></li></ul></li></ul>
+<ul><li><a href="#toc_19">Older Versions</a></li></ul>
+<ul><li><a href="#toc_20">Latest Development Snapshot</a><ul><li><a href="#toc_21">Maven</a></li></ul>
+<ul><li><a href="#toc_22">Gradle</a></li></ul>
+<ul><li><a href="#toc_23">SBT</a></li></ul></li></ul></ul><h2 id="toc_15">Latest Release Version: 1.1</h2>
+<p>Please use the latest release version 1.1.</p>
+
+<p>Just grab the <code>c10n-core-1.1.jar</code> from <a href="https://github.com/rodionmoiseev/c10n/tree/master/c10n-mvn-repo/releases/c10n/c10n-core/1.1" title="1.1 repository">master/c10n-mvn-repo/releases/c10n/c10n-core/1.1</a> folder, or use one of methods below.</p>
+
+<p>Currently there are three jars for you to download:</p>
+
+<ol>
+<li><code>c10n-core</code> - Contains the main API and functionality (required)</li>
+<li><code>c10n-ext-guice</code> - Contains Guice integration module (optional)</li>
+<li><code>c10n-tools</code> - Contains c10n inspection module primarily for unit testing (optional)</li>
+</ol>
+<h3 id="toc_16">Maven</h3>
+<p>Add the dependency and repository to your <code>pom.xml</code>.</p>
+<div class="highlight"><pre><code class="xml"><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>c10n<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>c10n-core<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.1<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="c">&lt;!-- optional Guice integration module --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>c10n<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>c10n-ext-guice<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.1<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="c">&lt;!-- optional c10n tools module --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>c10n<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>c10n-tools<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.1<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre>
+</div>
+
+<p>And somewhere in <code>&lt;repositories&gt; ... &lt;/repositories&gt;</code> add:</p>
+<div class="highlight"><pre><code class="xml"><span class="nt">&lt;repository&gt;</span>
+  <span class="nt">&lt;id&gt;</span>c10n-releases<span class="nt">&lt;/id&gt;</span>
+  <span class="nt">&lt;name&gt;</span>C10N Releases<span class="nt">&lt;/name&gt;</span>
+  <span class="nt">&lt;url&gt;</span>https://raw.github.com/rodionmoiseev/c10n/master/c10n-mvn-repo/releases<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;layout&gt;</span>default<span class="nt">&lt;/layout&gt;</span>
+  <span class="nt">&lt;releases&gt;</span>
+    <span class="nt">&lt;enabled&gt;</span>true<span class="nt">&lt;/enabled&gt;</span>
+    <span class="nt">&lt;updatePolicy&gt;</span>always<span class="nt">&lt;/updatePolicy&gt;</span>
+    <span class="nt">&lt;checksumPolicy&gt;</span>warn<span class="nt">&lt;/checksumPolicy&gt;</span>
+  <span class="nt">&lt;/releases&gt;</span>
+  <span class="nt">&lt;snapshots&gt;</span>
+    <span class="nt">&lt;enabled&gt;</span>false<span class="nt">&lt;/enabled&gt;</span>
+    <span class="nt">&lt;updatePolicy&gt;</span>never<span class="nt">&lt;/updatePolicy&gt;</span>
+    <span class="nt">&lt;checksumPolicy&gt;</span>fail<span class="nt">&lt;/checksumPolicy&gt;</span>
+  <span class="nt">&lt;/snapshots&gt;</span>
+<span class="nt">&lt;/repository&gt;</span>
+</code></pre>
+</div>
+<h3 id="toc_17">Gradle</h3>
+<p>Add to your <code>build.gradle</code>.</p>
+<div class="highlight"><pre><code class="groovy"><span class="n">repositories</span><span class="o">{</span>
+  <span class="n">maven</span><span class="o">{</span>
+    <span class="n">url</span> <span class="s2">&quot;https://raw.github.com/rodionmoiseev/c10n/master/c10n-mvn-repo/releases&quot;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="n">dependencies</span> <span class="o">{</span>
+  <span class="n">compile</span> <span class="nl">group:</span> <span class="s1">&#39;c10n&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;c10n-core&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;1.1&#39;</span>
+  <span class="c1">//Optional Guice integration module</span>
+  <span class="n">compile</span> <span class="nl">group:</span> <span class="s1">&#39;c10n&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;c10n-ext-guice&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;1.1&#39;</span>
+  <span class="c1">//Optional c10n tools module</span>
+  <span class="n">compile</span> <span class="nl">group:</span> <span class="s1">&#39;c10n&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;c10n-tools&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;1.1&#39;</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h3 id="toc_18">SBT</h3>
+<p>Add the dependency and the resolver to your <code>Build.scala</code>.</p>
+<div class="highlight"><pre><code class="scala"><span class="s">&quot;c10n&quot;</span> <span class="o">%</span> <span class="s">&quot;c10n-core&quot;</span> <span class="o">%</span> <span class="s">&quot;1.1&quot;</span> <span class="n">withSources</span><span class="o">()</span>
+<span class="n">resolvers</span> <span class="o">+=</span> <span class="s">&quot;C10N&quot;</span> <span class="n">at</span> <span class="s">&quot;https://raw.github.com/rodionmoiseev/c10n/master/c10n-mvn-repo/releases/&quot;</span>
+</code></pre>
+</div>
+<h2 id="toc_19">Older Versions</h2>
+<p>Version 1.0 can be found here: <a href="https://github.com/rodionmoiseev/c10n/tree/master/c10n-mvn-repo/releases/c10n/c10n-core/1.0" title="1.0 repository">master/c10n-mvn-repo/releases/c10n/c10n-core/1.0</a></p>
+<h2 id="toc_20">Latest Development Snapshot</h2>
+<p>Just grab the latest snapshot jar from <a href="https://github.com/rodionmoiseev/c10n/tree/master/c10n-mvn-repo/snapshots/c10n/c10n-core/1.2-SNAPSHOT" title="1.2-SNAPSHOT repository">master/c10n-mvn-repo/snapshots/c10n/c10n-core/1.2-SNAPSHOT</a> folder, or use one of methods below.</p>
+<h3 id="toc_21">Maven</h3>
+<p>Add the dependency and repository to your <code>pom.xml</code>.</p>
+<div class="highlight"><pre><code class="xml"><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>c10n<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>c10n-core<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.2-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="c">&lt;!-- optional Guice integration module --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>c10n<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>c10n-ext-guice<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.2-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="c">&lt;!-- optional c10n tools module --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>c10n<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>c10n-tools<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.2-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre>
+</div>
+
+<p>And somewhere in <code>&lt;repositories&gt; ... &lt;/repositories&gt;</code> add:</p>
+<div class="highlight"><pre><code class="xml"><span class="nt">&lt;repository&gt;</span>
+  <span class="nt">&lt;id&gt;</span>c10n-snapshots<span class="nt">&lt;/id&gt;</span>
+  <span class="nt">&lt;name&gt;</span>C10N Snapshots<span class="nt">&lt;/name&gt;</span>
+  <span class="nt">&lt;url&gt;</span>https://raw.github.com/rodionmoiseev/c10n/master/c10n-mvn-repo/snapshots<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;layout&gt;</span>default<span class="nt">&lt;/layout&gt;</span>
+  <span class="nt">&lt;releases&gt;</span>
+    <span class="nt">&lt;enabled&gt;</span>false<span class="nt">&lt;/enabled&gt;</span>
+    <span class="nt">&lt;updatePolicy&gt;</span>always<span class="nt">&lt;/updatePolicy&gt;</span>
+    <span class="nt">&lt;checksumPolicy&gt;</span>warn<span class="nt">&lt;/checksumPolicy&gt;</span>
+  <span class="nt">&lt;/releases&gt;</span>
+  <span class="nt">&lt;snapshots&gt;</span>
+    <span class="nt">&lt;enabled&gt;</span>true<span class="nt">&lt;/enabled&gt;</span>
+    <span class="nt">&lt;updatePolicy&gt;</span>never<span class="nt">&lt;/updatePolicy&gt;</span>
+    <span class="nt">&lt;checksumPolicy&gt;</span>fail<span class="nt">&lt;/checksumPolicy&gt;</span>
+  <span class="nt">&lt;/snapshots&gt;</span>
+<span class="nt">&lt;/repository&gt;</span>
+</code></pre>
+</div>
+<h3 id="toc_22">Gradle</h3>
+<p>Add to your <code>build.gradle</code>.</p>
+<div class="highlight"><pre><code class="groovy"><span class="n">repositories</span><span class="o">{</span>
+  <span class="n">maven</span><span class="o">{</span>
+    <span class="n">url</span> <span class="s2">&quot;https://raw.github.com/rodionmoiseev/c10n/master/c10n-mvn-repo/snapshots&quot;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="n">dependencies</span> <span class="o">{</span>
+  <span class="n">compile</span> <span class="nl">group:</span> <span class="s1">&#39;c10n&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;c10n-core&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;1.2-SNAPSHOT&#39;</span>
+  <span class="c1">//Optional Guice integration module</span>
+  <span class="n">compile</span> <span class="nl">group:</span> <span class="s1">&#39;c10n&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;c10n-ext-guice&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;1.2-SNAPSHOT&#39;</span>
+  <span class="c1">//Optional c10n tools module</span>
+  <span class="n">compile</span> <span class="nl">group:</span> <span class="s1">&#39;c10n&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;c10n-tools&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;1.2-SNAPSHOT&#39;</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h3 id="toc_23">SBT</h3>
+<p>Add the dependency and the resolver to your <code>Build.scala</code>.</p>
+<div class="highlight"><pre><code class="scala"><span class="s">&quot;c10n&quot;</span> <span class="o">%</span> <span class="s">&quot;c10n-core&quot;</span> <span class="o">%</span> <span class="s">&quot;1.2-SNAPSHOT&quot;</span> <span class="n">withSources</span><span class="o">()</span>
+<span class="n">resolvers</span> <span class="o">+=</span> <span class="s">&quot;C10N&quot;</span> <span class="n">at</span> <span class="s">&quot;https://raw.github.com/rodionmoiseev/c10n/master/c10n-mvn-repo/snapshots/&quot;</span>
+</code></pre>
+</div>
+
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a></small></p>
+	<p><small>Gen. with <a href="https://github.com/mojombo/jekyll">Jekyll</a> on 2013/01/02</small></p>
+        <p><small>[Dinky theme]</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-36523975-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>

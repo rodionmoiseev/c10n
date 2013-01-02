@@ -1,0 +1,132 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cosmopolitan = c10n by rodionmoiseev</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Cosmopolitan</h1>
+<!--
+        <p class="header">A Java library, focused on making internationalisation more modular, easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.</p>
+-->
+	<ul class="links">
+          <li>
+              <a href="index.html">Introduction</a>
+	  </li>
+          <li>
+              <a href="overview.html">Guide</a>
+	  </li>
+          <li>
+              <a href="features.html">All Features</a>
+	  </li>
+          <li>
+              <a href="download.html">Download</a>
+	  </li>
+          <li>
+              <a href="contributing.html">Contributing</a>
+          </li>
+	</ul>
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/rodionmoiseev/c10n">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/tarball/master">Download TAR</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/rodionmoiseev">rodionmoiseev</a></p>
+
+
+      </header>
+      <section>
+	<h1 id="toc_10">C10N Features by Release</h1><ul class="toc"><ul><li><a href="#toc_11">1.0 Release</a></li></ul>
+<ul><li><a href="#toc_12">1.1 Release</a></li></ul>
+<ul><li><a href="#toc_13">Future Releases, ver 1.2+</a></li></ul></ul><h2 id="toc_11">1.0 Release</h2>
+<p>Features:</p>
+
+<ul>
+<li><a href="overview.html#c10n-using-annotations">Annotation-based messages</a></li>
+<li><a href="overview.html#c10n-using-annotations">A default set of annotations</a> for each of the default locales in
+<a href="http://docs.oracle.com/javase/6/docs/api/java/util/Locale.html" title="Locale API JDK6"><code>Locale</code></a>. (like, <code>Locale.ENGLISH</code>, <code>Locale.JAPANESE</code>, etc.)</li>
+<li>Ability to <a href="overview.html#c10n-configuring-annotations-custom">use custom annotations</a> and custom locales</li>
+<li><a href="overview.html#c10n-locale-provider">Customisation of locale retrieval logic</a> (<code>LocaleProvider</code>)</li>
+<li><a href="overview.html#c10n-guice-configuration">Guice support</a> (separate jar: c10n-ext-guice.jar)</li>
+</ul>
+<h2 id="toc_12">1.1 Release</h2>
+<p>Features:</p>
+
+<ul>
+<li><a href="overview.html#c10n-using-bundles">Resource bundle support</a></li>
+<li><a href="tools.html">Tools for testing</a> (separate jar)
+
+<ul>
+<li>Checking for duplicates</li>
+<li>Checking for missing/untranslated resources</li>
+</ul></li>
+<li>New features:
+
+<ul>
+<li><a href="parameter-filters.html">Parameter filters and enum translation</a></li>
+<li><a href="overview.html#c10n-external-resources">Reading messages from external files</a></li>
+<li><a href="overview.html#c10n-disable-formatting">Disabling message formatting</a></li>
+</ul></li>
+<li>API improvements:
+
+<ul>
+<li><a href="overview.html#c10n-changing-locale">Specify locale at message proxy creation time</a></li>
+</ul></li>
+<li>Other:
+
+<ul>
+<li>Better integration with Play 2.0 development environment (<a href="https://github.com/rodionmoiseev/c10n/issues/3">#3</a>)</li>
+<li>Annotations directly on delegates (especially useful in Scala) (<a href="https://github.com/rodionmoiseev/c10n/issues/10">#10</a>)</li>
+</ul></li>
+</ul>
+<h2 id="toc_13">Future Releases, ver 1.2+</h2>
+<p>Some planned features:</p>
+
+<ul>
+<li>Tools for testing (separate jar)
+
+<ul>
+<li><a href="http://ant.apache.org/" title="Apache Ant">Ant</a> and <a href="http://www.gradle.org/" title="Gradle - Build automation tool">Gradle</a> plugins</li>
+</ul></li>
+<li>Additional c10n-interface extensions:
+
+<ul>
+<li>Advanced plurals handling</li>
+<li>Aiding of localisation for exceptions</li>
+<li>Auto resolving of external resources (<a href="https://github.com/rodionmoiseev/c10n/issues/16">#16</a>)</li>
+</ul></li>
+<li>Benchmarks and performance improvements: caching, etc.</li>
+</ul>
+
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a></small></p>
+	<p><small>Gen. with <a href="https://github.com/mojombo/jekyll">Jekyll</a> on 2013/01/02</small></p>
+        <p><small>[Dinky theme]</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-36523975-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>

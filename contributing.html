@@ -1,0 +1,155 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cosmopolitan = c10n by rodionmoiseev</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Cosmopolitan</h1>
+<!--
+        <p class="header">A Java library, focused on making internationalisation more modular, easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.</p>
+-->
+	<ul class="links">
+          <li>
+              <a href="index.html">Introduction</a>
+	  </li>
+          <li>
+              <a href="overview.html">Guide</a>
+	  </li>
+          <li>
+              <a href="features.html">All Features</a>
+	  </li>
+          <li>
+              <a href="download.html">Download</a>
+	  </li>
+          <li>
+              <a href="contributing.html">Contributing</a>
+          </li>
+	</ul>
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/rodionmoiseev/c10n">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/tarball/master">Download TAR</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/rodionmoiseev">rodionmoiseev</a></p>
+
+
+      </header>
+      <section>
+	<h1 id="toc_5">Contributing to C10N</h1><ul class="toc"><ul><li><a href="#toc_6">For Eclipse users:</a></li></ul>
+<ul><li><a href="#toc_7">For IntelliJ IDEA (11.1 or newer) users:</a></li></ul>
+<ul><li><a href="#toc_8">For IntellijJ IDEA (11.0 and earlier) users:</a></li></ul>
+<ul><li><a href="#toc_9">How to build</a></li></ul></ul><p>C10N uses <a href="http://www.gradle.org/" title="Gradle - Build automation tool">gradle</a> build tool for compiling, running tests and building jars, etc.
+Please get yourself the latest version from the website (tested with 1.3).</p>
+<h2 id="toc_6">For Eclipse users:</h2>
+<p>Follow these steps to set up c10n in Eclipse:</p>
+
+<ol>
+<li>Checkout the sources. Let&#39;s say to <code>/home/rodion/c10n</code>.</li>
+<li>Generate Eclipse settings files (<code>.project</code>, <code>.classpath</code>, etc.) by running:
+<code>
+$ cd /home/rodion/c10n/master
+$ gradle eclipse
+</code></li>
+<li>Import the projects into Eclipse: 
+
+<ol>
+<li>Choose <em>File &gt; Import &gt; Existing Projects into Workspace</em></li>
+<li>Set <em>Select root directory:</em> to <code>/home/rodion/c10n</code></li>
+<li>Check all projects (<code>core</code>, <code>master</code>, etc.) and click <em>Finish</em></li>
+</ol></li>
+</ol>
+
+<p>You can re-generate Eclipse settings files with:</p>
+<div class="highlight"><pre><code class="text">$ gradle cleanEclipse eclipse
+</code></pre>
+</div>
+
+<p>and then <em>Refresh</em> all projects in Eclipse to see the changes.</p>
+<h2 id="toc_7">For IntelliJ IDEA (11.1 or newer) users:</h2>
+<p>You are highly recommended to use the latest version of IntelliJ IDEA
+as it contains full round-trip support for Gradle-based projects.</p>
+
+<ol>
+<li>Checkout the sources. Let&#39;s say to <code>/home/rodion/c10n</code>.</li>
+<li>Choose <em>File &gt; New project ... &gt; Import project from external model</em></li>
+<li>Choose <em>Gradle</em></li>
+<li>Point it to <code>/home/rodion/c10n/master/build.gradle</code></li>
+<li>Rest of settings may stay unchanged</li>
+</ol>
+
+<p>To update changes to the dependencies, pull out the <em>JetGradle</em> from the right
+and click <em>Refresh Gradle Project</em>.</p>
+<h2 id="toc_8">For IntellijJ IDEA (11.0 and earlier) users:</h2>
+<ol>
+<li>Checkout the sources. Let&#39;s say to <code>/home/rodion/c10n</code>.</li>
+<li>Generate IDEA settings files (<code>.ipr</code>, <code>.iml</code>, etc.) by running:
+<code>
+$ cd /home/rodion/c10n/master
+$ gradle idea
+</code></li>
+<li>Choose <em>File &gt; Open Project ...</em></li>
+<li>Point it to the generated <code>/home/rodion/c10n/master/c10n.ipr</code> file</li>
+<li>For some versions of IDEA it will attempt to look for <code>core.iml</code> and
+<code>tools.iml</code> under <code>master/</code> instead of looking under the project directory.
+You will need to explicitly change the path to <code>*.iml</code> for each project
+before clicking <em>Finish</em>.</li>
+</ol>
+
+<p>You can re-generate IntelliJ IDEA settings files with:</p>
+<div class="highlight"><pre><code class="text">$ gradle cleanIdea idea
+</code></pre>
+</div>
+
+<p>This may cause IDEA to prompt you asking to reload the project.</p>
+<h2 id="toc_9">How to build</h2>
+<p>To build and test the core project:</p>
+<div class="highlight"><pre><code class="text">$ cd core
+$ gradle build
+</code></pre>
+</div>
+
+<p>To create jars (omit the jar tasks that you don&#39;t need):</p>
+<div class="highlight"><pre><code class="text">$ cd core
+$ gradle jar sourcesJar guiceJar guiceSourcesJar
+</code></pre>
+</div>
+
+<p>To update the maven repo (omit <code>uploadGuiceArchives</code> to skip updating <code>core-ext-guice.jar</code>):</p>
+<div class="highlight"><pre><code class="text">$ cd core
+$ gradle uploadArchives uploadGuiceArchives
+</code></pre>
+</div>
+
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a></small></p>
+	<p><small>Gen. with <a href="https://github.com/mojombo/jekyll">Jekyll</a> on 2013/01/02</small></p>
+        <p><small>[Dinky theme]</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-36523975-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>

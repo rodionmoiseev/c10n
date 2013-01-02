@@ -1,0 +1,136 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cosmopolitan = c10n by rodionmoiseev</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Cosmopolitan</h1>
+<!--
+        <p class="header">A Java library, focused on making internationalisation more modular, easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.</p>
+-->
+	<ul class="links">
+          <li>
+              <a href="index.html">Introduction</a>
+	  </li>
+          <li>
+              <a href="overview.html">Guide</a>
+	  </li>
+          <li>
+              <a href="features.html">All Features</a>
+	  </li>
+          <li>
+              <a href="download.html">Download</a>
+	  </li>
+          <li>
+              <a href="contributing.html">Contributing</a>
+          </li>
+	</ul>
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/rodionmoiseev/c10n">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/tarball/master">Download TAR</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/rodionmoiseev">rodionmoiseev</a></p>
+
+
+      </header>
+      <section>
+	<h1 id="toc_33">Scala Integration</h1><p>C10N works nicely in Scala. Simply create a <code>trait</code> with annotated abstract methods, to define your translations.</p>
+
+<p>If method&#39;s return type is another c10n trait it will be automatically populated with relevant translations,
+to allow you to chain several levels of traits, as shown in example below:</p>
+<div class="highlight"><pre><code class="scala"><span class="k">object</span> <span class="nc">Main</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">main</span><span class="o">(</span><span class="n">args</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">String</span><span class="o">])</span> <span class="o">{</span>
+    <span class="cm">/*</span>
+<span class="cm">     * Use default locale bindings:</span>
+<span class="cm">     * @En -&gt; Locale.ENGLISH</span>
+<span class="cm">     * @Ru -&gt; Locale(&quot;ru&quot;)</span>
+<span class="cm">     */</span>
+    <span class="n">C10N</span><span class="o">.</span><span class="n">configure</span><span class="o">(</span><span class="k">new</span> <span class="nc">DefaultC10NAnnotations</span><span class="o">())</span>
+
+    <span class="k">val</span> <span class="n">gui</span><span class="k">:</span> <span class="kt">Gui</span> <span class="o">=</span> <span class="n">C10N</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">classOf</span><span class="o">[</span><span class="kt">Gui</span><span class="o">])</span>
+
+    <span class="c1">// assume a certain locale for illustration purposes</span>
+    <span class="nc">Locale</span><span class="o">.</span><span class="n">setDefault</span><span class="o">(</span><span class="nc">Locale</span><span class="o">.</span><span class="nc">ENGLISH</span><span class="o">)</span>
+    <span class="c1">//Locale.setDefault(new Locale(&quot;ru&quot;))</span>
+
+    <span class="n">println</span><span class="o">(</span><span class="s">&quot;Welcome, &quot;</span> <span class="o">+</span> <span class="n">gui</span><span class="o">.</span><span class="n">hello</span> <span class="o">+</span> <span class="s">&quot;!&quot;</span><span class="o">)</span>
+    <span class="n">println</span><span class="o">(</span><span class="s">&quot;Click &quot;</span> <span class="o">+</span> <span class="n">gui</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">file</span> <span class="o">+</span> <span class="s">&quot; to start.&quot;</span><span class="o">)</span>
+    <span class="n">println</span><span class="o">(</span><span class="s">&quot;Click &quot;</span> <span class="o">+</span> <span class="n">gui</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">print</span><span class="o">.</span><span class="n">pageSettings</span> <span class="o">+</span> <span class="s">&quot; to open page settings.&quot;</span><span class="o">)</span>
+    <span class="n">println</span><span class="o">(</span><span class="s">&quot;Click &quot;</span> <span class="o">+</span> <span class="n">gui</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">print</span><span class="o">.</span><span class="n">execute</span><span class="o">(</span><span class="s">&quot;Canon iP90v&quot;</span><span class="o">)</span> <span class="o">+</span> <span class="s">&quot; to print&quot;</span><span class="o">)</span>
+    <span class="n">println</span><span class="o">(</span><span class="s">&quot;Push the &quot;</span> <span class="o">+</span> <span class="n">gui</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">print</span><span class="o">.</span><span class="n">redButton</span> <span class="o">+</span> <span class="s">&quot; for something special&quot;</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="nd">@C10NMessages</span>
+  <span class="k">trait</span> <span class="nc">Gui</span> <span class="o">{</span>
+    <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;C10N user&quot;</span><span class="o">)</span>
+    <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Пользователь C10N&quot;</span><span class="o">)</span>
+    <span class="k">def</span> <span class="n">hello</span><span class="k">:</span> <span class="kt">String</span>
+    <span class="k">def</span> <span class="n">menu</span><span class="k">:</span> <span class="kt">Menu</span>
+  <span class="o">}</span>
+
+  <span class="nd">@C10NMessages</span>
+  <span class="k">trait</span> <span class="nc">Menu</span> <span class="o">{</span>
+    <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;File Menu&quot;</span><span class="o">)</span>
+    <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Файл-меню&quot;</span><span class="o">)</span>
+    <span class="k">def</span> <span class="n">file</span><span class="k">:</span> <span class="kt">String</span>
+    <span class="k">def</span> <span class="n">print</span><span class="k">:</span> <span class="kt">PrintMenu</span>
+  <span class="o">}</span>
+
+  <span class="nd">@C10NMessages</span>
+  <span class="k">trait</span> <span class="nc">PrintMenu</span> <span class="k">extends</span> <span class="nc">ExtendedPrintMenu</span><span class="o">{</span>
+    <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Page Settings ...&quot;</span><span class="o">)</span>
+    <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Настройки страницы ...&quot;</span><span class="o">)</span>
+    <span class="k">def</span> <span class="n">pageSettings</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="s">&quot;default values are ignored, sorry.&quot;</span>
+
+    <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Print with {0}&quot;</span><span class="o">)</span>
+    <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Распечатать на {0}&quot;</span><span class="o">)</span>
+    <span class="k">def</span> <span class="n">execute</span><span class="o">(</span><span class="n">printerName</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span>
+  <span class="o">}</span>
+
+  <span class="k">trait</span> <span class="nc">ExtendedPrintMenu</span><span class="o">{</span>
+    <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;red button&quot;</span><span class="o">)</span>
+    <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;красная кнопка&quot;</span><span class="o">)</span>
+    <span class="k">def</span> <span class="n">redButton</span><span class="k">:</span> <span class="kt">String</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>The example also illustrates how you can extend traits (for example <code>PrintMenu</code> trait extends <code>ExtendedPrintMenu</code>) to structure your translations.</p>
+
+<p>See also: <a href="play-framework-2.0-integration.html"> Play Framework 2.0 Integration </a></p>
+
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a></small></p>
+	<p><small>Gen. with <a href="https://github.com/mojombo/jekyll">Jekyll</a> on 2013/01/02</small></p>
+        <p><small>[Dinky theme]</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-36523975-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>

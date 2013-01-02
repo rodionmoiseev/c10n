@@ -1,0 +1,627 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cosmopolitan = c10n by rodionmoiseev</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Cosmopolitan</h1>
+<!--
+        <p class="header">A Java library, focused on making internationalisation more modular, easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.</p>
+-->
+	<ul class="links">
+          <li>
+              <a href="index.html">Introduction</a>
+	  </li>
+          <li>
+              <a href="overview.html">Guide</a>
+	  </li>
+          <li>
+              <a href="features.html">All Features</a>
+	  </li>
+          <li>
+              <a href="download.html">Download</a>
+	  </li>
+          <li>
+              <a href="contributing.html">Contributing</a>
+          </li>
+	</ul>
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/rodionmoiseev/c10n">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/tarball/master">Download TAR</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/rodionmoiseev">rodionmoiseev</a></p>
+
+
+      </header>
+      <section>
+	<h1 id="toc_34">C10N Usage Overview</h1><ul class="toc"><ul><li><a href="#toc_35">Storing translations in source code</a><ul><li><a href="#toc_36">Configuring C10N to use with annotations</a></li></ul></li></ul>
+<ul><li><a href="#toc_37">Storing translated text in external resource (file)</a></li></ul>
+<ul><li><a href="#toc_38">Disabling Message Formatting</a></li></ul>
+<ul><li><a href="#toc_39">Storing translations in resource bundles</a><ul><li><a href="#toc_40">Bundle Key Binding</a></li></ul>
+<ul><li><a href="#toc_41">Customising Keys</a></li></ul>
+<ul><li><a href="#toc_42">Global Common Key Prefix</a></li></ul>
+<ul><li><a href="#toc_43">Debugging Key Binding</a></li></ul></li></ul>
+<ul><li><a href="#toc_44">Customising C10N behaviour</a><ul><li><a href="#toc_45">Dynamically changing the locale</a></li></ul>
+<ul><li><a href="#toc_46">Modularising C10N Configuration</a></li></ul>
+<ul><li><a href="#toc_47">Complex Locale-sensitive Conversion</a></li></ul>
+<ul><li><a href="#toc_48">Injecting C10N interfaces with Guice</a></li></ul></li></ul></ul><p>With c10n, there are two ways to manage translated messages:</p>
+
+<ol>
+<li>Store all your translations in source code <a href="#c10n-using-annotations">using annotated interfaces</a></li>
+<li>Store translations in <a href="#c10n-using-bundles">Java resource bundles</a>, accesed via a special set of interfaces</li>
+</ol>
+
+<p>Unless you really need to use resource bundles, give the annotation-based approach a try. </p>
+
+<p><a name="c10n-using-annotations"></a></p>
+<h2 id="toc_35">Storing translations in source code</h2>
+<p>Here&#39;s how a typical internationalised programme would look like:</p>
+<div class="highlight"><pre><code class="java"><span class="cm">/**</span>
+<span class="cm"> * All translations are bound to an interface method. Note the arguments.</span>
+<span class="cm"> */</span>
+<span class="nd">@C10NMessages</span> <span class="c1">//only required when using composition. See CalendarWidgetComposed class below</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Buttons</span><span class="o">{</span>
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;OK&quot;</span><span class="o">)</span>
+  <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Да&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">ok</span><span class="o">();</span>
+
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Cancel&quot;</span><span class="o">)</span>
+  <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Отмена&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">cancel</span><span class="o">();</span>
+
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Are you sure you want to {0}?&quot;</span><span class="o">)</span>
+  <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Вы уверены что хотите {0}?&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">confirmationText</span><span class="o">(</span><span class="n">String</span> <span class="n">action</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * A class using the messages.</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ConfirmationDialogWindow</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Buttons</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">C10N</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">Buttons</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">JButton</span> <span class="n">okButton</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JButton</span><span class="o">(</span><span class="n">msg</span><span class="o">.</span><span class="na">ok</span><span class="o">());</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">JButton</span> <span class="n">cancelButton</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JButton</span><span class="o">(</span><span class="n">msg</span><span class="o">.</span><span class="na">cancel</span><span class="o">());</span>
+  <span class="kd">private</span> <span class="kd">final</span> <span class="n">JButton</span> <span class="n">confirmButton</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JButton</span><span class="o">(</span><span class="n">msg</span><span class="o">.</span><span class="na">confirmationText</span><span class="o">(</span><span class="s">&quot;my action&quot;</span><span class="o">));</span>
+  <span class="o">...</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>Interfaces containing messages may extend or compose with other interfaces to allow you to structure
+and modularise your code as you see fit. For example:</p>
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">CalendarWidget</span> <span class="kd">extends</span> <span class="n">Buttons</span><span class="o">{</span>
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Calendar&quot;</span><span class="o">)</span>
+  <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Календарь&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">widgetTitle</span><span class="o">();</span>
+<span class="o">}</span>
+<span class="c1">// or if you prefer composition</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">CalendarWidgetComposed</span><span class="o">{</span>
+  <span class="c1">//Currently requires Buttons class to be </span>
+  <span class="c1">//annotated with @C10NMessages annotation to work</span>
+  <span class="n">Buttons</span> <span class="nf">buttons</span><span class="o">();</span>
+
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Calendar&quot;</span><span class="o">)</span>
+  <span class="nd">@Ru</span><span class="o">(</span><span class="s">&quot;Календарь&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">widgetTitle</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Using the above is as you would expect</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CalendarWidgetWindow</span><span class="o">{</span>
+  <span class="kd">private</span> <span class="n">CalendarWidget</span> <span class="n">cal</span> <span class="o">=</span> <span class="n">C10N</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">CalendarWidget</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+  <span class="kd">private</span> <span class="n">JButton</span> <span class="n">okButton</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JButton</span><span class="o">(</span><span class="n">cal</span><span class="o">.</span><span class="na">ok</span><span class="o">());</span>
+
+  <span class="c1">// OR using composition</span>
+  <span class="kd">private</span> <span class="n">CalendarWidgetComposed</span> <span class="n">calC</span> <span class="o">=</span> <span class="n">C10N</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">CalendarWidgetComposed</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+  <span class="kd">private</span> <span class="n">JButton</span> <span class="n">okButtonC</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JButton</span><span class="o">(</span><span class="n">calC</span><span class="o">.</span><span class="na">buttons</span><span class="o">().</span><span class="na">ok</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>The concept works for small projects as well as for large ones. If you ever need to turn back to
+using the text-based resource bundles you can still do so by using the resource bundle support
+feature (link: <em>work-in-progress</em>).</p>
+
+<p><a name="c10n-javadoc"></a>
+<em>Tip:</em> Default C10N annotations will also appear in the JavaDoc. Most IDEs (e.g. Eclipse, IntelliJ IDEA, etc.)
+will give you a preview of the JavaDoc when you mouse-over the method calling code:</p>
+
+<p><img src="images/javadoc-showcase.png" alt="JavaDoc showcase"></p>
+
+<p><a name="c10n-configuring-annotations"></a></p>
+<h3 id="toc_36">Configuring C10N to use with annotations</h3>
+<p>Each of the method annotations (such as <code>@En</code> and <code>@Ru</code>) are predefined to bind to a particular locale. 
+C10N contains a predefined set of bindings for each of the language locale constants in the <a href="http://docs.oracle.com/javase/6/docs/api/java/util/Locale.html" title="java.util.Locale API JDK6"><code>java.util.Locale</code></a> API.</p>
+
+<p>In order just use the predefined annotations, include them in your <code>C10N.configure()</code>, as follows:</p>
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">){</span>
+  <span class="cm">/*</span>
+<span class="cm">   * put this code before you access your c10n messages</span>
+<span class="cm">   */</span>
+  <span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">DefaultC10NAnnotations</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p><a name="c10n-configuring-annotations-custom"></a>
+You can additionally bind your own annotations:</p>
+<div class="highlight"><pre><code class="java"><span class="cm">/*</span>
+<span class="cm"> * Annotation must have RUNTIME retention</span>
+<span class="cm"> * and must declare a `String value()` method</span>
+<span class="cm"> */</span>
+<span class="nd">@Target</span><span class="o">(</span><span class="n">ElementType</span><span class="o">.</span><span class="na">METHOD</span><span class="o">)</span>
+<span class="nd">@Retention</span><span class="o">(</span><span class="n">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+<span class="nd">@Documented</span>
+<span class="kd">public</span> <span class="nd">@interface</span> <span class="n">MyLanguage</span> <span class="o">{</span>
+  <span class="n">String</span> <span class="nf">value</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="nd">@Target</span><span class="o">(</span><span class="n">ElementType</span><span class="o">.</span><span class="na">METHOD</span><span class="o">)</span>
+<span class="nd">@Retention</span><span class="o">(</span><span class="n">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+<span class="kd">public</span> <span class="nd">@interface</span> <span class="n">Default</span> <span class="o">{</span>
+  <span class="n">String</span> <span class="nf">value</span><span class="o">();</span>
+<span class="o">}</span>
+
+
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">){</span>
+  <span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10NConfigBase</span><span class="o">(){</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">install</span><span class="o">(</span><span class="k">new</span> <span class="n">DefaultC10NAnnotations</span><span class="o">());</span>
+
+      <span class="n">bindAnnotation</span><span class="o">(</span><span class="n">MyLanguage</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">toLocale</span><span class="o">(</span><span class="k">new</span> <span class="n">Locale</span><span class="o">(</span><span class="s">&quot;my&quot;</span><span class="o">,</span><span class="s">&quot;locale&quot;</span><span class="o">));</span>
+      <span class="c1">// fallback to this annotation if no better match found</span>
+      <span class="n">bindAnnotation</span><span class="o">(</span><span class="n">Default</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">});</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>The <code>@Documented</code> meta-annotation is optional, but is useful for making sure translations get generated
+in the JavaDoc, as well as <a href="#c10n-javadoc">this nice IDE bonus</a>.</p>
+
+<p><em>Note:</em> Locale search algorithm is the same as the one for <a href="http://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html" title="How a ResourceBundle is Related to a Locale">Java resource bundles</a>.</p>
+
+<p><a name="c10n-external-resources"></a></p>
+<h2 id="toc_37">Storing translated text in external resource (file)</h2>
+<p><em>Since version 1.1</em></p>
+
+<p>When you need to store a whole chunk of text, such as license file, in a locale-sensitive manner,
+you can tell C10N to load content from an external file, using the <code>extRes</code> method in your annotation:</p>
+<div class="highlight"><pre><code class="java"><span class="nd">@C10NMessages</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Messages</span><span class="o">{</span>
+  <span class="c1">//locale mapped external file resources (or http, etc) </span>
+  <span class="nd">@En</span><span class="o">(</span><span class="n">extRes</span><span class="o">=</span><span class="s">&quot;file:///absolute/path/text.txt&quot;</span><span class="o">)</span>
+  <span class="nd">@Ja</span><span class="o">(</span><span class="n">extRes</span><span class="o">=</span><span class="s">&quot;file://../relative/path/text.txt&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">textFileContents</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>Each locale can specify a custom external resource to fetch translated contents from.</p>
+
+<p>Alternatively, you can use the <code>intRes</code> method, in the same manner to fetch text from files located on the classpath. For instance, <code>@En(intRes=&quot;com/example/text.txt&quot;)</code>.</p>
+
+<p><a name="c10n-disable-formatting"></a></p>
+<h2 id="toc_38">Disabling Message Formatting</h2>
+<p><em>Since version 1.1</em></p>
+
+<p>By default translated text is processed with <a href="http://docs.oracle.com/javase/6/docs/api/java/text/MessageFormat.html">MessageFormat</a> on output, which
+may sometimes be undesirable, especially when loading markup files (such as Markdown) using <code>extRes</code>.</p>
+
+<p>You may suppress this behaviour by setting <code>raw</code> method in your annotation to <code>true</code>. e.g.</p>
+<div class="highlight"><pre><code class="java"><span class="kd">interface</span> <span class="nc">Messages</span><span class="o">{</span>
+  <span class="nd">@En</span><span class="o">(</span><span class="n">extRes</span><span class="o">=</span><span class="s">&quot;file:///absolute/path/text.txt&quot;</span><span class="o">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">true</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">markdownText</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p><a name="c10n-using-bundles"></a></p>
+<h2 id="toc_39">Storing translations in resource bundles</h2>
+<p><em>Since version 1.1</em></p>
+
+<p>Translations can be optionally stored in <a href="http://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html" title="How a ResourceBundle is Related to a Locale">resource bundles</a>, instead of annotations.</p>
+
+<p>To configure resource bundles, simply bind one or more resource bundle names in your configuration:</p>
+<div class="highlight"><pre><code class="java"><span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10NConfigBase</span><span class="o">()</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">//other configuration ...</span>
+
+    <span class="c1">//bind one or more bundles by their base name</span>
+    <span class="n">bindBundle</span><span class="o">(</span><span class="s">&quot;com.myCompany.MyBundle&quot;</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">});</span>
+</code></pre>
+</div>
+
+<p>Then make sure <code>MyBundle.properties</code>, <code>MyBundle_myLocale.properties</code>, etc. are included in your classpath
+in appropriate packages. The mechanism for finding bundles is delegated to Java 
+built-in <a href="http://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html" title="How a ResourceBundle is Related to a Locale">resource bundles</a>.</p>
+<h3 id="toc_40">Bundle Key Binding</h3>
+<p>By default, the bundle key that will be used for a particular method invocation on a c10n interface is
+defined as:</p>
+<div class="highlight"><pre><code class="text">Class FQDN &#39;.&#39; Method Name ( &#39;_&#39; ArgumentType )*
+</code></pre>
+</div>
+
+<p>Here are some examples:</p>
+<div class="highlight"><pre><code class="java"><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">myCompany</span><span class="o">;</span>
+
+<span class="kd">interface</span> <span class="nc">Messages</span><span class="o">{</span>
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; com.myCompany.Messages.greeting</span>
+<span class="cm">   */</span>
+  <span class="n">String</span> <span class="nf">greeting</span><span class="o">();</span>
+
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; com.myCompany.Messages.greetingToPerson_String_int</span>
+<span class="cm">   */</span>
+  <span class="n">String</span> <span class="nf">greetingToPerson</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">int</span> <span class="n">age</span><span class="o">);</span>
+
+  <span class="kd">interface</span> <span class="nc">SubMessages</span><span class="o">{</span>
+    <span class="cm">/*</span>
+<span class="cm">     * key -&gt; com.myCompany.Messages.SubMessages.farewell</span>
+<span class="cm">     */</span>
+    <span class="n">String</span> <span class="nf">farewell</span><span class="o">();</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h3 id="toc_41">Customising Keys</h3>
+<p>In order to override the default bundle key you can use the <code>@C10NKey</code> annotation:</p>
+<div class="highlight"><pre><code class="java"><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">myCompany</span><span class="o">;</span>
+
+<span class="kd">interface</span> <span class="nc">Messages</span><span class="o">{</span>
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; custom.key</span>
+<span class="cm">   */</span>
+  <span class="nd">@C10NKey</span><span class="o">(</span><span class="s">&quot;custom.key&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">greetingToPerson</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">int</span> <span class="n">age</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>If all methods in the interface share the same key prefix you can reuse the prefix
+by declaring the <code>@C10NKey</code> on the enclosing interface. You can choose to use
+the default method-name-based key, or specify your own with the annotation:</p>
+<div class="highlight"><pre><code class="java"><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">myCompany</span><span class="o">;</span>
+
+<span class="nd">@C10NKey</span><span class="o">(</span><span class="s">&quot;common.prefix&quot;</span><span class="o">)</span>
+<span class="kd">interface</span> <span class="nc">Messages</span><span class="o">{</span>
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; common.prefix.greetingToPerson_String_int</span>
+<span class="cm">   */</span>
+  <span class="n">String</span> <span class="nf">greetingToPerson</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">int</span> <span class="n">age</span><span class="o">);</span>
+
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; common.prefix.hello</span>
+<span class="cm">   */</span>
+  <span class="nd">@C10NKey</span><span class="o">(</span><span class="s">&quot;hello&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">greeting</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>If you want to exclude one or more methods from the above rule, you can use an <em>absolute key</em>
+by prefixing your key with a dot. This will ignore the <code>@C10NKey</code> annotation on the enclosing
+class.</p>
+<div class="highlight"><pre><code class="java"><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">myCompany</span><span class="o">;</span>
+
+<span class="nd">@C10NKey</span><span class="o">(</span><span class="s">&quot;common.prefix&quot;</span><span class="o">)</span>
+<span class="kd">interface</span> <span class="nc">Messages</span><span class="o">{</span>
+
+  <span class="c1">//... other methods ...</span>
+
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; org.other.greeting</span>
+<span class="cm">   */</span>
+  <span class="nd">@C10NKey</span><span class="o">(</span><span class="s">&quot;.org.other.greeting&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">greeting</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>Interface prefix can also be declared in one of the super interfaces:</p>
+<div class="highlight"><pre><code class="java"><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">myCompany</span><span class="o">;</span>
+
+<span class="nd">@C10NKey</span><span class="o">(</span><span class="s">&quot;common.prefix&quot;</span><span class="o">)</span>
+<span class="kd">interface</span> <span class="nc">ParentMessages</span><span class="o">{</span>
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; common.prefix.parentGreeting</span>
+<span class="cm">   */</span>
+  <span class="n">String</span> <span class="nf">parentGreeting</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="kd">interface</span> <span class="nc">ChildMessages</span> <span class="kd">extends</span> <span class="n">ParentMessages</span><span class="o">{</span>
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; common.prefix.childGreeting</span>
+<span class="cm">   */</span>
+  <span class="n">String</span> <span class="nf">childGreeting</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p><em>Note:</em> Interface prefix is searched in all extended interfaces recursively, in their declaration order, breadth-first.</p>
+<h3 id="toc_42">Global Common Key Prefix</h3>
+<p>If all bundle keys in your application should have a common prefix, you can set it globally
+in your c10n configuration:</p>
+<div class="highlight"><pre><code class="java"><span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10NConfigBase</span><span class="o">()</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">//other configuration ...</span>
+
+    <span class="c1">//bind one or more bundles by their base name</span>
+    <span class="n">bindBundle</span><span class="o">(</span><span class="s">&quot;com.myCompany.MyBundle&quot;</span><span class="o">);</span>
+
+    <span class="c1">//set global prefix</span>
+    <span class="n">setKeyPrefix</span><span class="o">(</span><span class="s">&quot;global.prefix&quot;</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">});</span>
+</code></pre>
+</div>
+
+<p>This will prepend all keys with the specified prefix (this includes absolute keys starting with a dot):</p>
+<div class="highlight"><pre><code class="java"><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">myCompany</span><span class="o">;</span>
+
+<span class="nd">@C10NKey</span><span class="o">(</span><span class="s">&quot;messages&quot;</span><span class="o">)</span>
+<span class="kd">interface</span> <span class="nc">Messages</span><span class="o">{</span>
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; global.prefix.messages.hello</span>
+<span class="cm">   */</span>
+  <span class="nd">@C10NKey</span><span class="o">(</span><span class="s">&quot;hello&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">greeting</span><span class="o">();</span>
+
+  <span class="cm">/*</span>
+<span class="cm">   * key -&gt; global.prefix.absolute.key</span>
+<span class="cm">   */</span>
+  <span class="nd">@C10NKey</span><span class="o">(</span><span class="s">&quot;.absolute.key&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">greeting</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h3 id="toc_43">Debugging Key Binding</h3>
+<p>Bundle key binding can be somewhat opaque when facing a missing key problem.</p>
+
+<p>You can use the <code>setDebug(true)</code> method in your parent c10n configuration to get an output of
+all method-to-key bindings to standard out.</p>
+<div class="highlight"><pre><code class="java"><span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10NConfigBase</span><span class="o">()</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">//other configuration ...</span>
+
+    <span class="c1">//enable debugging to stdout</span>
+    <span class="n">setDebug</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">});</span>
+</code></pre>
+</div>
+
+<p>This will generate messages like shown below, to help you debug:</p>
+<div class="highlight"><pre><code class="text">c10n: method com.myCompany.Messages.greeting was bound to bundle key &#39;global.prefix.com.myCompany.Messages.greeting&#39;
+</code></pre>
+</div>
+<h2 id="toc_44">Customising C10N behaviour</h2>
+<p>Various parts the message translation process can be customised:</p>
+
+<p><a name="c10n-changing-locale"></a></p>
+<h3 id="toc_45">Dynamically changing the locale</h3>
+<p>There are two ways to tell C10N which locale to use:</p>
+
+<p>1) Specify locale at message proxy creating time (since 1.1).
+This method takes precedence. For example:</p>
+<div class="highlight"><pre><code class="java"><span class="n">Messages</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">C10N</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">Messages</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">Locale</span><span class="o">.</span><span class="na">RUSSIAN</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p>2) Override the locale provider at configuration time.</p>
+
+<p>The default locale provider retrieves current locale using <a href="http://docs.oracle.com/javase/6/docs/api/java/util/Locale.html#getDefault()" title="java.util.Locale#getDefault() method API JDK6"><code>Locale#getDefault()</code></a> method.
+You can change the locale by using the respective <code>Locale#setLocale(Locale)</code> method. This will
+have immediate effect.</p>
+
+<p><a name="c10n-locale-provider"></a>
+Alternatively you can inject a custom locale provision logic, by implementing the <code>LocaleProvider</code>
+interface and configuring it as follows:</p>
+<div class="highlight"><pre><code class="java"><span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10NConfigBase</span><span class="o">(){</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(){</span>
+    <span class="n">setLocaleProvider</span><span class="o">(</span><span class="k">new</span> <span class="n">LocaleProvider</span><span class="o">(){</span>
+      <span class="nd">@Override</span>
+      <span class="kd">public</span> <span class="n">Locale</span> <span class="nf">getLocale</span><span class="o">(){</span>
+        <span class="c1">//your custom logic goes here ...</span>
+        <span class="k">return</span> <span class="nf">myGuiSettings</span><span class="o">().</span><span class="na">getUserSpecifiedLocale</span><span class="o">();</span>
+      <span class="o">}</span>
+    <span class="o">});</span>
+  <span class="o">}</span>
+<span class="o">});</span>
+</code></pre>
+</div>
+
+<p>Change in the locale returned by <code>getLocale()</code> method will have immediate effect, therefore
+any consequent calls to c10n interfaces will return messages bound to the new locale.</p>
+
+<p><a name="c10n-modules"></a></p>
+<h3 id="toc_46">Modularising C10N Configuration</h3>
+<p>C10N configuration can be split across several configuration classes (extending <code>C10NConfigBase</code>).
+Typically this is useful in multi-project setups.</p>
+
+<p>Configuration modules for sub-projects and sub-packages can be <em>installed</em> using the idiom below:</p>
+<div class="highlight"><pre><code class="java"><span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10NConfigBase</span><span class="o">(){</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(){</span>
+    <span class="n">install</span><span class="o">(</span><span class="k">new</span> <span class="n">ChildModule1</span><span class="o">());</span>
+    <span class="n">install</span><span class="o">(</span><span class="k">new</span> <span class="n">ChildModule2</span><span class="o">());</span>
+  <span class="o">}</span>
+<span class="o">});</span>
+</code></pre>
+</div>
+
+<p><em>Note:</em> All modules installed inside the child modules are recursively included. </p>
+
+<p>As a rule, it is best to avoid defining conflicting bindings in child and parent configurations
+to avoid strange behaviour. 
+When there is a conflicting setup, C10N will attempt to use the binding defined in the configuration
+that is the closest to the c10n interface in question. The closest configuration is determined by
+the class package hierarchy; configurations that are on the same hierarchy level are resolved
+alphabetically by class name (*TODO: detailed documentation*).</p>
+
+<p><a name="c10n-locale-sensitive-conversion"></a></p>
+<h3 id="toc_47">Complex Locale-sensitive Conversion</h3>
+<p>You can create complex locale-sensitive logic by binding different custom
+implementations of an interface for each locale.</p>
+
+<p>Consider an example, where you are required to display distance in units based
+on the current locale. For instance, a <code>distanceOf(0.91)</code> could be localised as</p>
+
+<ol>
+<li><code>&quot;0.91 meters&quot;</code> for the metric system</li>
+<li><code>&quot;1 yard&quot;</code> for the imperial unit system</li>
+</ol>
+
+<p>Such conversion can be achieved by creating a <code>Units</code> interface with
+two implementations: <code>ImperialUnits</code> for the <code>Locale.UK</code> and <code>MetricUnits</code> for
+all other locales:</p>
+<div class="highlight"><pre><code class="java"><span class="cm">/*</span>
+<span class="cm"> * Declare a c10n interface containing the conversion function</span>
+<span class="cm"> */</span>
+<span class="kd">interface</span> <span class="nc">Units</span><span class="o">{</span>
+  <span class="n">String</span> <span class="nf">distanceOf</span><span class="o">(</span><span class="kt">int</span> <span class="n">amount</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Provide your implementations</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ImperialUnits</span> <span class="kd">implements</span> <span class="n">Units</span><span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="n">String</span> <span class="nf">distanceOf</span><span class="o">(</span><span class="kt">int</span> <span class="n">amount</span><span class="o">){</span> <span class="k">return</span> <span class="n">Float</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">amount</span> <span class="o">/</span> <span class="mf">0.91f</span><span class="o">)</span> <span class="o">+</span> <span class="s">&quot; yards&quot;</span><span class="o">;</span> <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MetricUnits</span> <span class="kd">implements</span> <span class="n">Units</span><span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="n">String</span> <span class="nf">distanceOf</span><span class="o">(</span><span class="kt">int</span> <span class="n">amount</span><span class="o">){</span> <span class="k">return</span> <span class="n">amount</span> <span class="o">+</span> <span class="s">&quot; meters&quot;</span><span class="o">;</span> <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>Now bind implementations to their respective locales. By omitting the locale
+binding you can tell C10N to use the implementation as the default (fallback).</p>
+<div class="highlight"><pre><code class="java"><span class="n">C10N</span><span class="o">.</span><span class="na">configure</span><span class="o">(</span><span class="k">new</span> <span class="n">C10ConfigBase</span><span class="o">(){</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(){</span>
+    <span class="n">bind</span><span class="o">(</span><span class="n">Units</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+      <span class="o">.</span><span class="na">to</span><span class="o">(</span><span class="n">ImperialUnits</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">Locale</span><span class="o">.</span><span class="na">UK</span><span class="o">)</span>
+      <span class="o">.</span><span class="na">to</span><span class="o">(</span><span class="n">MetricUnits</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">});</span>
+</code></pre>
+</div>
+
+<p><em>Note:</em> Implementation classes must have a public no-args constructor.</p>
+
+<p>When C10N cannot find an appropriate implementation binding it will look to
+see if there is an annotation on the method, so in the example above, the
+default conversion to <code>amount + &quot; meters&quot;</code> can also be declared as:</p>
+<div class="highlight"><pre><code class="java"><span class="kd">interface</span> <span class="nc">Units</span><span class="o">{</span>
+  <span class="nd">@C10NDef</span><span class="o">(</span><span class="s">&quot;{0} meters&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">distanceOf</span><span class="o">(</span><span class="kt">int</span> <span class="n">amount</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>or instead of implementing <code>MetricUnits</code> class.</p>
+
+<p><a name="c10n-guice-configuration"></a></p>
+<h3 id="toc_48">Injecting C10N interfaces with Guice</h3>
+<p>If you are using <a href="http://code.google.com/p/google-guice/" title="Google Guice">Guice</a>, c10n interfaces can be automatically injected for you via
+the <code>C10NModule</code> (*TODO:* part of <em>c10n-ext-guice.jar</em>). </p>
+
+<p>In order to enable auto-detection of c10n interfaces, every interfaces has to be annotated 
+with the <code>@C10NMessages</code> interface. Note, that scanning for c10n interfaces also transitively 
+introduces a runtime dependency on <a href="http://code.google.com/p/reflections/" title="Reflections: Java runtime metadata analysis">reflections</a> library.</p>
+
+<p>Sample usage:</p>
+<div class="highlight"><pre><code class="java"><span class="cm">/*</span>
+<span class="cm"> * 1. Annotate your c10n interfaces with @C10NMessages</span>
+<span class="cm"> */</span>
+<span class="nd">@C10NMessages</span>
+<span class="kd">public</span> <span class="n">interfaces</span> <span class="n">MyMessages</span><span class="o">{</span>
+  <span class="nd">@En</span><span class="o">(</span><span class="s">&quot;Hello, C10N!&quot;</span><span class="o">)</span>
+  <span class="n">String</span> <span class="nf">greeting</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * 2. Your entry point containing Guice injector configuration</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">){</span>
+  <span class="n">Injector</span> <span class="n">injector</span> <span class="o">=</span> <span class="n">Guice</span><span class="o">.</span><span class="na">createInjector</span><span class="o">(</span><span class="k">new</span> <span class="n">MyAppModule</span><span class="o">(),</span> <span class="o">...,</span> 
+                                           <span class="c1">//Add c10n guice module</span>
+                                           <span class="n">C10NModule</span><span class="o">.</span><span class="na">scanPackages</span><span class="o">(</span><span class="s">&quot;com.myapp&quot;</span><span class="o">));</span>
+<span class="o">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * 3. Simply add c10n interfaces as a constructor/field injected dependency</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyClass</span><span class="o">{</span>
+  <span class="nd">@Inject</span>
+  <span class="kd">public</span> <span class="nf">MyClass</span><span class="o">(</span><span class="n">MyMessages</span> <span class="n">msg</span><span class="o">){</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Greeting: &quot;</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">greeting</span><span class="o">());</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>If you would like to avoid the additional runtime dependency, you can bind your c10n interfaces
+by hand by adding your own Guice module.</p>
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="n">C10NMessagesModule</span> <span class="kd">extends</span> <span class="n">AbstractModule</span><span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">//hand-bind each of your c10n interfaces</span>
+    <span class="n">bind</span><span class="o">(</span><span class="n">MyMessages</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">toInstance</span><span class="o">(</span><span class="n">C10N</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">MyMessages</span><span class="o">.</span><span class="na">class</span><span class="o">));</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p><em>Tip:</em> If you have lots of c10n interfaces and don&#39;t mind using field-injections, you can use the 
+<a href="http://code.google.com/p/google-guice/wiki/CustomInjections" title="Custom injections in Guice">Log4J logger custom injection technique</a> to save yourself some typing.</p>
+<h4 id="toc_49">Notes on Integrating with Guice in Servlets</h4>
+<p>If you are using <a href="http://code.google.com/p/google-guice/wiki/Servlets" title="Getting started with Web and Servlets">Guice in a Servlet environment</a>, you will have to make sure that your <code>C10N.configure()</code> is executed before your <code>GuiceServletContextListener.contextInitialized()</code>. This can be achieved by making sure the call to <code>configure()</code> is placed before the call to <code>super.contextInitialized()</code>. Alternatively, you can place <code>C10N.configure()</code> in its own <code>ServletContextListener</code> and make sure it appears before Guice&#39;s one in <code>web.xml</code> descriptor.</p>
+
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a></small></p>
+	<p><small>Gen. with <a href="https://github.com/mojombo/jekyll">Jekyll</a> on 2013/01/02</small></p>
+        <p><small>[Dinky theme]</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-36523975-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>

@@ -1,0 +1,131 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cosmopolitan = c10n by rodionmoiseev</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Cosmopolitan</h1>
+<!--
+        <p class="header">A Java library, focused on making internationalisation more modular, easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.</p>
+-->
+	<ul class="links">
+          <li>
+              <a href="index.html">Introduction</a>
+	  </li>
+          <li>
+              <a href="overview.html">Guide</a>
+	  </li>
+          <li>
+              <a href="features.html">All Features</a>
+	  </li>
+          <li>
+              <a href="download.html">Download</a>
+	  </li>
+          <li>
+              <a href="contributing.html">Contributing</a>
+          </li>
+	</ul>
+        <ul class="buttons">
+          <li><a class="buttons github" href="https://github.com/rodionmoiseev/c10n">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rodionmoiseev/c10n/tarball/master">Download TAR</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/rodionmoiseev">rodionmoiseev</a></p>
+
+
+      </header>
+      <section>
+	<h1 id="toc_24">Inspection Tools</h1><p><em>Since 1.1</em></p>
+
+<p>Localisation process can be error prone, and tools for to help identify problems in the process are very important.</p>
+
+<p>C10N offers an inspection tool, to help you automate various checks for compliance with your localisation process.</p>
+<h2 id="toc_25">Usage Overview</h2>
+<p>Inspector is a simple tool that scans your source for all c10n-enabled interfaces and extracts all possible messages. For each message, inspector determines what locales are translated and how. </p>
+
+<p>The basic inspector usage:</p>
+
+<p>1) Create an instance of the inspector</p>
+<div class="highlight"><pre><code class="java"><span class="n">C10NInspector</span> <span class="n">inspector</span> <span class="o">=</span> <span class="n">C10NTools</span><span class="o">.</span><span class="na">inspectorBuilder</span><span class="o">().</span><span class="na">build</span><span class="o">();</span>
+</code></pre>
+</div>
+
+<p>By default, inspector will use settings from the last c10n configuration
+used declared with <code>C10N.configure(...)</code> method.</p>
+
+<p>2) Launch inspection</p>
+<div class="highlight"><pre><code class="java"><span class="n">List</span><span class="o">&lt;</span><span class="n">C10NUnit</span><span class="o">&gt;</span> <span class="n">units</span> <span class="o">=</span> <span class="n">inspector</span><span class="o">.</span><span class="na">inspect</span><span class="o">(</span><span class="s">&quot;com.example.messages&quot;</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p>3) Write custom checking logic. For instance, let&#39;s write a JUnit test
+to check all methods have at least declared annotation for <code>Locale.ENGLISH</code>.</p>
+<div class="highlight"><pre><code class="java"><span class="n">List</span><span class="o">&lt;</span><span class="n">C10NUnit</span><span class="o">&gt;</span> <span class="n">units</span> <span class="o">=</span> <span class="n">checker</span><span class="o">.</span><span class="na">inspect</span><span class="o">(</span><span class="s">&quot;com.example.messages&quot;</span><span class="o">);</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">C10NUnit</span> <span class="n">unit</span> <span class="o">:</span> <span class="n">units</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">C10NTranslations</span> <span class="n">translations</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="na">getTranslations</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="n">Locale</span><span class="o">.</span><span class="na">ENGLISH</span><span class="o">);</span>
+  <span class="n">assertNotNull</span><span class="o">(</span><span class="s">&quot;No translations for &#39;en&#39; found&quot;</span><span class="o">,</span> <span class="n">translations</span><span class="o">);</span>
+  <span class="n">assertThat</span><span class="o">(</span><span class="s">&quot;Annotation count for &#39;en&#39;&quot;</span><span class="o">,</span>
+  <span class="n">translations</span><span class="o">.</span><span class="na">getAnnotations</span><span class="o">().</span><span class="na">size</span><span class="o">(),</span> <span class="n">is</span><span class="o">(</span><span class="n">greaterThan</span><span class="o">(</span><span class="mi">0</span><span class="o">)));</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+<h2 id="toc_26">Further Configuration</h2>
+<p>Inspector instance builder provides you with following parameters:</p>
+<div class="highlight"><pre><code class="java"><span class="n">C10NTools</span><span class="o">.</span><span class="na">inspectorBuilder</span><span class="o">()</span>
+  <span class="o">.</span><span class="na">module</span><span class="o">(</span><span class="n">myModule</span><span class="o">)</span>
+  <span class="o">.</span><span class="na">checkLocales</span><span class="o">(</span><span class="n">locales</span><span class="o">)</span>
+  <span class="o">.</span><span class="na">fetchTranslations</span><span class="o">(</span><span class="n">enableTranslations</span><span class="o">)</span>
+  <span class="o">.</span><span class="na">dummyInstanceProvider</span><span class="o">(</span><span class="n">provider</span><span class="o">)</span>
+  <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+</code></pre>
+</div>
+
+<p>Where:</p>
+
+<ul>
+<li><code>module(myModule)</code> - takes the module configuration to use during checking. <code>myModule</code> is an instance of <code>ConfiguredC10NModule</code> class, that can be retrieved with <code>C10N.configure(...)</code> method.</li>
+<li><code>checkLocales(locales)</code> - inspection will be restricted only to the given locales. Other locale related translations will not be reflected in inspection results. By default, all locales mentioned in the configuration will be inspected for.</li>
+<li><code>fetchTranslations(enableTranslations)</code> - when <code>true</code>, inspection results will contain the actual translated values for each of the locale. When <code>false</code>, translated values will be <code>null</code>.</li>
+<li><code>dummyInstanceProvider(provider)</code> - A provider of dummy instances for parameterised methods, such as <code>greet(String name)</code>. Only enabled when <code>fetchTranslations(true)</code>.</li>
+</ul>
+
+<p>In addition, you can restrict the scan to one or more packages by passing the list of packages to the <code>inspect(...)</code> method. Specified packages and their sub-packages will be scanned recursively.</p>
+<div class="highlight"><pre><code class="java"><span class="n">inspector</span><span class="o">.</span><span class="na">inspect</span><span class="o">(</span><span class="s">&quot;com.example.package1&quot;</span><span class="o">,</span> <span class="s">&quot;com.example.package2&quot;</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p><em>Note:</em> At least one package has to be specified.</p>
+
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a></small></p>
+	<p><small>Gen. with <a href="https://github.com/mojombo/jekyll">Jekyll</a> on 2013/01/02</small></p>
+        <p><small>[Dinky theme]</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-36523975-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>

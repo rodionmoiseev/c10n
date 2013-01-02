@@ -42,6 +42,10 @@ h1, h2, h3, h4, h5, h6 {
   margin:36px 0 10px;
 }
 
+h2:first-of-type {
+  margin-top: 10px;
+}
+
 p, ul, ol, table, dl {
   margin:0 0 22px;
 }
@@ -60,6 +64,7 @@ h1,h2, h3 {
 
 h1 {
 	font-size: 30px;
+	border-bottom: 5px solid #AF0011;
 }
 
 h2 {
@@ -143,7 +148,7 @@ hr {
 img {
   position: relative;
   margin: 0 auto;
-  max-width: 650px;
+  max-width: 750px;
   padding: 5px;
   margin: 10px 0 32px 0;
   border: 1px solid #ccc;
@@ -153,9 +158,10 @@ img {
 /* Code blocks */
 
 code, pre {
-	font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
+  font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
   color:#000;
-  font-size:14px;
+  font-size:11px;
+  line-height: 15px;
 }
 
 pre {
@@ -198,7 +204,7 @@ td {
 
 /* Wrapper */
 .wrapper {
-  width:960px;
+  width:1060px;
 }
 
 
@@ -207,7 +213,7 @@ td {
 header {
 	background-color: #171717;
 	color: #FDFDFB;
-  width:170px;
+  width:150px;
   float:left;
   position:fixed;
 	border: 1px solid #000;
@@ -217,18 +223,18 @@ header {
 	-moz-border-radius-bottomright: 4px;
 	border-top-right-radius: 4px;
 	border-bottom-right-radius: 4px;
-	padding: 34px 25px 22px 50px;
-	margin: 30px 25px 0 0;
+	padding: 45px 30px 22px 20px;
+	margin: 80px 25px 0 0;
 	-webkit-font-smoothing: antialiased;
 }
 
 p.header {
-	font-size: 16px;
+	font-size: 10px;
 }
 
 h1.header {
 	font-family: Arvo, sans-serif;
-	font-size: 30px;
+	font-size: 20px;
 	font-weight: 300;
 	line-height: 1.3em;
 	border-bottom: none;
@@ -253,7 +259,12 @@ header ul {
   padding:0;
 }
 
-header li {
+header ul.links li {
+  margin-left: -10px;
+  list-style-type: square;
+} 
+
+header ul.buttons li {
 	list-style-type: none;
   width:132px;
   height:15px;
@@ -277,7 +288,7 @@ header li {
 
 }
 
-header li:hover {
+header ul.buttons li:hover {
 	background: #C3001D;
 	background: -moz-linear-gradient(top, #C3001D 0%, #950119 100%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f8f8f8), color-stop(100%,#dddddd));
@@ -309,20 +320,47 @@ a.buttons:hover {
 /* Section - for main page content */
 
 section {
-  width:650px;
+  width:800px;
   float:right;
   padding-bottom:50px;
 }
 
+ul.toc {
+  display: inline-block;
+  border: 1px solid #aaaaaa;
+  background: #dddddd;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  padding: 20px 30px 20px 5px;
+}
+  
+ul.toc li {
+  list-style-type: square;
+}
+
+ul.toc ul {
+  display: inline;
+}
 
 /* Footer */
 
 footer {
-  width:170px;
+  width:150px;
   float:left;
   position:fixed;
-  bottom:10px;
-	padding-left: 50px;
+  bottom:50px;
+  padding-left: 20px;
+  font-size: 10px;
+  color: #888888;
+}
+
+footer a {
+  color: #171717;
+}
+
+footer p {
+  line-height: 3px;
 }
 
 @media print, screen and (max-width: 960px) {
@@ -340,7 +378,7 @@ footer {
 
 	footer {
 		border-top: 1px solid #ccc;
-		margin:0 84px 0 50px;
+		margin:0 30px 0 50px;
 		padding:0;
 	}
 
@@ -349,7 +387,7 @@ footer {
   }
 
   section {
-    padding:20px 84px 20px 50px;
+    padding:20px 30px 20px 50px;
     margin:0 0 20px;
   }
 
