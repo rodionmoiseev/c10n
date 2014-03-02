@@ -117,8 +117,30 @@ public final class C10N {
         return rootConfiguredModule;
     }
 
+    /**
+     * <p>Creates a message factory from a configured c10n configuration object.</p>
+     * <p>This method is mainly intended for internal use.</p>
+     *
+     * @param configuredModule pre-configured c10n configuration
+     * @return message factory for the given configuration
+     * @deprecated Use {@link #createMsgFactory(C10NConfigBase)} instead
+     */
+    @Deprecated
     public static C10NMsgFactory createMsgFactory(ConfiguredC10NModule configuredModule) {
         return coreModule.defaultC10NMsgFactory(configuredModule);
+    }
+
+    /**
+     * <p>Creates and configures a message factory for the given configuration.</p>
+     * <p>This method does not modify any of the static state variables and is therefore
+     * safe to be used when multple instances of c10n message factories need to be created within
+     * one JVM.</p>
+     *
+     * @param conf c10n configuration
+     * @return message factory for the given configuration
+     */
+    public static C10NMsgFactory createMsgFactory(C10NConfigBase conf) {
+        return coreModule.defaultC10NMsgFactory(coreModule.resolve(conf));
     }
 
     /**
