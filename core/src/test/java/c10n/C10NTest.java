@@ -22,6 +22,7 @@ package c10n;
 
 import c10n.annotations.DefaultC10NAnnotations;
 import c10n.annotations.En;
+import c10n.annotations.It;
 import c10n.annotations.Ja;
 import c10n.test.utils.RuleUtils;
 import org.junit.Rule;
@@ -39,6 +40,9 @@ import static org.junit.Assert.assertThat;
  * @author rodion
  */
 public class C10NTest {
+
+    private final static String containsApostrophe = "L\'Italiano";
+
     @Rule
     public TestRule tmpLocale = RuleUtils.tmpLocale();
     @Rule
@@ -86,6 +90,24 @@ public class C10NTest {
         assertThat(c10nFactory.get(Messages.class, Locale.ENGLISH).text(), is("english"));
     }
 
+    /**
+     * Test for <a href="https://github.com/rodionmoiseev/c10n/issues/22">issue 22</a>
+     */
+    @Test
+    public void issue22_apostrophe() throws Exception {
+        C10NMsgFactory itC10nFactory = C10N.createMsgFactory(C10N
+                .configure(new C10NConfigBase() {
+                    @Override
+                    protected void configure() {
+                        install(new DefaultC10NAnnotations());
+                        setLocale(Locale.ITALIAN);
+                    }
+                }));
+
+        assertThat(itC10nFactory.get(Messages.class).apostropheIssue(),
+                is(containsApostrophe));
+    }
+
     interface Messages {
         @En(value = "{} {0} {hello}", raw = true)
         String text(String ignored);
@@ -93,5 +115,8 @@ public class C10NTest {
         @En("english")
         @Ja("japanese")
         String text();
+
+        @It(containsApostrophe)
+        String apostropheIssue();
     }
 }
