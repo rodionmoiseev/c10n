@@ -81,8 +81,10 @@ task guiceSourcesJar(type: Jar, dependsOn: guiceClasses) {
   from sourceSets.guice.allSource
 }
 
-task guiceJavadoc(type: Javadoc){
+task guiceJavadoc(type: Javadoc, dependsOn: guiceClasses){
   source = sourceSets.guice.allJava
+  classpath += sourceSets.main.output
+  classpath += configurations.guice
 }
 
 task guiceJavadocJar(type: Jar, dependsOn: guiceJavadoc){
@@ -100,6 +102,9 @@ uploadArchives {
       addFilter(guiceArtifact) {artifact, file ->
         artifact.name == guiceArtifact
       }
+      commonPom(pom(coreArtifact))
+      commonPom(pom(guiceArtifact))
+      pom(guiceArtifact).scopeMappings.addMapping(1, configurations.guice, Conf2ScopeMappingContainer.COMPILE)
     }
   }
 }

@@ -69,7 +69,7 @@ subprojects {
     from sourceSets.main.allSource
   }
 
-  task javadocJar(type: Jar, dependsOn: javadoc){
+  task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from 'build/docs/javadoc'
   }
@@ -80,13 +80,46 @@ subprojects {
     archives sourcesJar
   }
 
-  signing{
+  signing {
     sign configurations.archives
   }
 
-  uploadArchives{
-    repositories{
-      mavenDeployer{
+  ext.commonPom = {pom ->
+    pom.project {
+      name 'Cosmopolitan (C10N)'
+      inceptionYear '2012'
+      packaging 'jar'
+      description 'A Java library, focused on making internationalisation more modular, ' +
+          'easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.'
+      url 'http://rodionmoiseev.github.io/c10n/'
+
+      scm {
+        url 'scm:git@github.com:rodionmoiseev/c10n.git'
+        connection 'scm:git@github.com:rodionmoiseev/c10n.git'
+        developerConnection 'scm:git@github.com:rodionmoiseev/c10n.git'
+      }
+
+      licenses {
+        license {
+          name 'The Apache Software License, Version 2.0'
+          url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          distribution 'repo'
+        }
+      }
+
+      developers {
+        developer {
+          id 'rodionmoiseev'
+          name 'Rodion Moiseev'
+          email 'rodion.moiseev+github@gmail.com'
+        }
+      }
+    }
+  }
+
+  uploadArchives {
+    repositories {
+      mavenDeployer {
         //Local repo for testing
         //repository(url: "file://localhost/Users/rodexion/work/local-repo/")
 
@@ -102,36 +135,11 @@ subprojects {
           authentication(userName: sonatypeUsername, password: sonatypePassword)
         }
 
-        pom.project{
-          name 'Cosmopolitan (C10N)'
-          inceptionYear '2012'
-          packaging 'jar'
-          description 'A Java library, focused on making internationalisation more modular, ' +
-              'easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.'
-          url 'http://rodionmoiseev.github.io/c10n/'
-
-          scm{
-            url 'scm:git@github.com:rodionmoiseev/c10n.git'
-            connection 'scm:git@github.com:rodionmoiseev/c10n.git'
-            developerConnection 'scm:git@github.com:rodionmoiseev/c10n.git'
-          }
-
-          licenses{
-            license{
-              name 'The Apache Software License, Version 2.0'
-              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-              distribution 'repo'
-            }
-          }
-
-          developers{
-            developer{
-              id 'rodionmoiseev'
-              name 'Rodion Moiseev'
-              email 'rodion.moiseev+github@gmail.com'
-            }
-          }
+        beforeDeployment { deployment ->
+          signing.signPom(deployment)
         }
+
+        commonPom(pom)
       }
     }
   }
