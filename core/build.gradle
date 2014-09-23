@@ -28,7 +28,7 @@ dependencies {
   guice group: 'com.google.inject', name: 'guice', version: '3.0'
   guice group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'
 
-  testCompile group: 'commons-io', name: 'commons-io', version: '2.3'
+  testCompile group: 'commons-io', name: 'commons-io', version: '2.4'
 }
 
 eclipse.classpath.plusConfigurations += configurations.guice
