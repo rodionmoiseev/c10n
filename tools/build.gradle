@@ -36,3 +36,7 @@ jar {
 sourcesJar {
   appendix = "tools"
 }
+
+javadocJar {
+  appendix = "tools"
+}

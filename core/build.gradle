@@ -53,35 +53,59 @@ sourceSets {
   }
 }
 
+def coreJarAppendix = "core"
+def coreArtifact = "${project.archivesBaseName}-${coreJarAppendix}"
+def guiceJarAppendix = "ext-guice"
+def guiceArtifact = "${project.archivesBaseName}-${guiceJarAppendix}"
+
 jar {
-  appendix = "core"
+  appendix = coreJarAppendix
 }
 
 sourcesJar {
-  appendix = "core"
+  appendix = coreJarAppendix
+}
+
+javadocJar {
+  appendix = coreJarAppendix
 }
 
 task guiceJar(type: Jar, dependsOn: guiceClasses) {
-  appendix = "ext-guice"
+  appendix = guiceJarAppendix
   from sourceSets.guice.output
 }
 
 task guiceSourcesJar(type: Jar, dependsOn: guiceClasses) {
-  appendix = "ext-guice"
+  appendix = guiceJarAppendix
   classifier = "sources"
   from sourceSets.guice.allSource
 }
 
-uploadGuiceArchives {
+task guiceJavadoc(type: Javadoc){
+  source = sourceSets.guice.allJava
+}
+
+task guiceJavadocJar(type: Jar, dependsOn: guiceJavadoc){
+  appendix = guiceJarAppendix
+  classifier = 'javadoc'
+  from guiceJavadoc
+}
+
+uploadArchives {
   repositories {
     mavenDeployer {
-      repository(url: project.releaseRepoUrl)
-      snapshotRepository(url: project.snapshotRepoUrl)
+      addFilter(coreArtifact) {artifact, file ->
+        artifact.name == coreArtifact
+      }
+      addFilter(guiceArtifact) {artifact, file ->
+        artifact.name == guiceArtifact
+      }
     }
   }
 }
 
 artifacts {
-  guiceArchives guiceJar
-  guiceArchives guiceSourcesJar
+  archives guiceJar
+  archives guiceSourcesJar
+  archives guiceJavadocJar
 }
