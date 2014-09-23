@@ -35,7 +35,7 @@ eclipse.classpath.plusConfigurations += configurations.guice
 
 idea.module {
   sourceDirs += file("src/ext/guice/java")
-  scopes.COMPILE.plus += configurations.guice
+  scopes.COMPILE.plus += [ configurations.guice ]
 }
 
 sourceSets {

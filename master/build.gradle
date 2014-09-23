@@ -19,12 +19,10 @@
 
 buildscript {
   repositories {
-    maven {
-      url "https://raw.github.com/rodionmoiseev/maven-repo/master/repo/releases"
-    }
+    mavenCentral()
   }
   dependencies {
-    classpath group: 'org.rodion.gradle', name: 'idea-utils-plugin', version: '0.1'
+    classpath 'com.github.rodionmoiseev.gradle.plugins:idea-utils:0.2'
   }
 }
 
@@ -142,7 +140,7 @@ subprojects {
 
   sourceSets.main.compileClasspath += configurations.provided
   eclipse.classpath.plusConfigurations += configurations.provided
-  idea.module.scopes.PROVIDED.plus += configurations.provided
+  idea.module.scopes.PROVIDED.plus += [ configurations.provided ]
 }
 
 idea.project {
