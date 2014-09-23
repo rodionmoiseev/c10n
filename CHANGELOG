@@ -1,4 +1,10 @@
-Current (1.1) - 2012/05/21
+Current (1.2) - 2014/09/23
+
+* Feature: Major package name change for migrating to maven central (#24 rodionmoiseev)
+* Feature: Utility for instantiating multiple msg factories (#21 rodionmoiseev paolofulgoni)
+* Other: Updated commons-io dependency: 2.3 -> 2.4
+
+Version (1.1) - 2012/05/21
 
 * Feature: Loading locale-sensitive external resources - partial support (#2 rodionmoiseev)
 * Feature: Support specifying custom class-loader for proxy classes (#3 rodionmoiseev)
