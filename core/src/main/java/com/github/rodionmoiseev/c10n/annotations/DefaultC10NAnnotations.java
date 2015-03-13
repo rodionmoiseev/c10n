@@ -42,6 +42,7 @@ public class DefaultC10NAnnotations extends C10NConfigBase {
     @Override
     protected void configure() {
         bindAnnotation(En.class).toLocale(Locale.ENGLISH);
+        bindAnnotation(Es.class).toLocale(new Locale("es"));
         bindAnnotation(De.class).toLocale(Locale.GERMAN);
         bindAnnotation(Fr.class).toLocale(Locale.FRENCH);
         bindAnnotation(It.class).toLocale(Locale.ITALIAN);
