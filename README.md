@@ -81,7 +81,7 @@ If required, you can opt to store all or some of you translations in resource bu
 Documentation
 -------------
 
-Download the latest 1.1 release from the [download section][C10NDownload]. 
+Download the latest 1.2 release from the [download section][C10NDownload]. 
 
 * [C10N Guide][C10NGuide]
 * [All Features][C10NFeatures]
