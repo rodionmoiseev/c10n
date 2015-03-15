@@ -21,7 +21,10 @@ package com.github.rodionmoiseev.c10n;
 
 import com.github.rodionmoiseev.c10n.share.ShareModule;
 
+import java.lang.annotation.Annotation;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author rodion
@@ -72,6 +75,13 @@ public class C10NCoreModule {
     private static final class UnconfiguredC10NConfig extends C10NConfigBase {
         @Override
         protected void configure() {
+        }
+
+        @Override
+        Map<Class<? extends Annotation>, Set<Locale>> getAnnotationToLocaleMapping() {
+            throw new C10NException("Your c10n instance has not yet been configured. " +
+                    "Please make sure C10N.configure() method is called prior to " +
+                    "performing a C10N.get().");
         }
     }
 }

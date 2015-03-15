@@ -20,15 +20,25 @@
 package com.github.rodionmoiseev.c10n.test.utils;
 
 import com.github.rodionmoiseev.c10n.C10N;
-import com.github.rodionmoiseev.c10n.C10NCoreModule;
+import com.github.rodionmoiseev.c10n.C10NConfigBase;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TestRule;
 
 import java.util.Locale;
 
 public class RuleUtils {
+    private static final C10NConfigBase emptyConfig = new C10NConfigBase() {
+        @Override
+        protected void configure() {
+        }
+    };
+
     public static TestRule tmpC10NConfiguration() {
-        return new TmpC10NConfiguration();
+        return new TmpC10NConfiguration(emptyConfig);
+    }
+
+    public static TestRule tmpC10NConfiguration(C10NConfigBase config) {
+        return new TmpC10NConfiguration(config);
     }
 
     public static TestRule tmpLocale() {
@@ -52,9 +62,15 @@ public class RuleUtils {
     }
 
     private static final class TmpC10NConfiguration extends ExternalResource {
+        private final C10NConfigBase config;
+
+        TmpC10NConfiguration(C10NConfigBase config) {
+            this.config = config;
+        }
+
         @Override
         protected void after() {
-            C10N.configure(new C10NCoreModule().defaultConfig());
+            C10N.configure(config);
         }
     }
 

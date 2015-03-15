@@ -24,10 +24,16 @@ import com.github.rodionmoiseev.c10n.annotations.DefaultC10NAnnotations;
 import com.github.rodionmoiseev.c10n.annotations.En;
 import com.github.rodionmoiseev.c10n.annotations.Ja;
 import com.github.rodionmoiseev.c10n.test.utils.RuleUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TestRule;
 
+import java.lang.reflect.InvocationTargetException;
+import java.net.URLClassLoader;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -43,6 +49,8 @@ public class C10NTest {
     public TestRule tmpLocale = RuleUtils.tmpLocale();
     @Rule
     public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration();
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void parametrisationIsDisabledWhenRawFalseIsPresent() {
@@ -84,6 +92,49 @@ public class C10NTest {
         }));
         assertThat(c10nFactory.get(Messages.class, Locale.JAPANESE).text(), is("japanese"));
         assertThat(c10nFactory.get(Messages.class, Locale.ENGLISH).text(), is("english"));
+    }
+
+    /*
+     * A somewhat hacky test to make sure invoking C10N.get() on a freshly
+     * created C10N class throws the configuration warning.
+     * The reason we have to do this is because, C10N class in the current
+     * class loader is likely to have been already initialized by other unit tests.
+     */
+    @Test
+    public void cannotGetMessagesWhenConfigureHasNotBeenCalled() throws Throwable {
+        thrown.expect(exceptionClassWithName(C10NException.class.getName()));
+        thrown.expectMessage("C10N.configure()");
+        URLClassLoader cl = (URLClassLoader) C10N.class.getClassLoader();
+        Class<?> c10nClass = new URLClassLoader(cl.getURLs(), null).loadClass(C10N.class.getName());
+        try {
+            c10nClass.getMethod("get", new Class[]{Class.class}).invoke(null, Messages.class);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
+    }
+
+    @Test
+    public void cannotGetMessagesUsingDefaultConfig() {
+        C10NCoreModule coreModule = new C10NCoreModule();
+        ConfiguredC10NModule rootConfiguredModule = coreModule.resolve(coreModule.defaultConfig());
+        C10NMsgFactory root = coreModule.defaultC10NMsgFactory(rootConfiguredModule);
+        thrown.expect(C10NException.class);
+        thrown.expectMessage("C10N.configure()");
+        root.get(Messages.class);
+    }
+
+    private static Matcher<? extends Throwable> exceptionClassWithName(final String name) {
+        return new BaseMatcher<Throwable>() {
+            @Override
+            public boolean matches(Object item) {
+                return item.getClass().getName().equals(name);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Exception with class name '" + name + "'");
+            }
+        };
     }
 
     interface Messages {
