@@ -46,7 +46,7 @@ subprojects {
   archivesBaseName = 'c10n'
   group = 'com.github.rodionmoiseev.c10n'
 
-  sourceCompatibility = '1.6'
+  sourceCompatibility = '1.8'
   [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
   //[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:all']
 
