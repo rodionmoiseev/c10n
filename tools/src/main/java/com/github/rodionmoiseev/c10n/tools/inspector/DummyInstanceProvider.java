@@ -24,32 +24,33 @@ import java.lang.reflect.Method;
 
 /**
  * <p>Dummy instace generator, used for supplying arguments to parameterised
- * methods. See {@link #getInstance(Class, java.lang.reflect.Method, Class, int)} for more details.</p>
+ * methods. See {@link #getInstance(Class, java.lang.reflect.Method, Class, int)} for more details.
  *
  * @author rodion
  * @since 1.1
  */
 public interface DummyInstanceProvider {
     /**
-     * <p>Generate a dummy parameter instance for parameterized c10n methods.</p>
+     * <p>Generate a dummy parameter instance for parameterized c10n methods.
      * <p>Consider the interface below:
-     * <code><pre>
+     * <pre>{@code
      *     public interface Messages{
      *          &#64;En("Message {0}, {1}")
      *          String msg(String arg1, int arg2);
      *     }
-     * </pre></code>
-     * <p/>
+     * }
+     * </pre>
+     *
      * During inspection, translated value for the <code>msg(String,int)</code>
      * method will be evaluated by invoking it for each locale. Since invokation
      * requires a list of instaces of <code>String</code> and <code>int</code>,
      * dummy instances will have to be generated at runtime.
-     * </p>
+     *
      * <p>This method must make sure it always returns an instance of type
      * specified by the <code>paramType</code> argument, or null if it cannot
      * be correctly generated. If the generated instance is of other type, or null,
      * the value for {@link C10NTranslations#getValue()} after
-     * inspection will also be <code>null</code>.</p>
+     * inspection will also be <code>null</code>.
      *
      * @param c10nInterface c10n interface declaring the corresponding method (not null)
      * @param method        c10n method for which the translation is being provided (not null)

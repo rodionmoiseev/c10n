@@ -38,13 +38,13 @@ public final class C10NTranslations {
     private final Set<Annotation> annotations = Sets.newHashSet();
 
     /**
-     * <p>Get the actual translated value.</p>
+     * <p>Get the actual translated value.
      * <p>Note that value may not be available (be <code>null</code>) if
      * it corresponds to a parameterised method with argument types other
      * than one of {@link String}, {@link CharSequence} or one of primitive
      * types. However, the behaviour can be customised by providing a custom
      * {@link DefaultDummyInstanceProvider} (see {@link com.github.rodionmoiseev.c10n.tools.C10NTools}.
-     * </p>
+     *
      *
      * @return the actual translated value, or <code>null</code> if not available
      * @see DummyInstanceProvider

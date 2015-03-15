@@ -24,7 +24,7 @@ import com.github.rodionmoiseev.c10n.share.Constants;
 import java.lang.annotation.*;
 
 /**
- * Annotation bound to {@link java.util.Locale#SPANISH} locale
+ * Annotation bound to <code>new Locale("es")</code> locale
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

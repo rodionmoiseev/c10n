@@ -28,83 +28,88 @@ import com.github.rodionmoiseev.c10n.share.utils.Preconditions;
 public final class C10NFilters {
 
     /**
-     * <p>Create an Enum-to-methods mapping filter to ease Enum translation using C10N.</p>
-     * <p/>
+     * <p>Create an Enum-to-methods mapping filter to ease Enum translation using C10N.
+     * 
      * <h3>Basic Usage</h3>
-     * <p>Consider the following Enum type with 3 values:</p>
-     * <code><pre>
+     * <p>Consider the following Enum type with 3 values:
+     * <pre>{@code
      *   enum Status{
      *     Open, Closed, Pending
      *   }
-     * </pre></code>
-     * <p/>
+     * }
+     * </pre>
+     * 
      * <p>In order to localise each of the values, first create a c10n interface with a method for
-     * each of the Status values</p>
-     * <code><pre>
+     * each of the Status values
+     * <pre>{@code
      *   &#64;C10NMessages
      *   public interface StatusMsg {
      *     &#64;En("open")
      *     &#64;Ja("未着手")
      *     String open();
-     * <p/>
+     * 
      *     &#64;En("closed! beer time!")
      *     &#64;Ja("完了")
      *     String closed();
-     * <p/>
+     * 
      *     &#64;En("pending ...")
      *     &#64;Ja("進行中")
      *     String pending();
      *   }
-     * </pre></code>
-     * <p/>
+     * }
+     * </pre>
+     * 
      * Then, in your c10n configuration add an enum-filter binding for the Status type
-     * <p/>
-     * <code><pre>
+     * 
+     * <pre>{@code
      *   void configure(){
      *     bindFilter(C10NFilters.enumMapping(Status.class, StatusMsg.class), Status.class);
      *   }
-     * </pre></code>
-     * <p/>
+     * }
+     * </pre>
+     * 
      * <p>Now, every time c10n encounters Status as a method argument in a c10n-interface type,
-     * the it will be replaced with the appropriate localised version of the Enum value:</p>
-     * <p/>
-     * <code><pre>
+     * the it will be replaced with the appropriate localised version of the Enum value:
+     * 
+     * <pre>{@code
      *   &#64;C10NMessages
      *   public interface Messages{
      *     &#64;En("Localised status is: {0}")
      *     &#64;Ja("状態は{0}")
      *     String showStatus(Status status);
      *   }
-     * </pre></code>
-     * <p/>
+     * }
+     * </pre>
+     * 
      * <p>Invoking <code>showStatus(Status.Closed)</code> will render
-     * as <code>"Localised status is: closed! beer time!"</code>.</p>
-     * <p/>
+     * as <code>"Localised status is: closed! beer time!"</code>.
+     * 
      * <h2>Restricting Filter Application</h2>
      * <p>You can restrict filter application only to method arguments annotated with a given
      * annotation, or one of the given annotations from a list, by using <code>annotatedWith(Class)</code> method
-     * when binding. For example: </p>
-     * <code><pre>
+     * when binding. For example:
+     * <pre>{@code
      *   void configure(){
      *     bindFilter(new IntFormattingFilter(), int.class)
      *       .annotatedWith(Precise.class);
      *   }
-     * </pre></code>
-     * <p/>
+     * }
+     * </pre>
+     * 
      * <p>The above declaration will make sure int arguments are only passed through the
      * <code>IntFormattingFilter</code> whenever the method argument is marked with the <code>&#64;Precise</code>
-     * annotation. Other int arguments will not have the filter applied.</p>
-     * <p/>
+     * annotation. Other int arguments will not have the filter applied.
+     * 
      * <h2>Method Mapping Rules</h2>
      * <p>Enum values are mapped to c10n-interface methods in the following order:
      * <ol>
      * <li>Method name matches "&lt;Enum class name&gt;_&lt;Enum value name&gt;". e.g <code>status_open()</code></li>
      * <li>Method name matches "&lt;Enum value name&gt;" e.g. <code>closed()</code></li>
      * </ol>
-     * </p>
-     * <p><i>Note:</i> method mapping is case-insensitive.</p>
-     * <p><i>Note:</i> mapped methods cannot take any arguments. Methods with arguments will be excluded from mapping.</p>
-     * <p><i>Warning:</i> if mapping for one or more values is not found, a runtime exception will be thrown.</p>
+     *
+     * <p><i>Note:</i> method mapping is case-insensitive.
+     * <p><i>Note:</i> mapped methods cannot take any arguments. Methods with arguments will be excluded from mapping.
+     * <p><i>Warning:</i> if mapping for one or more values is not found, a runtime exception will be thrown.
      *
      * @param enumClass           Enum type to create mapping for
      * @param c10nMappedInterface a c10n-interface containing mapped methods
@@ -116,7 +121,7 @@ public final class C10NFilters {
     }
 
     /**
-     * <p>Filter provider that always returns the specified instance</p>
+     * <p>Filter provider that always returns the specified instance
      *
      * @param filter filter instance to return from the generated provider(not-null)
      * @param <T>    Filter argument type
@@ -130,7 +135,7 @@ public final class C10NFilters {
     /**
      * <p>Decorates the specified filter provider with a simple static cache.
      * Only the first call will result in an execution of {@link com.github.rodionmoiseev.c10n.C10NFilterProvider#get()} method.
-     * The following calls will always return a cached instance of the first call.</p>
+     * The following calls will always return a cached instance of the first call.
      *
      * @param filterProvider filter provider to decorate with caching (not-null)
      * @param <T>            Filter argument type

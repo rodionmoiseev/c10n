@@ -30,7 +30,7 @@ public class DefaultC10NAnnotations extends C10NConfigBase {
     /**
      * <p>Always returns an empty package name to make
      * sure this configuration is always the parent
-     * of all other configurations in the hierarchy</p>
+     * of all other configurations in the hierarchy
      *
      * @return Empty string
      */

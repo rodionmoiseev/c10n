@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * <p>Marks a c10n message interface in order
  * to make it detectable by the resource bundle
- * generator.</p>
+ * generator.
  *
  * @author rodion
  */

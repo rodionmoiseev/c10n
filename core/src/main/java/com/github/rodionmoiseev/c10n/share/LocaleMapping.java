@@ -28,10 +28,10 @@ import java.util.Set;
 public interface LocaleMapping {
     /**
      * <p>Find the locale from the given locale set that
-     * is the closes match to the forLocale.</p>
-     * <p/>
+     * is the closes match to the forLocale.
+     *
      * <p>Provided the set contains {@link Locale#ROOT}, the
-     * result is guaranteed to be non-null.</p>
+     * result is guaranteed to be non-null.
      *
      * @param fromList  possible locales to pick from
      * @param forLocale locale to find the closest match for

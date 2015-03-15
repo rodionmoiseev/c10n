@@ -25,15 +25,15 @@ import java.util.Locale;
  * <p>
  * Utility class for generating implementations of c10n message interfaces
  * annotated with &#64;{@link C10NMessages}.
- * </p>
- * <p/>
+ *
+ *
  * <p>
  * Usage similar to logger creating in frameworks like log4j or slf4j.
- * </p>
- * <p/>
+ *
+ *
  * <p>
  * Sample usage:
- * <p/>
+ *
  * <pre>
  *   -- MyMessages.java
  *     import com.github.rodionmoiseev.c10n.C10NMessages;
@@ -66,16 +66,16 @@ import java.util.Locale;
  *       }
  *     }
  * </pre>
- * <p/>
+ *
  * Implementation of <code>MyMessages</code> class is generated and will return
  * messages from configured bundle (TODO configuration).
- * </p>
+ *
  *
  * @author rodion
  */
 public final class C10N {
     /**
-     * <p>Classloader to use for loading c10n-interface proxies</p>
+     * <p>Classloader to use for loading c10n-interface proxies
      */
     private static ClassLoader proxyClassloader = C10N.class.getClassLoader();
 
@@ -118,8 +118,8 @@ public final class C10N {
     }
 
     /**
-     * <p>Creates a message factory from a configured c10n configuration object.</p>
-     * <p>This method is mainly intended for internal use.</p>
+     * <p>Creates a message factory from a configured c10n configuration object.
+     * <p>This method is mainly intended for internal use.
      *
      * @param configuredModule pre-configured c10n configuration
      * @return message factory for the given configuration
@@ -131,10 +131,10 @@ public final class C10N {
     }
 
     /**
-     * <p>Creates and configures a message factory for the given configuration.</p>
+     * <p>Creates and configures a message factory for the given configuration.
      * <p>This method does not modify any of the static state variables and is therefore
      * safe to be used when multple instances of c10n message factories need to be created within
-     * one JVM.</p>
+     * one JVM.
      *
      * @param conf c10n configuration
      * @return message factory for the given configuration
@@ -146,11 +146,11 @@ public final class C10N {
     /**
      * <p>Overrides the classloader used for loading c10n-interface proxies.
      * This maybe useful in the context of hot-swapping enabled classloaders, like
-     * the one for Play framework 2.0</p>
-     * <p/>
-     * <p>Overriding should be done before any calls to {@link C10N#get(Class)}, to be effective.</p>
-     * <p/>
-     * <p>By default, the classloader of {@link com.github.rodionmoiseev.c10n.C10N#getClass()} class is used.</p>
+     * the one for Play framework 2.0
+     *
+     * <p>Overriding should be done before any calls to {@link C10N#get(Class)}, to be effective.
+     *
+     * <p>By default, the classloader of {@link com.github.rodionmoiseev.c10n.C10N#getClass()} class is used.
      *
      * @param classloader the classloader to use for loading c10n-interface proxies (not-null)
      */

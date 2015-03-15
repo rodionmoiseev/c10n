@@ -22,13 +22,13 @@ package com.github.rodionmoiseev.c10n.share.utils;
 import static com.github.rodionmoiseev.c10n.share.utils.Preconditions.assertNotNull;
 
 /**
- * <p>A bundle key used to look up the translation in a {@link java.util.ResourceBundle}.</p>
- * <p/>
+ * <p>A bundle key used to look up the translation in a {@link java.util.ResourceBundle}.
+ *
  * <p>Bundle key consists of the the key actually used to look up in the bundle, as well as
  * the key, declared by the user, using {@link com.github.rodionmoiseev.c10n.C10NKey} annotaion, if any.
  * If the {@link com.github.rodionmoiseev.c10n.C10NKey} annotation has in any way affected the bundle key generation
  * process, i.e. either the annotation was declared on the enclosing class or on the method
- * itself, then the bundle key is considered custom ({@link #isCustomKey()} will be <code>true</code>).</p>
+ * itself, then the bundle key is considered custom ({@link #isCustomKey()} will be <code>true</code>).
  *
  * @author rodion
  * @since 1.1
@@ -49,7 +49,7 @@ public class C10NBundleKey {
      * <p>Determines whether the key was automatically generated
      * by c10n, or customised by the user using
      * the {@link com.github.rodionmoiseev.c10n.C10NKey} annotation, either on one of the
-     * parent classes, or the method directly, or both.</p>
+     * parent classes, or the method directly, or both.
      *
      * @return If key is customised, <code>true</code>, else <code>false</code>.
      */
@@ -58,7 +58,7 @@ public class C10NBundleKey {
     }
 
     /**
-     * <p>The bundle key used for retrieval from the bundle.</p>
+     * <p>The bundle key used for retrieval from the bundle.
      *
      * @return bundle key(not null)
      */
@@ -68,7 +68,7 @@ public class C10NBundleKey {
 
     /**
      * <p>The bundle key as it appeared in the {@link com.github.rodionmoiseev.c10n.C10NKey} annotation
-     * value. If annotation was not specified, returns <code>null</code></p>
+     * value. If annotation was not specified, returns <code>null</code>
      *
      * @return value of the {@link com.github.rodionmoiseev.c10n.C10NKey} annotation, or <code>null</code> if
      *         none was declared.

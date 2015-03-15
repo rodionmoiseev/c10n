@@ -40,10 +40,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
- * <p>Created: 7/31/12 11:33 AM</p>
+ * <p>Created: 7/31/12 11:33 AM
  *
  * @author rodion
  */
+@SuppressWarnings("deprecation")//rational: using deprecated api for internal testing purposes
 public class C10NTest {
     @Rule
     public TestRule tmpLocale = RuleUtils.tmpLocale();

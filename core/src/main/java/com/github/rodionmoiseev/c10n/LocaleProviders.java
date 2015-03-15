@@ -32,7 +32,7 @@ public class LocaleProviders {
 
     /**
      * <p>{@link LocaleProvider} that always returns the given
-     * {@link java.util.Locale} instance.</p>
+     * {@link java.util.Locale} instance.
      */
     private static final class FixedLocaleProvider implements LocaleProvider {
         private final Locale locale;

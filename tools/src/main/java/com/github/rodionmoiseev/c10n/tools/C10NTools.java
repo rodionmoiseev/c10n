@@ -32,9 +32,9 @@ import java.util.Set;
 import static com.github.rodionmoiseev.c10n.share.utils.Preconditions.assertNotNull;
 
 /**
- * <p>C10N translation inspection tools.</p>
+ * <p>C10N translation inspection tools.
  * <p>Typical inspector usage:
- * <p/>
+ *
  * <ol>
  * <li>Instanciate the inspector:
  * <pre>
@@ -67,7 +67,7 @@ import static com.github.rodionmoiseev.c10n.share.utils.Preconditions.assertNotN
  * {@link String}, {@link CharSequence} or one of the primitive types.
  * </li>
  * </ol>
- * </p>
+ *
  *
  * @author rodion
  * @since 1.1
@@ -75,7 +75,7 @@ import static com.github.rodionmoiseev.c10n.share.utils.Preconditions.assertNotN
 public final class C10NTools {
 
     /**
-     * <p>Start a new inspector builder</p>
+     * <p>Start a new inspector builder
      *
      * @return inspector builder instance.
      * @see C10NTools Typical usage
@@ -85,7 +85,7 @@ public final class C10NTools {
     }
 
     /**
-     * <p>{@link C10NInspector} instance builder</p>
+     * <p>{@link C10NInspector} instance builder
      */
     public static final class C10NInspectorBuilder {
         private ConfiguredC10NModule configuredModule = C10N.getRootConfiguredModule();
@@ -94,7 +94,7 @@ public final class C10NTools {
         private boolean fetchTranslations = true;
 
         /**
-         * <p>Specify the C10N module to inspect. Defaults to {@link com.github.rodionmoiseev.c10n.C10N#getRootConfiguredModule()}</p>
+         * <p>Specify the C10N module to inspect. Defaults to {@link com.github.rodionmoiseev.c10n.C10N#getRootConfiguredModule()}
          *
          * @param module c10n module to inspect (not null)
          * @return this builder instance
@@ -106,7 +106,7 @@ public final class C10NTools {
         }
 
         /**
-         * <p>Specify the list of locales to check against</p>
+         * <p>Specify the list of locales to check against
          *
          * @param locales a list of locales to check (not null)
          * @return this builder instance
@@ -118,7 +118,7 @@ public final class C10NTools {
         }
 
         /**
-         * <p>Specify the provider for dummy instances for parameterised methods</p>
+         * <p>Specify the provider for dummy instances for parameterised methods
          *
          * @param dummyInstanceProvider provider for dummy instances for parameterised methods (not null)
          * @return this builder instance
@@ -131,7 +131,7 @@ public final class C10NTools {
 
         /**
          * <p>Specify whether to fetch actual translation values for each
-         * of the checked locales. If false, translated values will be set to <code>null</code></p>
+         * of the checked locales. If false, translated values will be set to <code>null</code>
          *
          * @param enable fetch translated values if <code>true</code>, else skip fetching.
          * @return this builder instance
@@ -142,7 +142,7 @@ public final class C10NTools {
         }
 
         /**
-         * <p>Create inspector instance based on configured values.</p>
+         * <p>Create inspector instance based on configured values.
          *
          * @return inspector instance (not null)
          */

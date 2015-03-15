@@ -52,8 +52,8 @@ public class C10NCoreModule {
 
     /**
      * <p>Locale provider that always delegates to
-     * {@link java.util.Locale#getDefault()}.</p>
-     * <p>The value may be changed by calling {@link Locale#setDefault(java.util.Locale)}</p>
+     * {@link java.util.Locale#getDefault()}.
+     * <p>The value may be changed by calling {@link Locale#setDefault(java.util.Locale)}
      *
      * @return current locale
      */

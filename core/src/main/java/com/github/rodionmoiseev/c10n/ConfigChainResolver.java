@@ -28,12 +28,12 @@ import java.util.List;
 interface ConfigChainResolver {
     /**
      * <p>Resolve all c10n configurations responsible for the specified
-     * c10n interface.</p>
-     * <p/>
+     * c10n interface.
+     *
      * <p>Configurations are returned in the bottom-up order, that is the
      * most concrete configuration first, followed by parent configurations.
      * When multiple configurations exist on the same hierarchy level, they
-     * are returned in alphabetical order of their class name.</p>
+     * are returned in alphabetical order of their class name.
      *
      * @param c10nInterface C10N interface to resolve configurations for (non-null)
      * @return List of configurations responsible for the given c10n interface

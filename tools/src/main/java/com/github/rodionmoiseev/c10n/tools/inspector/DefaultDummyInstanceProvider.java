@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 
 /**
  * <p>Default dummy instance provide that can generate dummy values for
- * for all primitive types and strings.</p>
+ * for all primitive types and strings.
  *
  * @author rodion
  */

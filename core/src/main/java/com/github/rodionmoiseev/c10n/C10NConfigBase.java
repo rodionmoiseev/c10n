@@ -45,7 +45,8 @@ public abstract class C10NConfigBase {
     private boolean configured = false;
 
     /**
-     * <p>To be implemented by subclasses of {@link C10NConfigBase}.</p>
+     * <p>To be implemented by subclasses of {@link C10NConfigBase}.
+     *
      * <p>Configuration methods are as follows:
      * <ul>
      * <li>{@link #bindAnnotation(Class)} - binds annotation that holds translation for a specific locale.</li>
@@ -57,22 +58,21 @@ public abstract class C10NConfigBase {
      * unresolved translation mappings</li>
      * <li>{@link #setKeyPrefix(String)} - sets global key prefix to auto-prepend to all bundle keys</li>
      * </ul>
-     * </p>
      */
     protected abstract void configure();
 
     /**
      * <p>Get the name of the package for which the current
-     * module is responsible.</p>
-     * <p/>
+     * module is responsible.
+     *
      * <p>The name of the package is used to determine
      * which c10n interfaces this configuration is
-     * responsible for</p>
-     * <p/>
+     * responsible for
+     *
      * <p>The default implementation, which returns
      * the string representation of the package of
      * the configuration class, should suffice in most
-     * cases</p>
+     * cases
      *
      * @return name of package the current module is responsible for
      */
@@ -89,10 +89,10 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Install the given child c10n configuration module</p>
-     * <p/>
+     * <p>Install the given child c10n configuration module
+     *
      * <p>This will apply the configuration to all c10n interfaces
-     * located in the child configuration package or below.</p>
+     * located in the child configuration package or below.
      *
      * @param childConfig child c10n configuration to install (not-null)
      */
@@ -102,23 +102,23 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Create a custom implementation binding for the given c10n interface</p>
-     * <p/>
+     * <p>Create a custom implementation binding for the given c10n interface
+     *
      * <p>There are two basic usages:
      * <pre><code>
      *   bind(Messages.class).to(JapaneseMessagesImpl.class, Locale.JAPANESE);
      * </code></pre>
-     * <p/>
+     *
      * which will use the <code>JapaneseMessagesImpl.class</code> when locale is
-     * set to <code>Locale.JAPANESE</code></p>
-     * <p/>
+     * set to <code>Locale.JAPANESE</code>
+     *
      * <p>The second usage is:
      * <pre><code>
      *   bind(Messages.class).to(FallbackMessagesImpl.class);
      * </code></pre>
-     * <p/>
+     *
      * which will use the <code>FallbackMessagesImpl.class</code> when no other
-     * implementation class was matched for the current locale.</p>
+     * implementation class was matched for the current locale.
      *
      * @param c10nInterface C10N interface to create an implementation binding for (not-null)
      * @param <T>           C10N interface type
@@ -131,20 +131,20 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Sets the {@link LocaleProvider} for this configuration.</p>
-     * <p/>
+     * <p>Sets the {@link LocaleProvider} for this configuration.
+     *
      * <p>Locale provider is consulted every time a translation is requested,
-     * that is every time a method on an c10n interface is called.</p>
-     * <p/>
+     * that is every time a method on an c10n interface is called.
+     *
      * <p>As a rule, there should be only one locale provider per application.
      * Any locale providers defined in child configurations (see {@link #install(C10NConfigBase)}
-     * are disregarded.</p>
-     * <p/>
+     * are disregarded.
+     *
      * <p>Because locale provider has to be consulted on every translation request
-     * {@link com.github.rodionmoiseev.c10n.LocaleProvider#getLocale()} should avoid any CPU intensive processing</p>
-     * <p/>
+     * {@link com.github.rodionmoiseev.c10n.LocaleProvider#getLocale()} should avoid any CPU intensive processing
+     *
      * <p>Default locale provider implementation always returns the same result as
-     * {@link java.util.Locale#getDefault()}</p>
+     * {@link java.util.Locale#getDefault()}
      *
      * @param localeProvider custom locale provider (not-null)
      */
@@ -154,10 +154,10 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Fixes the {@link java.util.Locale} to the specified locale.</p>
-     * <p/>
+     * <p>Fixes the {@link java.util.Locale} to the specified locale.
+     *
      * <p>Generally useful when your application needs to create separate
-     * {@link C10NMsgFactory} instances for each locale.</p>
+     * {@link C10NMsgFactory} instances for each locale.
      *
      * @param locale Locale to use
      */
@@ -166,13 +166,12 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Customise placeholder value for unresolved translations.</p>
-     * <p/>
+     * <p>Customise placeholder value for unresolved translations.
+     *
      * <p>The default behaviour is to return a string in format:
      * <pre>
      *   [InterfaceName].[MethodName]([ArgumentValues])
      * </pre>
-     * </p>
      *
      * @param handler custom implementation of untranslated message handler (not-null)
      */
@@ -182,27 +181,27 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Create a method annotation binding to the specified locale</p>
-     * <p/>
+     * <p>Create a method annotation binding to the specified locale
+     *
      * <p>There are two basic usages:
      * <pre><code>
      *   bindAnnotation(Ja.class).to(Locale.JAPANESE);
      * </code></pre>
-     * <p/>
+     *
      * which will tell c10n to take the value given in the <code>@Ja</code>
-     * annotation whenever the current locale is <code>Locale.JAPANESE</code></p>
-     * <p/>
+     * annotation whenever the current locale is <code>Locale.JAPANESE</code>
+     *
      * <p>The second usage is:
      * <pre><code>
      *   bindAnnotation(En.class);
      * </code></pre>
-     * <p/>
+     *
      * which will make c10n always fallback to the value given in the <code>@En</code>
-     * annotation if no other annotation binding matched the current locale.</p>
-     * <p/>
+     * annotation if no other annotation binding matched the current locale.
+     *
      * <p>Note: Some default annotation bindings are defined in {@link com.github.rodionmoiseev.c10n.annotations.DefaultC10NAnnotations}.
      * In order to use <code>install(new DefaultC10NAnnotations());</code> somewhere in your configuration
-     * (see {@link #install(C10NConfigBase)}</p>
+     * (see {@link #install(C10NConfigBase)}
      *
      * @param annotationClass Class of the annotation to create a local binding for (not-null)
      * @return annotation locale binding DSL object
@@ -216,17 +215,18 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Create a filter binding for one or more argument types.</p>
+     * <p>Create a filter binding for one or more argument types.
      * <p>All arguments passed to c10n-interfaces with the specified type(s) will
      * be converted to string using the filter generated by the given filter provider,
-     * instead of the conventional <code>toString()</code> method.</p>
-     * <p/>
+     * instead of the conventional <code>toString()</code> method.
+     *
      * <p>Filter creation (using {@link com.github.rodionmoiseev.c10n.C10NFilterProvider#get()} method) will be
      * deferred until the first call to a c10n-interface method with a matching
-     * argument type is executed.</p>
+     * argument type is executed.
      *
      * @param c10NFilterProvider provider of filter implementation (not-null)
      * @param type               method argument type to which the filter should be applied
+     * @param <T>                method argument type to which the filter should be applied
      * @return filter binding DSL object
      * @see C10NFilterBinder
      */
@@ -239,13 +239,14 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Create a filter binding for one or more argument types.</p>
+     * <p>Create a filter binding for one or more argument types.
      * <p>All arguments passed to c10n-interfaces with the specified type(s) will
      * be converted to string using this filter, instead of the conventional <code>toString()</code>
-     * method.</p>
+     * method.
      *
      * @param c10nFilter filter implementation (not-null)
      * @param type       method argument type to which the filter should be applied
+     * @param <T>        method argument type to which the filter should be applied
      * @return filter binding DSL object
      * @see C10NFilterBinder
      */
@@ -258,8 +259,8 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Set global key prefix. All other keys will be automatically prepended with the global key.</p>
-     * <p>Settings key prefix to an empty string resets to default behaviour (no prefix).</p>
+     * <p>Set global key prefix. All other keys will be automatically prepended with the global key.
+     * <p>Settings key prefix to an empty string resets to default behaviour (no prefix).
      *
      * @param key the key to use at configuration scope (not null)
      */
@@ -273,7 +274,7 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>If set to 'true', c10n will output debugging information to std-out at configuration and lookup time.</p>
+     * <p>If set to 'true', c10n will output debugging information to std-out at configuration and lookup time.
      *
      * @param debug debug flag
      */
@@ -393,7 +394,7 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Get a set of all locales explicitly declared in implementation bindings</p>
+     * <p>Get a set of all locales explicitly declared in implementation bindings
      *
      * @return set of all bound locales
      */
@@ -450,10 +451,10 @@ public abstract class C10NConfigBase {
     }
 
     /**
-     * <p>Filter binding DSL object.</p>
+     * <p>Filter binding DSL object.
      * <p>Use {@link #annotatedWith(Class)} method to restrict the filter
      * to arguments annotated with the specified annotation(s). Multiple
-     * annotations may be specified using chained {@link #annotatedWith(Class)} methods.</p>
+     * annotations may be specified using chained {@link #annotatedWith(Class)} methods.
      */
     protected static final class C10NFilterBinder<T> {
         private final C10NFilterProvider<T> filter;
@@ -467,8 +468,8 @@ public abstract class C10NConfigBase {
 
         /**
          * <p>Restrict filter application only to arguments annotated with the
-         * given annotation.</p>
-         * <p>Multiple annotations can be specified using method chaining.</p>
+         * given annotation.
+         * <p>Multiple annotations can be specified using method chaining.
          *
          * @param annotation annotation class to restrict filter application to
          * @return this DLS object for method chaining

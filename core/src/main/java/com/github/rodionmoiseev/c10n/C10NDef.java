@@ -28,12 +28,12 @@ import java.lang.annotation.Target;
 
 /**
  * <p>Optionally marks c10n message interface methods
- * with default translation strings.</p>
- * <p/>
+ * with default translation strings.
+ *
  * <p>Specified translation string will be used as
  * a default value during resource bundle generation.
  * The string can also be optionally used as a
- * fallback in case the resource bundle is not found.</p>
+ * fallback in case the resource bundle is not found.
  *
  * @author rodion
  */

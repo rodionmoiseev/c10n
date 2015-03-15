@@ -30,7 +30,7 @@ import java.util.Set;
 import static com.github.rodionmoiseev.c10n.share.utils.Preconditions.assertNotNull;
 
 /**
- * <p>One c10n translation unit, representing one single message.</p>
+ * <p>One c10n translation unit, representing one single message.
  *
  * @author rodion
  * @since 1.1
@@ -55,7 +55,7 @@ public final class C10NUnit {
     }
 
     /**
-     * <p>c10n interface declaring the method to which this key is bound.</p>
+     * <p>c10n interface declaring the method to which this key is bound.
      *
      * @return c10n interface class (not null)
      */
@@ -64,7 +64,7 @@ public final class C10NUnit {
     }
 
     /**
-     * <p>Method to which this key is bound</p>
+     * <p>Method to which this key is bound
      *
      * @return bound method (not null)
      */
@@ -73,7 +73,7 @@ public final class C10NUnit {
     }
 
     /**
-     * <p>Resource bundle key bound to this unit</p>
+     * <p>Resource bundle key bound to this unit
      *
      * @return bound bundle key (not null)
      */
@@ -83,7 +83,7 @@ public final class C10NUnit {
 
     /**
      * <p>All detected translations and their values for the
-     * given set of locales specified at inspection time.</p>
+     * given set of locales specified at inspection time.
      *
      * @return set of translations per locale
      */

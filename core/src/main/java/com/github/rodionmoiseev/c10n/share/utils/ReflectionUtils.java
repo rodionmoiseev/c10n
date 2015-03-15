@@ -28,15 +28,15 @@ public final class ReflectionUtils {
     private static final String KEY_DELIM = ".";
 
     /**
-     * <p>Work out method's bundle key.</p>
-     * <p/>
+     * <p>Work out method's bundle key.
+     *
      * <h2>Bundle key resolution</h2>
      * <p>Bundle key is generated as follows:
      * <ul>
      * <li>If there are no {@link com.github.rodionmoiseev.c10n.C10NKey} annotations, key is the <code>Class FQDN '.' Method Name</code>.
      * If method has arguments, method name is post-fixed with argument types delimited
      * with '_', e.g. <code>myMethod_String_int</code></li>
-     * <p/>
+     *
      * <li>If declaring interface or any of the super-interfaces contain {@link com.github.rodionmoiseev.c10n.C10NKey}
      * annotation <code>C</code> then
      * <ul>
@@ -50,13 +50,13 @@ public final class ReflectionUtils {
      * <code>M</code>, then key is just <code>M</code>.</li>
      * <li>Lastly, if global key prefix is specified, it is always prepended to the final key, delimited by '.'</li>
      * </ul>
-     * </p>
-     * <p/>
+     *
+     *
      * <h2>Looking for c10n key in parent interfaces</h2>
      * <p>The lookup of c10n key in parent interfaces is done breadth-first, starting from the declaring class.
      * That is, if the declaring class does not have c10n key, all interfaces it extends are checked in declaration
      * order first. If no key is found, this check is repeated for each of the super interfaces in the same order.
-     * </p>
+     *
      *
      * @param keyPrefix global key prefix
      * @param method    method to extract the key from
@@ -102,7 +102,7 @@ public final class ReflectionUtils {
 
     /**
      * <p>Get the value provided with the {@link com.github.rodionmoiseev.c10n.C10NKey} annotation. If annotation
-     * is not declared returns <code>null</code></p>
+     * is not declared returns <code>null</code>
      *
      * @param method method for which to retrieve the value {@link com.github.rodionmoiseev.c10n.C10NKey} annotation
      * @return value of the declared annotation. <code>null</code> if not present.
@@ -118,7 +118,7 @@ public final class ReflectionUtils {
     /**
      * <p>Works out the non-{@link C10NKey} bundle key for method, based on its
      * class FQDN and method name (plus argument types),
-     * e.g. <code>com.myCompany.MyClass.myMethod_String_boolean</code></p>
+     * e.g. <code>com.myCompany.MyClass.myMethod_String_boolean</code>
      *
      * @param method the method for which to work out the key(not null)
      * @return method's default bundle key(not null)

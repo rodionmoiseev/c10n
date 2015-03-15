@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 
 /**
  * <p>Determines how untranslated c10n interface methods are
- * rendered to String.</p>
+ * rendered to String.
  *
  * @author rodion
  */
