@@ -52,7 +52,8 @@ public class ConfiguredC10NModuleTest {
                 Locale.JAPANESE,
                 Locale.KOREAN,
                 new Locale("ru"),
-                Locale.CHINESE
+                Locale.CHINESE,
+                new Locale("es")
         )));
     }
 
