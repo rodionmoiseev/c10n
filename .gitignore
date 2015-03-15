@@ -24,3 +24,8 @@ out/
 #
 .gradle
 build/
+
+#
+# Mac stuff
+#
+.DS_Store
