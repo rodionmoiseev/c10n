@@ -69,8 +69,13 @@ public class RuleUtils {
         }
 
         @Override
-        protected void after() {
+        protected void before() {
             C10N.configure(config);
+        }
+
+        @Override
+        protected void after() {
+            before();
         }
     }
 

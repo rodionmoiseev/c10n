@@ -36,13 +36,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.CharBuffer;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -315,10 +310,21 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
         }
 
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            Locale locale = localeProvider.getLocale();
+        public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
+            Locale currentLocale = localeProvider.getLocale();
 
-            Locale implLocale = localeMapping.findClosestMatch(availableImplLocales, locale);
+            Class<?> returnType = method.getReturnType();
+            if (C10NMessage.class.equals(returnType)) {
+                Map<Locale, String> msgs = new HashMap<Locale, String>();
+                Set<Locale> declaredLocales = translationsByMethod.get(method.toString()).keySet();
+                for (Locale locale : declaredLocales) {
+                    msgs.put(locale, getStringValue(method, args, locale));
+                }
+                Locale actualCurrentLocale = localeMapping.findClosestMatch(declaredLocales, currentLocale);
+                return new C10NMessage(actualCurrentLocale, getStringValue(method, args, currentLocale), msgs);
+            }
+
+            Locale implLocale = localeMapping.findClosestMatch(availableImplLocales, currentLocale);
 
             Class<?> binding = conf.getImplementationBinding(proxiedClass, implLocale);
             if (null != binding) {
@@ -328,9 +334,8 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                 return method.invoke(instance, args);
             }
 
-            String stringValue = getStringValue(method, args, locale);
+            String stringValue = getStringValue(method, args, currentLocale);
 
-            Class<?> returnType = method.getReturnType();
             if (returnType.isAssignableFrom(String.class)) {
                 // For methods returning String or CharSequence
                 return stringValue;
