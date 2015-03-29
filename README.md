@@ -59,7 +59,7 @@ public interface Window{
   String ok();
   
   @En("Cancel")
-  @Ru("")
+  @Ru("Отмена")
   String cancel();
 }
 ```
