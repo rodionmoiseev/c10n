@@ -19,6 +19,8 @@
 
 package com.github.rodionmoiseev.c10n;
 
+import com.github.rodionmoiseev.c10n.plugin.C10NPlugin;
+import com.github.rodionmoiseev.c10n.plugin.PluginResult;
 import com.github.rodionmoiseev.c10n.share.Constants;
 import com.github.rodionmoiseev.c10n.share.LocaleMapping;
 import com.github.rodionmoiseev.c10n.share.utils.ReflectionUtils;
@@ -77,7 +79,12 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
     public <T> T get(Class<T> c10nInterface, String delegatingValue, LocaleProvider localeProvider) {
         return (T) Proxy.newProxyInstance(proxyClassloader,
                 new Class[]{c10nInterface},
-                C10NInvocationHandler.create(this, delegatingValue, conf, localeProvider, localeMapping, c10nInterface));
+                C10NInvocationHandler.create(this,
+                        delegatingValue,
+                        conf,
+                        localeProvider,
+                        localeMapping,
+                        c10nInterface));
     }
 
     private static final class C10NString {
@@ -311,6 +318,27 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
 
         @Override
         public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
+            PluginResult result = PluginResult.passOn(translate(proxy, method, args));
+            for (C10NPlugin plugin : conf.getPlugins()) {
+                if (result.isInterrupt()) {
+                    //The last execution requests that
+                    //no further plugin processing should take
+                    //place
+                    break;
+                }
+
+                PluginResult pluginResult = plugin.format(proxiedClass, method, args, result.getValue());
+                if(null == pluginResult){
+                    //ignore the execution of this plugin
+                    continue;
+                }
+
+                result = pluginResult;
+            }
+            return result.getValue();
+        }
+
+        private Object translate(Object proxy, final Method method, final Object[] args) throws Throwable {
             Locale currentLocale = localeProvider.getLocale();
 
             Class<?> returnType = method.getReturnType();

@@ -20,6 +20,8 @@
 
 package com.github.rodionmoiseev.c10n;
 
+import com.github.rodionmoiseev.c10n.plugin.C10NPlugin;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -47,6 +49,8 @@ public interface ConfiguredC10NModule {
     boolean isDebug();
 
     Set<Locale> getAllBoundLocales();
+
+    List<C10NPlugin> getPlugins();
 }
 
 class AnnotatedClass {

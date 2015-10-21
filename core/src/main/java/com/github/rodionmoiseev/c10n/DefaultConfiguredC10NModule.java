@@ -20,6 +20,8 @@
 
 package com.github.rodionmoiseev.c10n;
 
+import com.github.rodionmoiseev.c10n.plugin.C10NPlugin;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -131,6 +133,15 @@ class DefaultConfiguredC10NModule implements ConfiguredC10NModule {
             }
         }
         return res;
+    }
+
+    @Override
+    public List<C10NPlugin> getPlugins(){
+        List<C10NPlugin> plugins = new ArrayList<C10NPlugin>();
+        for (C10NConfigBase config : traverseConfigs(parentConfig)) {
+            plugins.addAll(config.getPlugins());
+        }
+        return plugins;
     }
 
     private List<C10NConfigBase> traverseConfigs(C10NConfigBase config) {

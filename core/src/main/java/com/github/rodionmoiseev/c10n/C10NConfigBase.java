@@ -19,6 +19,7 @@
 
 package com.github.rodionmoiseev.c10n;
 
+import com.github.rodionmoiseev.c10n.plugin.C10NPlugin;
 import com.github.rodionmoiseev.c10n.share.EncodedResourceControl;
 import com.github.rodionmoiseev.c10n.share.utils.Preconditions;
 
@@ -38,6 +39,7 @@ public abstract class C10NConfigBase {
     private final Map<Class<? extends Annotation>, C10NAnnotationBinder> annotationBinders = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder>();
     private final List<C10NFilterBinder<?>> filterBinders = new ArrayList<C10NFilterBinder<?>>();
     private final List<C10NConfigBase> childConfigs = new ArrayList<C10NConfigBase>();
+    private final List<C10NPlugin> plugins = new ArrayList<C10NPlugin>();
     private String keyPrefix = "";
 
     private boolean debug = false;
@@ -86,6 +88,23 @@ public abstract class C10NConfigBase {
             configure();
         }
         configured = true;
+    }
+
+    /**
+     * Registers a C10N extension plugin to this configuration module.
+     * @param plugin plugin to install (not-null)
+     */
+    protected void installPlugin(C10NPlugin plugin){
+        plugins.add(plugin);
+    }
+
+    /**
+     * Returns the current list of plugins.
+     *
+     * @return list of registered plugins (not-null)
+     */
+    protected List<C10NPlugin> getPlugins(){
+        return plugins;
     }
 
     /**
