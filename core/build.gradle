@@ -33,6 +33,10 @@ dependencies {
 
 eclipse.classpath.plusConfigurations += configurations.guice
 
+compileTestJava {
+  options.compilerArgs += ['-parameters']
+}
+
 idea.module {
   sourceDirs += file("src/ext/guice/java")
   scopes.COMPILE.plus += [ configurations.guice ]

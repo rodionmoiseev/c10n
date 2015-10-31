@@ -18,38 +18,22 @@
  *
  */
 
-package com.github.rodionmoiseev.c10n.plugin;
+package com.github.rodionmoiseev.c10n.formatters;
 
-import java.lang.reflect.Method;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Result object returned by the plugin, controlling
- * the formatted message flow within the system.
+ * Used to explicitly specify argument name
+ * to be used for message placeholder formatting.
  *
- * @see C10NPlugin#format(Class, Method, Object[], Object)
+ * @see MessageFormatter
+ * @see com.github.rodionmoiseev.c10n.C10NConfigBase#setMessageFormatter(MessageFormatter)
  */
-public class PluginResult {
-    private final Object value;
-    private final boolean interrupt;
-
-    private PluginResult(Object value, boolean interrupt) {
-        this.value = value;
-        this.interrupt = interrupt;
-    }
-
-    public static PluginResult passOn(Object value){
-        return new PluginResult(value, false);
-    }
-
-    public static PluginResult last(Object value){
-        return new PluginResult(value, true);
-    }
-
-    public boolean isInterrupt(){
-        return interrupt;
-    }
-
-    public Object getValue(){
-        return value;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface NamedArg {
+    String value();
 }

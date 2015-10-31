@@ -18,38 +18,16 @@
  *
  */
 
-package com.github.rodionmoiseev.c10n.plugin;
+package com.github.rodionmoiseev.c10n;
+
+import com.github.rodionmoiseev.c10n.formatters.MessageFormatter;
 
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 
-/**
- * Result object returned by the plugin, controlling
- * the formatted message flow within the system.
- *
- * @see C10NPlugin#format(Class, Method, Object[], Object)
- */
-public class PluginResult {
-    private final Object value;
-    private final boolean interrupt;
-
-    private PluginResult(Object value, boolean interrupt) {
-        this.value = value;
-        this.interrupt = interrupt;
-    }
-
-    public static PluginResult passOn(Object value){
-        return new PluginResult(value, false);
-    }
-
-    public static PluginResult last(Object value){
-        return new PluginResult(value, true);
-    }
-
-    public boolean isInterrupt(){
-        return interrupt;
-    }
-
-    public Object getValue(){
-        return value;
+class DefaultMessageFormatter implements MessageFormatter {
+    @Override
+    public String format(Method method, String message, Object... args) {
+        return MessageFormat.format(message, args);
     }
 }

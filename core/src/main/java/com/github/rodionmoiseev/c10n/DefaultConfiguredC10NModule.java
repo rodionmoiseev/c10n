@@ -20,6 +20,7 @@
 
 package com.github.rodionmoiseev.c10n;
 
+import com.github.rodionmoiseev.c10n.formatters.MessageFormatter;
 import com.github.rodionmoiseev.c10n.plugin.C10NPlugin;
 
 import java.lang.annotation.Annotation;
@@ -142,6 +143,11 @@ class DefaultConfiguredC10NModule implements ConfiguredC10NModule {
             plugins.addAll(config.getPlugins());
         }
         return plugins;
+    }
+
+    @Override
+    public MessageFormatter getMessageFormatter() {
+        return parentConfig.getMessageFormatter();
     }
 
     private List<C10NConfigBase> traverseConfigs(C10NConfigBase config) {

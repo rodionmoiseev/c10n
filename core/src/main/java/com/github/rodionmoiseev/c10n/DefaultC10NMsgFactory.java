@@ -19,6 +19,7 @@
 
 package com.github.rodionmoiseev.c10n;
 
+import com.github.rodionmoiseev.c10n.formatters.MessageFormatter;
 import com.github.rodionmoiseev.c10n.plugin.C10NPlugin;
 import com.github.rodionmoiseev.c10n.plugin.PluginResult;
 import com.github.rodionmoiseev.c10n.share.Constants;
@@ -37,7 +38,6 @@ import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.CharBuffer;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -115,6 +115,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
         private final Set<Locale> availableImplLocales;
         private final Map<AnnotatedClass, C10NFilterProvider<?>> filters;
         private final Map<Method, String> bundleKeys;
+        private final MessageFormatter formatter;
 
         C10NInvocationHandler(InternalC10NMsgFactory c10nFactory,
                               String delegatingValue,
@@ -134,6 +135,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
             this.availableImplLocales = conf.getImplementationBindings(proxiedClass);
             this.filters = conf.getFilterBindings(proxiedClass);
             this.bundleKeys = bundleKeys;
+            this.formatter = conf.getMessageFormatter();
         }
 
         static C10NInvocationHandler create(InternalC10NMsgFactory c10nFactory,
@@ -318,7 +320,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
 
         @Override
         public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-            PluginResult result = PluginResult.passOn(translate(proxy, method, args));
+            PluginResult result = PluginResult.passOn(translate(method, args));
             for (C10NPlugin plugin : conf.getPlugins()) {
                 if (result.isInterrupt()) {
                     //The last execution requests that
@@ -328,7 +330,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                 }
 
                 PluginResult pluginResult = plugin.format(proxiedClass, method, args, result.getValue());
-                if(null == pluginResult){
+                if (null == pluginResult) {
                     //ignore the execution of this plugin
                     continue;
                 }
@@ -338,7 +340,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
             return result.getValue();
         }
 
-        private Object translate(Object proxy, final Method method, final Object[] args) throws Throwable {
+        private Object translate(final Method method, final Object[] args) throws Throwable {
             Locale currentLocale = localeProvider.getLocale();
 
             Class<?> returnType = method.getReturnType();
@@ -432,9 +434,9 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                     Annotation[] annotations = argAnnotations != null ? argAnnotations[i] : NO_ANNOTATIONS;
                     filteredArgs[i] = applyArgFilterIfExists(annotations, argTypes[i], args[i]);
                 }
-                return MessageFormat.format(message, filteredArgs);
+                return formatter.format(method, message, filteredArgs);
             }
-            return MessageFormat.format(message, args);
+            return formatter.format(method, message, args);
         }
 
         private Object applyArgFilterIfExists(Annotation[] annotations, Class argType, Object arg) {

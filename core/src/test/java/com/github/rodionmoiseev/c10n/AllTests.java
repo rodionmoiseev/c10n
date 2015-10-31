@@ -19,6 +19,7 @@
 
 package com.github.rodionmoiseev.c10n;
 
+import com.github.rodionmoiseev.c10n.formatters.CustomMessageFormatterTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -43,11 +44,15 @@ import org.junit.runners.Suite;
         CustomAnnotationBindingTest.class,
         CustomImplementationBindingTest.class,
         DelegationTest.class,
+        ExtendedMessageFormatterTest.class,
         FallbackC10NFactoryTest.class,
         LocaleProviderTest.class,
         LocaleSelectionTest.class,
+        CustomMessageFormatterTest.class,
         PackageLocalInterfaceTest.class,
+        PluginTest.class,
         ResourceBundleBindingTest.class,
-        UntranslatedMessageHandlerTest.class})
+        UntranslatedMessageHandlerTest.class
+})
 public class AllTests {
 }

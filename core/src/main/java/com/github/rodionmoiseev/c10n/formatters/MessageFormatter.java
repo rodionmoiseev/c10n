@@ -18,38 +18,27 @@
  *
  */
 
-package com.github.rodionmoiseev.c10n.plugin;
+package com.github.rodionmoiseev.c10n.formatters;
 
 import java.lang.reflect.Method;
 
 /**
- * Result object returned by the plugin, controlling
- * the formatted message flow within the system.
+ * Formatter fills in the method argument placeholders
+ * in the translated message.
  *
- * @see C10NPlugin#format(Class, Method, Object[], Object)
+ * The syntax for placeholders in not defined, and
+ * it's up to the implementation to parse and replace
+ * the message correctly.
  */
-public class PluginResult {
-    private final Object value;
-    private final boolean interrupt;
-
-    private PluginResult(Object value, boolean interrupt) {
-        this.value = value;
-        this.interrupt = interrupt;
-    }
-
-    public static PluginResult passOn(Object value){
-        return new PluginResult(value, false);
-    }
-
-    public static PluginResult last(Object value){
-        return new PluginResult(value, true);
-    }
-
-    public boolean isInterrupt(){
-        return interrupt;
-    }
-
-    public Object getValue(){
-        return value;
-    }
+public interface MessageFormatter {
+    /**
+     * Return a message with the argument placeholders
+     * replaced with the given argument values.
+     *
+     * @param method  The method on which the invocation was made
+     * @param message The translated message as it is declared in the method annotation
+     * @param args    The actual argument values passed to the method
+     * @return Formatted string with the argument placeholders replaced
+     */
+    String format(Method method, String message, Object... args);
 }

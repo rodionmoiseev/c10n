@@ -19,6 +19,7 @@
 
 package com.github.rodionmoiseev.c10n;
 
+import com.github.rodionmoiseev.c10n.formatters.MessageFormatter;
 import com.github.rodionmoiseev.c10n.plugin.C10NPlugin;
 import com.github.rodionmoiseev.c10n.share.EncodedResourceControl;
 import com.github.rodionmoiseev.c10n.share.utils.Preconditions;
@@ -45,6 +46,7 @@ public abstract class C10NConfigBase {
     private boolean debug = false;
 
     private boolean configured = false;
+    private MessageFormatter formatter = new DefaultMessageFormatter();
 
     /**
      * <p>To be implemented by subclasses of {@link C10NConfigBase}.
@@ -303,6 +305,14 @@ public abstract class C10NConfigBase {
 
     boolean isDebug() {
         return debug;
+    }
+
+    protected void setMessageFormatter(MessageFormatter formatter){
+        this.formatter = formatter;
+    }
+
+    public MessageFormatter getMessageFormatter(){
+        return formatter;
     }
 
     List<C10NFilterBinder<?>> getFilterBinders() {

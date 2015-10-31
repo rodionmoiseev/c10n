@@ -18,38 +18,21 @@
  *
  */
 
-package com.github.rodionmoiseev.c10n.plugin;
+package com.github.rodionmoiseev.c10n;
 
 import java.lang.reflect.Method;
 
 /**
- * Result object returned by the plugin, controlling
- * the formatted message flow within the system.
- *
- * @see C10NPlugin#format(Class, Method, Object[], Object)
+ * Created by rodexion on 2015/10/24.
  */
-public class PluginResult {
-    private final Object value;
-    private final boolean interrupt;
-
-    private PluginResult(Object value, boolean interrupt) {
-        this.value = value;
-        this.interrupt = interrupt;
-    }
-
-    public static PluginResult passOn(Object value){
-        return new PluginResult(value, false);
-    }
-
-    public static PluginResult last(Object value){
-        return new PluginResult(value, true);
-    }
-
-    public boolean isInterrupt(){
-        return interrupt;
-    }
-
-    public Object getValue(){
-        return value;
+public class TestUtil {
+    public static Method method(Class<?> clazz, String name) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.getName().equals(name)) {
+                return method;
+            }
+        }
+        throw new IllegalArgumentException(String.format("Method with name %s was not" +
+                "found in class %s", name, clazz.getSimpleName()));
     }
 }

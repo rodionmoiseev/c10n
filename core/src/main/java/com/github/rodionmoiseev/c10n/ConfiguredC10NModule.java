@@ -20,6 +20,7 @@
 
 package com.github.rodionmoiseev.c10n;
 
+import com.github.rodionmoiseev.c10n.formatters.MessageFormatter;
 import com.github.rodionmoiseev.c10n.plugin.C10NPlugin;
 
 import java.lang.annotation.Annotation;
@@ -51,6 +52,8 @@ public interface ConfiguredC10NModule {
     Set<Locale> getAllBoundLocales();
 
     List<C10NPlugin> getPlugins();
+
+    MessageFormatter getMessageFormatter();
 }
 
 class AnnotatedClass {
