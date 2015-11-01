@@ -146,7 +146,21 @@ subprojects {
     }
   }
 
-  test.exclude '**/AllTests.class'
+    /*
+     * A hack to correct a bad dependency from c10n-tools to c10n-core
+     */
+    def installer = install.repositories.mavenInstaller
+    def deployer = uploadArchives.repositories.mavenDeployer
+
+    [installer, deployer]*.pom*.whenConfigured { pom ->
+        pom.dependencies.find { dep ->
+            if (dep.artifactId == 'c10n') {
+                dep.artifactId = 'c10n-core'
+            }
+        }
+    }
+
+    test.exclude '**/AllTests.class'
 
   sourceSets.main.compileClasspath += configurations.provided
   eclipse.classpath.plusConfigurations += configurations.provided
