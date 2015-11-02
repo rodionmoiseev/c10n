@@ -18,133 +18,133 @@
  */
 
 buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'com.github.rodionmoiseev.gradle.plugins:idea-utils:0.2'
-  }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rodionmoiseev.gradle.plugins:idea-utils:0.2'
+    }
 }
 
 apply plugin: 'idea-utils'
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.1'
+    gradleVersion = '2.1'
 }
 
 allprojects {
-  apply plugin: 'eclipse'
-  apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
 }
 
 subprojects {
-  apply plugin: 'java'
-  apply plugin: 'maven'
-  apply plugin: 'signing'
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
 
-  version = '1.3-SNAPSHOT'
-  archivesBaseName = 'c10n'
-  group = 'com.github.rodionmoiseev.c10n'
+    version = '1.3-SNAPSHOT'
+    archivesBaseName = 'c10n'
+    group = 'com.github.rodionmoiseev.c10n'
 
-  sourceCompatibility = '1.8'
-  [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-  //[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:all']
+    sourceCompatibility = '1.8'
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+    //[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:all']
 
-  repositories {
-    mavenCentral()
-  }
-
-  configurations {
-    provided
-    testCompile.extendsFrom provided
-  }
-
-  dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
-    testCompile 'org.mockito:mockito-core:2.0.31-beta'
-    testCompile 'com.google.guava:guava:18.0'
-  }
-
-  task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-  }
-
-  task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
-  }
-
-  artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
-  }
-
-  signing {
-    sign configurations.archives
-  }
-
-  ext.commonPom = {pom ->
-    pom.project {
-      name 'Cosmopolitan (C10N)'
-      inceptionYear '2012'
-      packaging 'jar'
-      description 'A Java library, focused on making internationalisation more modular, ' +
-          'easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.'
-      url 'http://rodionmoiseev.github.io/c10n/'
-
-      scm {
-        url 'scm:git@github.com:rodionmoiseev/c10n.git'
-        connection 'scm:git@github.com:rodionmoiseev/c10n.git'
-        developerConnection 'scm:git@github.com:rodionmoiseev/c10n.git'
-      }
-
-      licenses {
-        license {
-          name 'The Apache Software License, Version 2.0'
-          url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-          distribution 'repo'
-        }
-      }
-
-      developers {
-        developer {
-          id 'rodionmoiseev'
-          name 'Rodion Moiseev'
-          email 'rodion.moiseev+github@gmail.com'
-        }
-      }
-    }
-  }
-
-  uploadArchives {
     repositories {
-      mavenDeployer {
-        //Local repo for testing
-        //repository(url: "file://localhost/Users/rodexion/work/local-repo/")
-
-        /*
-         * sonatypeUserName as sonatypePassword come from $HOME/.gradle/gradle.properties
-         * (intentionally not on github)
-         */
-        repository(url: project.releaseRepoUrl){
-          authentication(userName: sonatypeUsername, password: sonatypePassword)
-        }
-
-        snapshotRepository(url: project.snapshotRepoUrl){
-          authentication(userName: sonatypeUsername, password: sonatypePassword)
-        }
-
-        beforeDeployment { deployment ->
-          signing.signPom(deployment)
-        }
-
-        commonPom(pom)
-      }
+        mavenCentral()
     }
-  }
+
+    configurations {
+        provided
+        testCompile.extendsFrom provided
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.11'
+        testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+        testCompile 'org.mockito:mockito-core:2.0.31-beta'
+        testCompile 'com.google.guava:guava:18.0'
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from 'build/docs/javadoc'
+    }
+
+    artifacts {
+        archives jar
+        archives javadocJar
+        archives sourcesJar
+    }
+
+    signing {
+        sign configurations.archives
+    }
+
+    ext.commonPom = { pom ->
+        pom.project {
+            name 'Cosmopolitan (C10N)'
+            inceptionYear '2012'
+            packaging 'jar'
+            description 'A Java library, focused on making internationalisation more modular, ' +
+                    'easier to evolve and maintain, robust-to-change and IDE-friendly without excess of external tools.'
+            url 'http://rodionmoiseev.github.io/c10n/'
+
+            scm {
+                url 'scm:git@github.com:rodionmoiseev/c10n.git'
+                connection 'scm:git@github.com:rodionmoiseev/c10n.git'
+                developerConnection 'scm:git@github.com:rodionmoiseev/c10n.git'
+            }
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+
+            developers {
+                developer {
+                    id 'rodionmoiseev'
+                    name 'Rodion Moiseev'
+                    email 'rodion.moiseev+github@gmail.com'
+                }
+            }
+        }
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                //Local repo for testing
+                //repository(url: "file://localhost/Users/rodexion/work/local-repo/")
+
+                /*
+                 * sonatypeUserName as sonatypePassword come from $HOME/.gradle/gradle.properties
+                 * (intentionally not on github)
+                 */
+                repository(url: project.releaseRepoUrl) {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+
+                snapshotRepository(url: project.snapshotRepoUrl) {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+
+                beforeDeployment { deployment ->
+                    signing.signPom(deployment)
+                }
+
+                commonPom(pom)
+            }
+        }
+    }
 
     /*
      * A hack to correct a bad dependency from c10n-tools to c10n-core
@@ -162,18 +162,18 @@ subprojects {
 
     test.exclude '**/AllTests.class'
 
-  sourceSets.main.compileClasspath += configurations.provided
-  eclipse.classpath.plusConfigurations += configurations.provided
-  idea.module.scopes.PROVIDED.plus += [ configurations.provided ]
+    sourceSets.main.compileClasspath += configurations.provided
+    eclipse.classpath.plusConfigurations += configurations.provided
+    idea.module.scopes.PROVIDED.plus += [configurations.provided]
 }
 
 idea.project {
-  vcs {
-    vcs = 'Git'
-    directory = '$PROJECT_DIR$/..'
-  }
-  copyright {
-    name = 'Apache 2.0'
-    license = file("${project.projectDir}/license-preamble.txt")
-  }
+    vcs {
+        vcs = 'Git'
+        directory = '$PROJECT_DIR$/..'
+    }
+    copyright {
+        name = 'Apache 2.0'
+        license = file("${project.projectDir}/license-preamble.txt")
+    }
 }

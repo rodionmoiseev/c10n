@@ -18,43 +18,43 @@
  */
 
 configurations {
-  guice
-  guiceArchives
-  testCompile.extendsFrom guice
+    guice
+    guiceArchives
+    testCompile.extendsFrom guice
 }
 
 dependencies {
-  guice group: "org.reflections", name: "reflections", version: "0.9.8"
-  guice group: 'com.google.inject', name: 'guice', version: '3.0'
-  guice group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'
+    guice group: "org.reflections", name: "reflections", version: "0.9.8"
+    guice group: 'com.google.inject', name: 'guice', version: '3.0'
+    guice group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'
 
-  testCompile group: 'commons-io', name: 'commons-io', version: '2.4'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.4'
 }
 
 eclipse.classpath.plusConfigurations += configurations.guice
 
 compileTestJava {
-  options.compilerArgs += ['-parameters']
+    options.compilerArgs += ['-parameters']
 }
 
 idea.module {
-  sourceDirs += file("src/ext/guice/java")
-  scopes.COMPILE.plus += [ configurations.guice ]
+    sourceDirs += file("src/ext/guice/java")
+    scopes.COMPILE.plus += [configurations.guice]
 }
 
 sourceSets {
-  guice {
-    java {
-      srcDir "src/ext/guice/java"
+    guice {
+        java {
+            srcDir "src/ext/guice/java"
+        }
+        compileClasspath += sourceSets.main.output
+        compileClasspath += configurations.provided
+        compileClasspath += configurations.guice
     }
-    compileClasspath += sourceSets.main.output
-    compileClasspath += configurations.provided
-    compileClasspath += configurations.guice
-  }
-  test {
-    compileClasspath += sourceSets.guice.output
-    runtimeClasspath += sourceSets.guice.output
-  }
+    test {
+        compileClasspath += sourceSets.guice.output
+        runtimeClasspath += sourceSets.guice.output
+    }
 }
 
 def coreJarAppendix = "core"
@@ -63,58 +63,58 @@ def guiceJarAppendix = "ext-guice"
 def guiceArtifact = "${project.archivesBaseName}-${guiceJarAppendix}"
 
 jar {
-  appendix = coreJarAppendix
+    appendix = coreJarAppendix
 }
 
 sourcesJar {
-  appendix = coreJarAppendix
+    appendix = coreJarAppendix
 }
 
 javadocJar {
-  appendix = coreJarAppendix
+    appendix = coreJarAppendix
 }
 
 task guiceJar(type: Jar, dependsOn: guiceClasses) {
-  appendix = guiceJarAppendix
-  from sourceSets.guice.output
+    appendix = guiceJarAppendix
+    from sourceSets.guice.output
 }
 
 task guiceSourcesJar(type: Jar, dependsOn: guiceClasses) {
-  appendix = guiceJarAppendix
-  classifier = "sources"
-  from sourceSets.guice.allSource
+    appendix = guiceJarAppendix
+    classifier = "sources"
+    from sourceSets.guice.allSource
 }
 
-task guiceJavadoc(type: Javadoc, dependsOn: guiceClasses){
-  source = sourceSets.guice.allJava
-  classpath += sourceSets.main.output
-  classpath += configurations.guice
+task guiceJavadoc(type: Javadoc, dependsOn: guiceClasses) {
+    source = sourceSets.guice.allJava
+    classpath += sourceSets.main.output
+    classpath += configurations.guice
 }
 
-task guiceJavadocJar(type: Jar, dependsOn: guiceJavadoc){
-  appendix = guiceJarAppendix
-  classifier = 'javadoc'
-  from guiceJavadoc
+task guiceJavadocJar(type: Jar, dependsOn: guiceJavadoc) {
+    appendix = guiceJarAppendix
+    classifier = 'javadoc'
+    from guiceJavadoc
 }
 
 uploadArchives {
-  repositories {
-    mavenDeployer {
-      addFilter(coreArtifact) {artifact, file ->
-        artifact.name == coreArtifact
-      }
-      addFilter(guiceArtifact) {artifact, file ->
-        artifact.name == guiceArtifact
-      }
-      commonPom(pom(coreArtifact))
-      commonPom(pom(guiceArtifact))
-      pom(guiceArtifact).scopeMappings.addMapping(1, configurations.guice, Conf2ScopeMappingContainer.COMPILE)
+    repositories {
+        mavenDeployer {
+            addFilter(coreArtifact) { artifact, file ->
+                artifact.name == coreArtifact
+            }
+            addFilter(guiceArtifact) { artifact, file ->
+                artifact.name == guiceArtifact
+            }
+            commonPom(pom(coreArtifact))
+            commonPom(pom(guiceArtifact))
+            pom(guiceArtifact).scopeMappings.addMapping(1, configurations.guice, Conf2ScopeMappingContainer.COMPILE)
+        }
     }
-  }
 }
 
 artifacts {
-  archives guiceJar
-  archives guiceSourcesJar
-  archives guiceJavadocJar
+    archives guiceJar
+    archives guiceSourcesJar
+    archives guiceJavadocJar
 }
