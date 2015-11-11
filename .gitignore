@@ -18,6 +18,7 @@
 *.iml
 *.iws
 out/
+.shelf
 
 #
 # Gradle temporary files
