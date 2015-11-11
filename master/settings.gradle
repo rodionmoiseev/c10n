@@ -17,5 +17,5 @@
  *  under the License.
  */
 
-includeFlat 'core', 'tools'
+includeFlat 'core', 'tools', 'loggingPlugin'
 rootProject.name = 'c10n'
