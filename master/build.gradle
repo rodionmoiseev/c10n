@@ -119,9 +119,20 @@ subprojects {
         }
     }
 
+    def propOrDefault = { String propertyName, String defValue ->
+        return project.hasProperty(propertyName) ? project.property(propertyName) : defValue;
+    }
+
     uploadArchives {
         repositories {
             mavenDeployer {
+                //Setup dummy credentials to sonatype to make sure the build passes.
+                //If you have real credentials make sure to store them in
+                //the $HOME/.gradle/gradle.properties file, to avoid accidentally
+                //commiting them to the repo.
+                def username = propOrDefault("sonatypeUsername", "anonymous")
+                def password = propOrDefault("sonatypePassword", "secret")
+
                 //Local repo for testing
                 //repository(url: "file://localhost/Users/rodexion/work/local-repo/")
 
@@ -130,11 +141,11 @@ subprojects {
                  * (intentionally not on github)
                  */
                 repository(url: project.releaseRepoUrl) {
-                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                    authentication(userName: username, password: password)
                 }
 
                 snapshotRepository(url: project.snapshotRepoUrl) {
-                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                    authentication(userName: username, password: password)
                 }
 
                 beforeDeployment { deployment ->
