@@ -1,5 +1,6 @@
 Cosmopolitan -- C10N
 ====================
+[![Build Status](https://travis-ci.org/rodionmoiseev/c10n.svg?branch=master)](https://travis-ci.org/rodionmoiseev/c10n)
 
 A Java library, focused on making internationalisation more modular, easier
 to evolve and maintain, robust-to-change and IDE-friendly without excess of
