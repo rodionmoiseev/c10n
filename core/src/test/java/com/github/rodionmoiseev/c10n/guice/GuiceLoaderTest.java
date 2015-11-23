@@ -19,15 +19,26 @@
 
 package com.github.rodionmoiseev.c10n.guice;
 
-import com.github.rodionmoiseev.c10n.C10NDef;
-import com.github.rodionmoiseev.c10n.C10NMessages;
+import com.github.rodionmoiseev.c10n.*;
+import com.github.rodionmoiseev.c10n.annotations.DefaultC10NAnnotations;
+import com.github.rodionmoiseev.c10n.test.utils.RuleUtils;
 import com.google.inject.Guice;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 public class GuiceLoaderTest {
+    @Rule
+    public TestRule tmpC10N = RuleUtils.tmpC10NConfiguration(new C10NConfigBase() {
+        @Override
+        protected void configure() {
+            install(new DefaultC10NAnnotations());
+        }
+    });
+
     @Test
     public void guiceTest() {
         MyGuiceMessages msg = Guice.createInjector(C10NModule.scanAllPackages())

@@ -24,7 +24,7 @@ configurations {
 }
 
 dependencies {
-    guice group: "org.reflections", name: "reflections", version: "0.9.8"
+    guice group: "org.reflections", name: "reflections", version: "0.9.10"
     guice group: 'com.google.inject', name: 'guice', version: '3.0'
     guice group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'
 

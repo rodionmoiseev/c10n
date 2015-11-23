@@ -21,9 +21,6 @@ package com.github.rodionmoiseev.c10n.guice;
 
 import com.github.rodionmoiseev.c10n.C10N;
 import com.github.rodionmoiseev.c10n.C10NMessages;
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
@@ -33,6 +30,7 @@ import org.reflections.util.FilterBuilder;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")//rationale: public API
 public class C10NModule extends AbstractModule {
@@ -57,21 +55,17 @@ public class C10NModule extends AbstractModule {
                 new Reflections(new ConfigurationBuilder().filterInputsBy(getPackageInputFilter()).setUrls(getPackageURLs()))
                         .getTypesAnnotatedWith(C10NMessages.class);
         for (Class<?> c10nType : c10nTypes) {
-            bind((Class<Object>) c10nType)
-                    .toInstance(C10N.get(c10nType));
+            if (c10nType.isInterface()) {
+                bind((Class<Object>) c10nType)
+                        .toInstance(C10N.get(c10nType));
+            }
         }
     }
 
     private Set<URL> getPackageURLs() {
-        Iterable<URL> packages = Iterables.concat(Iterables.transform(
-                Arrays.asList(packagePrefixes), new Function<String, Set<URL>>() {
-            @Override
-            public Set<URL> apply(String prefix) {
-                return ClasspathHelper.forPackage(prefix);
-            }
-        }));
-
-        return Sets.newHashSet(packages);
+        return Arrays.asList(packagePrefixes).stream()
+                .flatMap(prefix -> ClasspathHelper.forPackage(prefix).stream())
+                .collect(Collectors.toSet());
     }
 
     private FilterBuilder getPackageInputFilter() {
