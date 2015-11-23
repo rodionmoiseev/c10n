@@ -66,12 +66,13 @@ public class UntranslatedMessageHandlerTest {
 
     private Method withArgsMethod() {
         try {
-            return Messages.class.getMethod("withArgs", new Class[]{String.class, Integer.class});
+            return Messages.class.getMethod("withArgs", String.class, Integer.class);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @SuppressWarnings("unused")
     interface Messages {
         String noArgs();
 

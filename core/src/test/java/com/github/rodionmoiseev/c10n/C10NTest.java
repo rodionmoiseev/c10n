@@ -108,7 +108,7 @@ public class C10NTest {
         URLClassLoader cl = (URLClassLoader) C10N.class.getClassLoader();
         Class<?> c10nClass = new URLClassLoader(cl.getURLs(), null).loadClass(C10N.class.getName());
         try {
-            c10nClass.getMethod("get", new Class[]{Class.class}).invoke(null, Messages.class);
+            c10nClass.getMethod("get", new Class<?>[]{Class.class}).invoke(null, Messages.class);
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }

@@ -66,7 +66,7 @@ final class EnumMappingFilter<E extends Enum<?>> implements C10NFilter<E> {
     }
 
     private static boolean hasOneOrMoreParams(Method m) {
-        Class[] paramTypes = m.getParameterTypes();
+        Class<?>[] paramTypes = m.getParameterTypes();
         return paramTypes != null && paramTypes.length != 0;
     }
 

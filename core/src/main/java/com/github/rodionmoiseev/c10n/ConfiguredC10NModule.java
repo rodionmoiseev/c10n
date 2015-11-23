@@ -56,33 +56,3 @@ public interface ConfiguredC10NModule {
     MessageFormatter getMessageFormatter();
 }
 
-class AnnotatedClass {
-    private final Class<?> clazz;
-    private final Class<? extends Annotation> annotation;
-
-    AnnotatedClass(Class<?> clazz, Class<? extends Annotation> annotation) {
-        this.clazz = clazz;
-        this.annotation = annotation;
-    }
-
-    @SuppressWarnings("RedundantIfStatement")//rationale: generated code
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        AnnotatedClass that = (AnnotatedClass) o;
-
-        if (annotation != null ? !annotation.equals(that.annotation) : that.annotation != null) return false;
-        if (clazz != null ? !clazz.equals(that.clazz) : that.clazz != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = clazz != null ? clazz.hashCode() : 0;
-        result = 31 * result + (annotation != null ? annotation.hashCode() : 0);
-        return result;
-    }
-}

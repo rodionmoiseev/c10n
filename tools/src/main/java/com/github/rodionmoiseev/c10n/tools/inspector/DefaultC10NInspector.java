@@ -58,6 +58,7 @@ class DefaultC10NInspector implements C10NInspector {
     public List<C10NUnit> inspect(String... packagePrefixes) {
         List<C10NUnit> res = Lists.newArrayList();
 
+        @SuppressWarnings("deprecation")
         C10NMsgFactory c10NMsgFactory = C10N.createMsgFactory(configuredC10NModule);
 
         Set<Class<?>> c10nInterfaces = c10NInterfaceSearch.find(C10NMessages.class, packagePrefixes);
@@ -169,6 +170,8 @@ class DefaultC10NInspector implements C10NInspector {
 
 
     private static final class C10NInspectorException extends Exception {
+        private static final long serialVersionUID = 1L;
+
         C10NInspectorException(String message) {
             super(message);
         }
