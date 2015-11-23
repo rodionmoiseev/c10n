@@ -18,38 +18,37 @@
  *
  */
 
-package com.github.rodionmoiseev.c10n.plugin;
-
-import com.github.rodionmoiseev.c10n.InvocationDetails;
+package com.github.rodionmoiseev.c10n.plugins.logging;
 
 /**
- * Result object returned by the plugin, controlling
- * the formatted message flow within the system.
+ * Logging message interfaces can implement this
+ * interface to gain access to some commonly used
+ * logger functionality.
  *
- * @see C10NPlugin#format(String, Object, InvocationDetails)
+ * Most methods are designed to be called on the
+ * underlying logging framework implementation.
  */
-public class PluginResult {
-    private final Object value;
-    private final boolean interrupt;
+public interface LoggingBase {
+    boolean isLevelEnabled(LoggingLevel level);
 
-    private PluginResult(Object value, boolean interrupt) {
-        this.value = value;
-        this.interrupt = interrupt;
+    default boolean isTraceEnabled() {
+        return isLevelEnabled(LoggingLevel.TRACE);
     }
 
-    public static PluginResult passOn(Object value) {
-        return new PluginResult(value, false);
+    default boolean isDebugEnabled() {
+        return isLevelEnabled(LoggingLevel.DEBUG);
     }
 
-    public static PluginResult last(Object value) {
-        return new PluginResult(value, true);
+    default boolean isInfoEnabled() {
+        return isLevelEnabled(LoggingLevel.INFO);
     }
 
-    public boolean isInterrupt() {
-        return interrupt;
+    default boolean isWarnEnabled() {
+        return isLevelEnabled(LoggingLevel.WARN);
     }
 
-    public Object getValue() {
-        return value;
+
+    default boolean isErrorEnabled() {
+        return isLevelEnabled(LoggingLevel.ERROR);
     }
 }

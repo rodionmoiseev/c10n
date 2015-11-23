@@ -20,7 +20,7 @@
 
 package com.github.rodionmoiseev.c10n.plugin;
 
-import java.lang.reflect.Method;
+import com.github.rodionmoiseev.c10n.InvocationDetails;
 
 /**
  * C10N extension plugin.
@@ -59,14 +59,14 @@ public interface C10NPlugin {
      * this plugin. The behaviour would be equivalent to one if this
      * plugin was not installed.
      *
-     * @param c10nInterface       the c10n message interface class subject to proxy (not null)
-     * @param method              the method that was invoked (not null)
-     * @param methodArgs          method arguments used at the invocation (maybe null)
-     * @param resolvedReturnValue string formatted by the default c10n message factory
+     * @param resolvedMessage     message string formatted by c10n message factory
+     * @param resolvedReturnValue the return value of the method, resolved by c10n message factory.
+     *                            Returns {@code null} for {@code void} methods and other unknown
+     *                            return types.
+     * @param invocationDetails   c10n proxy invocation data (not null)
      * @return a plugin result object, or {@code null}
      */
-    PluginResult format(Class<?> c10nInterface,
-                        Method method,
-                        Object[] methodArgs,
-                        Object resolvedReturnValue);
+    PluginResult format(String resolvedMessage,
+                        Object resolvedReturnValue,
+                        InvocationDetails invocationDetails);
 }

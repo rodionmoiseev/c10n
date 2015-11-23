@@ -320,7 +320,9 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
 
         @Override
         public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-            PluginResult result = PluginResult.passOn(translate(method, args));
+            Locale currentLocale = localeProvider.getLocale();
+            String stringValue = getStringValue(method, args, currentLocale);
+            PluginResult result = PluginResult.passOn(translate(method, args, stringValue, currentLocale));
             for (C10NPlugin plugin : conf.getPlugins()) {
                 if (result.isInterrupt()) {
                     //The last execution requests that
@@ -329,7 +331,10 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                     break;
                 }
 
-                PluginResult pluginResult = plugin.format(proxiedClass, method, args, result.getValue());
+                PluginResult pluginResult = plugin.format(
+                        stringValue,
+                        result.getValue(),
+                        new InvocationDetails(proxy, proxiedClass, method, args));
                 if (null == pluginResult) {
                     //ignore the execution of this plugin
                     continue;
@@ -340,9 +345,10 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
             return result.getValue();
         }
 
-        private Object translate(final Method method, final Object[] args) throws Throwable {
-            Locale currentLocale = localeProvider.getLocale();
-
+        private Object translate(Method method,
+                                 Object[] args,
+                                 String stringValue,
+                                 Locale currentLocale) throws Throwable {
             Class<?> returnType = method.getReturnType();
             if (C10NMessage.class.equals(returnType)) {
                 Map<Locale, String> msgs = new HashMap<Locale, String>();
@@ -364,7 +370,6 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                 return method.invoke(instance, args);
             }
 
-            String stringValue = getStringValue(method, args, currentLocale);
 
             if (returnType.isAssignableFrom(String.class)) {
                 // For methods returning String or CharSequence

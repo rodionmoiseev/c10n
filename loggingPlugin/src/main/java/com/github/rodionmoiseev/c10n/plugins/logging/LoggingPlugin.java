@@ -20,87 +20,19 @@
 
 package com.github.rodionmoiseev.c10n.plugins.logging;
 
+import com.github.rodionmoiseev.c10n.InvocationDetails;
 import com.github.rodionmoiseev.c10n.plugin.C10NPlugin;
 import com.github.rodionmoiseev.c10n.plugin.PluginResult;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.function.Function;
 
 /**
  * Created by rodexion on 2015/10/10.
  */
 public class LoggingPlugin implements C10NPlugin {
-    /**
-     * Holds arguments passed from the c10n framework at
-     * method invocation time.
-     */
-    public static final class InvocationDetails {
-        private final Class<?> c10nInterface;
-        private final Method method;
-        private final Object[] methodArguments;
-
-        InvocationDetails(Class<?> c10nInterface, Method method, Object[] methodArguments) {
-            this.c10nInterface = c10nInterface;
-            this.method = method;
-            this.methodArguments = methodArguments;
-        }
-
-        /**
-         * @return The c10n interface class containing the invoked method
-         */
-        public Class<?> getC10nInterface() {
-            return c10nInterface;
-        }
-
-        /**
-         * @return The c10n method that was invoked
-         */
-        public Method getMethod() {
-            return method;
-        }
-
-        /**
-         * @return The actual arguments that were passed to the c10n method invoked
-         */
-        public Object[] getMethodArguments() {
-            return methodArguments;
-        }
-
-        @Override
-        public String toString() {
-            return "InvocationDetails{" +
-                    "c10nInterface=" + c10nInterface +
-                    ", method=" + method +
-                    ", methodArguments=" + Arrays.toString(methodArguments) +
-                    '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            InvocationDetails that = (InvocationDetails) o;
-
-            if (c10nInterface != null ? !c10nInterface.equals(that.c10nInterface) : that.c10nInterface != null)
-                return false;
-            if (method != null ? !method.equals(that.method) : that.method != null) return false;
-            // Probably incorrect - comparing Object[] arrays with Arrays.equals
-            return Arrays.equals(methodArguments, that.methodArguments);
-
-        }
-
-        @Override
-        public int hashCode() {
-            int result = c10nInterface != null ? c10nInterface.hashCode() : 0;
-            result = 31 * result + (method != null ? method.hashCode() : 0);
-            result = 31 * result + (methodArguments != null ? Arrays.hashCode(methodArguments) : 0);
-            return result;
-        }
-    }
-
     private final LoggingLevel defaultLoggingLevel;
     private final LoggerImplementation implementation;
 
@@ -128,15 +60,27 @@ public class LoggingPlugin implements C10NPlugin {
     }
 
     @Override
-    public PluginResult format(Class<?> c10nInterface,
-                               Method method,
-                               Object[] methodArgs,
-                               Object resolvedReturnValue) {
+    public PluginResult format(String resolvedMessage,
+                               Object resolvedReturnValue,
+                               InvocationDetails invocationDetails) {
+        Class<?> c10nInterface = invocationDetails.getC10nInterface();
         //Determine if the plugin should be applied
         //by checking if the @Logger annotation is present
         if (null == c10nInterface.getAnnotation(Logger.class)) {
             return PluginResult.passOn(resolvedReturnValue);
         }
+
+        Method method = invocationDetails.getMethod();
+        Object[] methodArgs = invocationDetails.getMethodArguments();
+        if (method.getDeclaringClass().equals(LoggingBase.class)) {
+            try {
+                return PluginResult.last(method.invoke(implementation, methodArgs));
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException("Failed to invoke metod '" +
+                        method.getName() + "' on current logger implementation instance.", e);
+            }
+        }
+
 
         LoggingLevel level = get(c10nInterface, method, Level.class, defaultLoggingLevel, Level::value);
         String loggerName = get(c10nInterface, method, Logger.class, c10nInterface.getName(),
@@ -151,9 +95,9 @@ public class LoggingPlugin implements C10NPlugin {
                 });
         implementation.log(loggerName,
                 level,
-                String.valueOf(resolvedReturnValue),
+                String.valueOf(resolvedMessage),
                 getCauseOrNull(methodArgs),
-                new InvocationDetails(c10nInterface, method, methodArgs));
+                invocationDetails);
         return PluginResult.last(null);
     }
 

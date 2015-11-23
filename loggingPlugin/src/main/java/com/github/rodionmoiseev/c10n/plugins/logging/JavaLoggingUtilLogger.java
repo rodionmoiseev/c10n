@@ -20,6 +20,8 @@
 
 package com.github.rodionmoiseev.c10n.plugins.logging;
 
+import com.github.rodionmoiseev.c10n.InvocationDetails;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -44,12 +46,17 @@ public class JavaLoggingUtilLogger implements LoggerImplementation {
                     LoggingLevel level,
                     String message,
                     Throwable cause,
-                    LoggingPlugin.InvocationDetails details) {
+                    InvocationDetails details) {
         java.util.logging.Logger lgr = Logger.getLogger(logger);
         lgr.log(
                 levelMapping.getOrDefault(level, Level.ALL),
                 message,
                 cause
         );
+    }
+
+    @Override
+    public boolean isLevelEnabled(LoggingLevel level) {
+        return java.util.logging.Logger.getGlobal().isLoggable(levelMapping.getOrDefault(level, Level.ALL));
     }
 }

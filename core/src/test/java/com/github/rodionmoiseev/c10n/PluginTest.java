@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
@@ -54,6 +55,12 @@ public class PluginTest {
     public interface MyMessage {
         @En("Hello {0}!")
         String testMessage(String user);
+
+        @En("Hello!")
+        void voidMethod();
+
+        @En("Message")
+        int intMethod();
     }
 
     @Test
@@ -65,10 +72,13 @@ public class PluginTest {
 
         MyMessage mm = C10N.get(MyMessage.class);
         assertThat(mm.testMessage("rodion"), is("last message"));
-        verify(plugin1).format(MyMessage.class,
-                getMethod(MyMessage.class, "testMessage"),
-                new Object[]{"rodion"},
-                "Hello rodion!");
+        verify(plugin1).format(
+                eq("Hello rodion!"),
+                eq("Hello rodion!"),
+                refEq(new InvocationDetails(null,
+                        MyMessage.class,
+                        getMethod(MyMessage.class, "testMessage"),
+                        new Object[]{"rodion"}), "proxy"));
         verifyZeroInteractions(plugin2);
     }
 
@@ -82,14 +92,20 @@ public class PluginTest {
 
         MyMessage mm = C10N.get(MyMessage.class);
         assertThat(mm.testMessage("rodion"), is("plugin result2"));
-        verify(plugin1).format(MyMessage.class,
-                getMethod(MyMessage.class, "testMessage"),
-                new Object[]{"rodion"},
-                "Hello rodion!");
-        verify(plugin2).format(MyMessage.class,
-                getMethod(MyMessage.class, "testMessage"),
-                new Object[]{"rodion"},
-                "Hello rodion!");// <-- receives the original message
+        verify(plugin1).format(
+                eq("Hello rodion!"),
+                eq("Hello rodion!"),
+                refEq(new InvocationDetails(null,
+                        MyMessage.class,
+                        getMethod(MyMessage.class, "testMessage"),
+                        new Object[]{"rodion"}), "proxy"));
+        verify(plugin2).format(
+                eq("Hello rodion!"),
+                eq("Hello rodion!"),
+                refEq(new InvocationDetails(null,
+                        MyMessage.class,
+                        getMethod(MyMessage.class, "testMessage"),
+                        new Object[]{"rodion"}), "proxy"));// <-- receives the original message
     }
 
 
@@ -103,14 +119,54 @@ public class PluginTest {
 
         MyMessage mm = C10N.get(MyMessage.class);
         assertThat(mm.testMessage("rodion"), is("plugin result2"));
-        verify(plugin1).format(MyMessage.class,
-                getMethod(MyMessage.class, "testMessage"),
-                new Object[]{"rodion"},
-                "Hello rodion!");
-        verify(plugin2).format(MyMessage.class,
-                getMethod(MyMessage.class, "testMessage"),
-                new Object[]{"rodion"},
-                "plugin result1");
+        verify(plugin1).format(
+                eq("Hello rodion!"),
+                eq("Hello rodion!"),
+                refEq(new InvocationDetails(null,
+                        MyMessage.class,
+                        getMethod(MyMessage.class, "testMessage"),
+                        new Object[]{"rodion"}), "proxy"));
+        verify(plugin2).format(
+                eq("Hello rodion!"),
+                eq("plugin result1"),
+                refEq(new InvocationDetails(null,
+                        MyMessage.class,
+                        getMethod(MyMessage.class, "testMessage"),
+                        new Object[]{"rodion"}), "proxy"));
+    }
+
+    @Test
+    public void voidMethodEquallyGetsPassedTheTranslatedString() throws Exception {
+        final C10NPlugin plugin1 = Mockito.mock(C10NPlugin.class);
+        pluginReturn(plugin1, PluginResult.passOn("plugin result1"));
+        configurePlugins(plugin1);
+
+        MyMessage mm = C10N.get(MyMessage.class);
+        mm.voidMethod();
+        verify(plugin1).format(
+                eq("Hello!"),
+                eq(null), //void returns null
+                refEq(new InvocationDetails(null,
+                        MyMessage.class,
+                        getMethod(MyMessage.class, "voidMethod"),
+                        null), "proxy"));
+    }
+
+    @Test
+    public void pluginCanReturnAnyValueForMethod() throws Exception {
+        final C10NPlugin plugin1 = Mockito.mock(C10NPlugin.class);
+        pluginReturn(plugin1, PluginResult.passOn(123));
+        configurePlugins(plugin1);
+
+        MyMessage mm = C10N.get(MyMessage.class);
+        assertThat(mm.intMethod(), is(equalTo(123)));
+        verify(plugin1).format(
+                eq("Message"),
+                eq(null), //null as int is not known by c10n itself
+                refEq(new InvocationDetails(null,
+                        MyMessage.class,
+                        getMethod(MyMessage.class, "intMethod"),
+                        null), "proxy"));
     }
 
     private void configurePlugins(final C10NPlugin... plugins) {
@@ -135,9 +191,8 @@ public class PluginTest {
     }
 
     private void pluginReturn(C10NPlugin plugin, PluginResult result) {
-        when(plugin.format(any(Class.class),
-                any(Method.class),
-                any(Object[].class),
-                any())).thenReturn(result);
+        when(plugin.format(any(String.class),
+                any(Object.class),
+                any(InvocationDetails.class))).thenReturn(result);
     }
 }

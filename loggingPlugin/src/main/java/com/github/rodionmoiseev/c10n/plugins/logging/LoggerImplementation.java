@@ -20,11 +20,13 @@
 
 package com.github.rodionmoiseev.c10n.plugins.logging;
 
+import com.github.rodionmoiseev.c10n.InvocationDetails;
+
 /**
  * The actual implementation of logging using a
  * logging framework of choice, or a custom implementation.
  */
-public interface LoggerImplementation {
+public interface LoggerImplementation extends LoggingBase {
     /**
      * Log an event. This method will be invoked every
      * time a c10n method invocation is made.
@@ -35,5 +37,5 @@ public interface LoggerImplementation {
      * @param cause   the exception associated with the logging event (maybe null)
      * @param details c10n method invocation details
      */
-    void log(String logger, LoggingLevel level, String message, Throwable cause, LoggingPlugin.InvocationDetails details);
+    void log(String logger, LoggingLevel level, String message, Throwable cause, InvocationDetails details);
 }

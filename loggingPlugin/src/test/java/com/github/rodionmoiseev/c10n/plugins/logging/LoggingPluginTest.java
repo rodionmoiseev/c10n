@@ -21,6 +21,7 @@
 package com.github.rodionmoiseev.c10n.plugins.logging;
 
 import com.github.rodionmoiseev.c10n.C10NMessages;
+import com.github.rodionmoiseev.c10n.InvocationDetails;
 import com.github.rodionmoiseev.c10n.TestUtil;
 import com.github.rodionmoiseev.c10n.annotations.En;
 import com.github.rodionmoiseev.c10n.plugin.PluginResult;
@@ -34,8 +35,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unused")
 public class LoggingPluginTest {
@@ -66,6 +66,11 @@ public class LoggingPluginTest {
         void usesMethodLogger();
     }
 
+    @Logger
+    @C10NMessages
+    public interface WithUtils extends LoggingBase {
+    }
+
     @C10NMessages
     public interface UnrelatedC10NMessageBundle {
         @En("noArg")
@@ -79,7 +84,11 @@ public class LoggingPluginTest {
     public void loggingRequestsInterruptThePluginPipeline() throws Exception {
         LoggerImplementation logger = Mockito.mock(LoggerImplementation.class);
         LoggingPlugin plugin = new LoggingPlugin(LoggingLevel.INFO, logger);
-        PluginResult res = plugin.format(LoggingMessagesWithClassDecls.class, TestUtil.method(LoggingMessagesWithClassDecls.class, "usesClassLogger"), null, "test message");
+        PluginResult res = plugin.format("test message", "test message",
+                new InvocationDetails(null,
+                        LoggingMessagesWithClassDecls.class,
+                        TestUtil.method(LoggingMessagesWithClassDecls.class, "usesClassLogger"),
+                        null));
         assertThat(res.isInterrupt(), is(equalTo(true)));
     }
 
@@ -87,42 +96,24 @@ public class LoggingPluginTest {
     public void classDeclarationsAreTakenIntoAccountUnlessOveriddenOnMethod() throws Exception {
         LoggerImplementation logger = Mockito.mock(LoggerImplementation.class);
         LoggingPlugin plugin = new LoggingPlugin(LoggingLevel.INFO, logger);
-        plugin.format(LoggingMessagesWithClassDecls.class, TestUtil.method(LoggingMessagesWithClassDecls.class, "usesClassLogger"), null, "test message");
-        verify(logger).log(
-                eq(LoggingPluginTest.class.getName()),
-                eq(LoggingLevel.ERROR),
-                eq("test message"),
-                eq(null),
-                any(LoggingPlugin.InvocationDetails.class));
 
-        plugin.format(LoggingMessagesWithClassDecls.class, TestUtil.method(LoggingMessagesWithClassDecls.class, "usesMethodLogger"), null, "test message");
-        verify(logger).log(
-                eq("methodLogger"),
-                eq(LoggingLevel.TRACE),
-                eq("test message"),
-                eq(null),
-                any(LoggingPlugin.InvocationDetails.class));
+        check(plugin, "test message", LoggingMessagesWithClassDecls.class, "usesClassLogger", null,
+                logger, LoggingPluginTest.class.getName(), LoggingLevel.ERROR);
+
+        check(plugin, "test message", LoggingMessagesWithClassDecls.class, "usesMethodLogger", null,
+                logger, "methodLogger", LoggingLevel.TRACE);
     }
 
     @Test
     public void defaultDeclarationsAreUsedUnlessOveriddenOnMethod() throws Exception {
         LoggerImplementation logger = Mockito.mock(LoggerImplementation.class);
         LoggingPlugin plugin = new LoggingPlugin(LoggingLevel.INFO, logger);
-        plugin.format(LoggingMessagesWithoutClassDecls.class, TestUtil.method(LoggingMessagesWithoutClassDecls.class, "defaultLogger"), null, "test message");
-        verify(logger).log(
-                eq(LoggingMessagesWithoutClassDecls.class.getName()),
-                eq(LoggingLevel.INFO),
-                eq("test message"),
-                eq(null),
-                any(LoggingPlugin.InvocationDetails.class));
 
-        plugin.format(LoggingMessagesWithoutClassDecls.class, TestUtil.method(LoggingMessagesWithoutClassDecls.class, "usesMethodLogger"), null, "test message");
-        verify(logger).log(
-                eq("methodLogger"),
-                eq(LoggingLevel.TRACE),
-                eq("test message"),
-                eq(null),
-                any(LoggingPlugin.InvocationDetails.class));
+        check(plugin, "test message", LoggingMessagesWithoutClassDecls.class, "defaultLogger", null,
+                logger, LoggingMessagesWithoutClassDecls.class.getName(), LoggingLevel.INFO);
+
+        check(plugin, "test message", LoggingMessagesWithoutClassDecls.class, "usesMethodLogger", null,
+                logger, "methodLogger", LoggingLevel.TRACE);
     }
 
     @Test
@@ -131,13 +122,9 @@ public class LoggingPluginTest {
         LoggingPlugin plugin = new LoggingPlugin(LoggingLevel.INFO, logger);
         Method withArgMethod = TestUtil.method(LoggingMessagesWithClassDecls.class, "withArg");
         Object[] args = {"rodion"};
-        plugin.format(LoggingMessagesWithClassDecls.class, withArgMethod, args, "test message");
-        verify(logger).log(
-                eq(LoggingPluginTest.class.getName()),
-                eq(LoggingLevel.ERROR),
-                eq("test message"),
-                eq(null),
-                eq(new LoggingPlugin.InvocationDetails(LoggingMessagesWithClassDecls.class, withArgMethod, args)));
+
+        check(plugin, "test message", LoggingMessagesWithClassDecls.class, "withArg", args,
+                logger, LoggingPluginTest.class.getName(), LoggingLevel.ERROR);
     }
 
     @Test
@@ -145,23 +132,70 @@ public class LoggingPluginTest {
         LoggerImplementation logger = Mockito.mock(LoggerImplementation.class);
         LoggingPlugin plugin = new LoggingPlugin(LoggingLevel.INFO, logger);
         Object[] args = {"rodion", new AnException("intentional")};
-        plugin.format(LoggingMessagesWithClassDecls.class, TestUtil.method(LoggingMessagesWithClassDecls.class, "withCause"), args, "message and stack");
-        verify(logger).log(
-                eq(LoggingPluginTest.class.getName()),
-                eq(LoggingLevel.WARN),
-                eq("message and stack"),
-                eq(new AnException("intentional")),
-                any(LoggingPlugin.InvocationDetails.class));
+
+        check(plugin, "message and stack", LoggingMessagesWithClassDecls.class, "withCause", args, new AnException("intentional"),
+                logger, LoggingPluginTest.class.getName(), LoggingLevel.WARN);
     }
 
     @Test
     public void unrelatedC10NMessageClassesAreNotPassedThroughThePlugin() {
         LoggerImplementation logger = Mockito.mock(LoggerImplementation.class);
         LoggingPlugin plugin = new LoggingPlugin(LoggingLevel.INFO, logger);
-        PluginResult res = plugin.format(UnrelatedC10NMessageBundle.class, TestUtil.method(UnrelatedC10NMessageBundle.class, "noArg"), null, "noArg");
+        PluginResult res = plugin.format("noArg", "noArg",
+                new InvocationDetails(null,
+                        UnrelatedC10NMessageBundle.class,
+                        TestUtil.method(UnrelatedC10NMessageBundle.class, "noArg"),
+                        null));
         assertThat(res.isInterrupt(), is(equalTo(false)));
         assertThat(res.getValue(), is(equalTo("noArg")));
         verifyZeroInteractions(logger);
+    }
+
+    @Test
+    public void extendingLoggerBaseGainsAccessToUnderlyingLoggerFunctionality() throws Exception {
+        LoggerImplementation logger = Mockito.mock(LoggerImplementation.class);
+        when(logger.isDebugEnabled()).thenReturn(true);
+        when(logger.isLevelEnabled(any(LoggingLevel.class))).thenReturn(false);
+        LoggingPlugin plugin = new LoggingPlugin(LoggingLevel.INFO, logger);
+        PluginResult res = plugin.format(null, null,
+                new InvocationDetails(null,
+                        WithUtils.class,
+                        TestUtil.method(LoggingBase.class, "isDebugEnabled"),
+                        null));
+        assertThat(res.isInterrupt(), is(equalTo(true)));
+        assertThat(res.getValue(), is(equalTo(true)));
+
+        PluginResult res2 = plugin.format(null, null,
+                new InvocationDetails(null,
+                        WithUtils.class,
+                        TestUtil.method(LoggingBase.class, "isLevelEnabled"),
+                        new Object[]{LoggingLevel.ERROR}));
+        assertThat(res2.isInterrupt(), is(equalTo(true)));
+        assertThat(res2.getValue(), is(equalTo(false)));
+
+        verify(logger).isLevelEnabled(LoggingLevel.ERROR);
+    }
+
+    private void check(LoggingPlugin plugin, String message, Class<?> c10nClass, String methodName, Object[] args,
+                       LoggerImplementation logger, String loggerName, LoggingLevel level) {
+        check(plugin, message, c10nClass, methodName, args, null, logger, loggerName, level);
+    }
+
+    private void check(LoggingPlugin plugin, String message, Class<?> c10nClass, String methodName, Object[] args, Throwable cause,
+                       LoggerImplementation logger, String loggerName, LoggingLevel level) {
+        Method method = TestUtil.method(c10nClass, methodName);
+        plugin.format(message, message, new InvocationDetails(null,
+                c10nClass,
+                method,
+                args
+        ));
+        verify(logger).log(
+                eq(loggerName),
+                eq(level),
+                eq(message),
+                eq(cause),
+                eq(new InvocationDetails(null, c10nClass, method, args))
+        );
     }
 
     private static final class AnException extends Exception {

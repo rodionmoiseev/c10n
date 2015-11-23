@@ -19,7 +19,6 @@
 
 package com.github.rodionmoiseev.c10n;
 
-import com.github.rodionmoiseev.c10n.formatters.CustomMessageFormatterTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -29,6 +28,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         com.github.rodionmoiseev.c10n.annotations.AllTests.class,
+        com.github.rodionmoiseev.c10n.formatters.AllTests.class,
         com.github.rodionmoiseev.c10n.guice.AllTests.class,
         com.github.rodionmoiseev.c10n.resources.AllTests.class,
         com.github.rodionmoiseev.c10n.share.AllTests.class,
@@ -38,6 +38,7 @@ import org.junit.runners.Suite;
         C10NConfigBaseInstallTest.class,
         C10NFiltersTest.class,
         C10NFilterTest.class,
+        C10NMessageTest.class,
         C10NTest.class,
         ConfigChainResolverTest.class,
         ConfiguredC10NModuleTest.class,
@@ -48,7 +49,6 @@ import org.junit.runners.Suite;
         FallbackC10NFactoryTest.class,
         LocaleProviderTest.class,
         LocaleSelectionTest.class,
-        CustomMessageFormatterTest.class,
         PackageLocalInterfaceTest.class,
         PluginTest.class,
         ResourceBundleBindingTest.class,
