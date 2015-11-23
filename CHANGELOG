@@ -2,9 +2,18 @@ Dev (1.3) - 2015/03
 
 Important: c10n now works only with Java8 and above!
 
+* Feature: Created a logging plugin (separate jar) (#34 rodionmoiseev)
+* Feature: Support for custom message formatters (#32 rodionmoiseev)
+* Feature: New plugin system (#31 rodionmoiseev)
+* Feature: Retrieve all message mappings with special C10NMessage return type (#29 rodionmoiseev)
+
+* Enhancement: Integration with Travis CI (sakamotodesu)
+* Enhancement: Upgraded reflections library 0.9.8 -> 0.9.10
 * Enhancement: Migrate binary/source levels to Java8 (#28 rodionmoiseev)
 * Enhancement: Add locale or Spanish languages (es) to default annotations (#27 kevinrobayna)
 * Enhancement: Make calls to C10N.get(...) fail when c10n has noot been configured yet (#18 rodionmoiseev)
+
+* Fixed: c10n-tools has unresolvable dependecy on "c10n" (should be "c10n-core") (#30 rodionmoiseev)
 
 Current (1.2) - 2014/09/23
 
