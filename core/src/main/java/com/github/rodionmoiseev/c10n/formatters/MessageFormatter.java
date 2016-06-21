@@ -21,6 +21,7 @@
 package com.github.rodionmoiseev.c10n.formatters;
 
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 /**
  * Formatter fills in the method argument placeholders
@@ -37,8 +38,9 @@ public interface MessageFormatter {
      *
      * @param method  The method on which the invocation was made
      * @param message The translated message as it is declared in the method annotation
+     * @param locale  resolved locale of the message
      * @param args    The actual argument values passed to the method
      * @return Formatted string with the argument placeholders replaced
      */
-    String format(Method method, String message, Object... args);
+    String format(Method method, String message, Locale locale, Object... args);
 }

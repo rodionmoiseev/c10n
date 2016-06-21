@@ -65,14 +65,17 @@ public class CustomMessageFormatterTest {
                 install(new DefaultC10NAnnotations());
                 setMessageFormatter(new MessageFormatter() {
                     @Override
-                    public String format(Method method, String message, Object... args) {
-                        return method.getName() + ":" + message + ":" + args[0];
+                    public String format(Method method, String message, Locale locale, Object... args) {
+                        return method.getName() + ":" +
+                                message + ":" +
+                                locale.getDisplayName() + ":" +
+                                args[0];
                     }
                 });
             }
         });
 
         MyMessageForFormatting msg = C10N.get(MyMessageForFormatting.class);
-        assertThat(msg.testMessage("rodion"), is(equalTo("testMessage:Hello {0}!:rodion")));
+        assertThat(msg.testMessage("rodion"), is(equalTo("testMessage:Hello {0}!:English:rodion")));
     }
 }

@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -73,7 +74,7 @@ public class ExtendedMessageFormatter implements MessageFormatter {
     }
 
     @Override
-    public String format(Method method, String message, Object... args) {
+    public String format(Method method, String message, Locale locale, Object... args) {
         Map<String,String> replacements = new HashMap<String, String>(customReplacements);
         Parameter[] params = method.getParameters();
         Annotation[][] paramAnnotations = method.getParameterAnnotations();

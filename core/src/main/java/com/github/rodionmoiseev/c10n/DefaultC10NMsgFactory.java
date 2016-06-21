@@ -387,7 +387,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                 String key = bundleKeys.get(method);
                 if (null != key) {
                     if (bundle.containsKey(key)) {
-                        return format(bundle.getString(key), method, args);
+                        return format(bundle.getString(key), method, locale, args);
                     }
                 }//else: should never happen!
             }
@@ -399,7 +399,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                 }
                 return conf.getUntranslatedMessageString(proxiedClass, method, args);
             }
-            return format(res, method, args);
+            return format(res, method, locale, args);
         }
 
         private C10NString findTranslationFromAnnotations(Method method, Locale locale) {
@@ -410,15 +410,15 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
             return null;
         }
 
-        private String format(C10NString message, Method method, Object... args) {
-            return format(message.text, message.raw, method, args);
+        private String format(C10NString message, Method method, Locale locale, Object... args) {
+            return format(message.text, message.raw, method, locale, args);
         }
 
-        private String format(String message, Method method, Object... args) {
-            return format(message, false, method, args);
+        private String format(String message, Method method, Locale locale, Object... args) {
+            return format(message, false, method, locale, args);
         }
 
-        private String format(String message, boolean raw, Method method, Object... args) {
+        private String format(String message, boolean raw, Method method, Locale locale, Object... args) {
             if (raw) {
                 //Raw messages accept no parameters
                 return message;
@@ -432,9 +432,9 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
                     Annotation[] annotations = argAnnotations != null ? argAnnotations[i] : NO_ANNOTATIONS;
                     filteredArgs[i] = applyArgFilterIfExists(annotations, argTypes[i], args[i]);
                 }
-                return formatter.format(method, message, filteredArgs);
+                return formatter.format(method, message, locale, filteredArgs);
             }
-            return formatter.format(method, message, args);
+            return formatter.format(method, message, locale, args);
         }
 
         private Object applyArgFilterIfExists(Annotation[] annotations, Class<?> argType, Object arg) {

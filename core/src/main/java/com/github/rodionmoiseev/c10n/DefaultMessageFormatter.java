@@ -24,10 +24,11 @@ import com.github.rodionmoiseev.c10n.formatters.MessageFormatter;
 
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.Locale;
 
 class DefaultMessageFormatter implements MessageFormatter {
     @Override
-    public String format(Method method, String message, Object... args) {
+    public String format(Method method, String message, Locale locale, Object... args) {
         return MessageFormat.format(message, args);
     }
 }
