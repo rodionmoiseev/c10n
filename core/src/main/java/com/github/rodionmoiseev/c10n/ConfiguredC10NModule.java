@@ -54,5 +54,7 @@ public interface ConfiguredC10NModule {
     List<C10NPlugin> getPlugins();
 
     MessageFormatter getMessageFormatter();
+
+    ClassLoader getProxyClassLoader();
 }
 

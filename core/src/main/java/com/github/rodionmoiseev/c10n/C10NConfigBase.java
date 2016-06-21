@@ -34,6 +34,7 @@ public abstract class C10NConfigBase {
     //DI
     private final C10NCoreModule coreModule = new C10NCoreModule();
     private LocaleProvider localeProvider = coreModule.defaultLocaleProvider();
+    private ClassLoader proxyClassLoader = C10N.class.getClassLoader();
     private UntranslatedMessageHandler untranslatedMessageHandler = coreModule.defaultUnknownMessageHandler();
     private final Map<String, C10NBundleBinder> bundleBinders = new HashMap<String, C10NBundleBinder>();
     private final Map<Class<?>, C10NImplementationBinder<?>> binders = new HashMap<Class<?>, C10NImplementationBinder<?>>();
@@ -199,6 +200,30 @@ public abstract class C10NConfigBase {
     protected void setUntranslatedMessageHandler(UntranslatedMessageHandler handler) {
         Preconditions.assertNotNull(handler, "handler");
         this.untranslatedMessageHandler = handler;
+    }
+
+    /**
+     * <p>Overrides the classloader used for loading c10n-interface proxies.
+     * This maybe useful in the context of hot-swapping enabled classloaders, like
+     * the one for Play framework 2.0, or OSGi.
+     *
+     * <p>By default, the classloader of {@link com.github.rodionmoiseev.c10n.C10N#getClass()} class is used.
+     *
+     * @param proxyClassLoader the classloader to use for loading c10n-interface proxies (not-null)
+     */
+    protected void setProxyClassLoader(ClassLoader proxyClassLoader) {
+        Preconditions.assertNotNull(proxyClassLoader, "proxyClassLoader");
+        this.proxyClassLoader = proxyClassLoader;
+    }
+
+    /**
+     * <p>The c10n intefrace proxy classloader that will be used
+     * by the current instance of c10n message factory.</p>
+     *
+     * @return the classloader to be used for loading c10n-interface proxies (not-null)
+     */
+    protected ClassLoader getProxyClassLoader() {
+        return proxyClassLoader;
     }
 
     /**

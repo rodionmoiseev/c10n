@@ -48,12 +48,10 @@ import static com.github.rodionmoiseev.c10n.share.utils.Preconditions.assertNotN
 class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
     private final ConfiguredC10NModule conf;
     private final LocaleMapping localeMapping;
-    private final ClassLoader proxyClassloader;
 
-    DefaultC10NMsgFactory(ConfiguredC10NModule conf, LocaleMapping localeMapping, ClassLoader proxyClassloader) {
+    DefaultC10NMsgFactory(ConfiguredC10NModule conf, LocaleMapping localeMapping) {
         this.conf = conf;
         this.localeMapping = localeMapping;
-        this.proxyClassloader = proxyClassloader;
     }
 
     @Override
@@ -72,7 +70,7 @@ class DefaultC10NMsgFactory implements InternalC10NMsgFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> c10nInterface, String delegatingValue, LocaleProvider localeProvider) {
-        return (T) Proxy.newProxyInstance(proxyClassloader,
+        return (T) Proxy.newProxyInstance(conf.getProxyClassLoader(),
                 new Class<?>[]{c10nInterface},
                 C10NInvocationHandler.create(this,
                         delegatingValue,

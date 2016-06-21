@@ -46,8 +46,7 @@ public class C10NCoreModule {
 
     public C10NMsgFactory defaultC10NMsgFactory(ConfiguredC10NModule configuredModule) {
         return new DefaultC10NMsgFactory(configuredModule,
-                shareModule.defaultLocaleMapping(),
-                C10N.getProxyClassloader());
+                shareModule.defaultLocaleMapping());
     }
 
     /**

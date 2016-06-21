@@ -74,11 +74,6 @@ import java.util.Locale;
  * @author rodion
  */
 public final class C10N {
-    /**
-     * <p>Classloader to use for loading c10n-interface proxies
-     */
-    private static ClassLoader proxyClassloader = C10N.class.getClassLoader();
-
     //DI
     private static final C10NCoreModule coreModule = new C10NCoreModule();
     private static ConfiguredC10NModule rootConfiguredModule = coreModule.resolve(coreModule.defaultConfig());
@@ -141,33 +136,5 @@ public final class C10N {
      */
     public static C10NMsgFactory createMsgFactory(C10NConfigBase conf) {
         return coreModule.defaultC10NMsgFactory(coreModule.resolve(conf));
-    }
-
-    /**
-     * <p>Overrides the classloader used for loading c10n-interface proxies.
-     * This maybe useful in the context of hot-swapping enabled classloaders, like
-     * the one for Play framework 2.0
-     *
-     * <p>Overriding should be done before any calls to {@link C10N#get(Class)}, to be effective.
-     *
-     * <p>By default, the classloader of {@link com.github.rodionmoiseev.c10n.C10N#getClass()} class is used.
-     *
-     * @param classloader the classloader to use for loading c10n-interface proxies (not-null)
-     */
-    @SuppressWarnings("UnusedDeclaration")//rationale: public API
-    public static void setProxyClassloader(ClassLoader classloader) {
-        if (null == classloader) {
-            throw new IllegalArgumentException("classloader is null");
-        }
-        proxyClassloader = classloader;
-    }
-
-    /**
-     * Get the instance of the classloader currently used for loading c10n-interface proxies.
-     *
-     * @return classloader instance (not-null)
-     */
-    public static ClassLoader getProxyClassloader() {
-        return proxyClassloader;
     }
 }

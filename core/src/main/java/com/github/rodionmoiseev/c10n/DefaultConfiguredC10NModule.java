@@ -150,6 +150,11 @@ class DefaultConfiguredC10NModule implements ConfiguredC10NModule {
         return parentConfig.getMessageFormatter();
     }
 
+    @Override
+    public ClassLoader getProxyClassLoader() {
+        return parentConfig.getProxyClassLoader();
+    }
+
     private List<C10NConfigBase> traverseConfigs(C10NConfigBase config) {
         List<C10NConfigBase> res = new ArrayList<C10NConfigBase>();
         traverseConfigs(config, res);
