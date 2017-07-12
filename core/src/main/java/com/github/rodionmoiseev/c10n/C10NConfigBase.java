@@ -36,7 +36,7 @@ public abstract class C10NConfigBase {
     private LocaleProvider localeProvider = coreModule.defaultLocaleProvider();
     private ClassLoader proxyClassLoader = C10N.class.getClassLoader();
     private UntranslatedMessageHandler untranslatedMessageHandler = coreModule.defaultUnknownMessageHandler();
-    private final Map<String, C10NBundleBinder> bundleBinders = new HashMap<String, C10NBundleBinder>();
+    private final Map<String, C10NBundleBinderEntry> bundleBinders = new HashMap<String, C10NBundleBinderEntry>();
     private final Map<Class<?>, C10NImplementationBinder<?>> binders = new HashMap<Class<?>, C10NImplementationBinder<?>>();
     private final Map<Class<? extends Annotation>, C10NAnnotationBinder> annotationBinders = new HashMap<Class<? extends Annotation>, C10NAnnotationBinder>();
     private final List<C10NFilterBinder<?>> filterBinders = new ArrayList<C10NFilterBinder<?>>();
@@ -367,20 +367,23 @@ public abstract class C10NConfigBase {
         return false;
     }
 
+    protected C10NBundleBinder bindBundle(String baseName, String charsetName) {
+        C10NBundleBinderEntry entry = new C10NBundleBinderEntry(baseName, charsetName, new C10NBundleBinder());
+        bundleBinders.put(entry.getBaseName(), entry);
+        return entry.getBinder();
+    }
+
     protected C10NBundleBinder bindBundle(String baseName) {
-        C10NBundleBinder binder = new C10NBundleBinder();
-        bundleBinders.put(baseName, binder);
-        return binder;
+        return bindBundle(baseName, "UTF-8");
     }
 
     List<ResourceBundle> getBundlesForLocale(Class<?> c10nInterface, Locale locale) {
         List<ResourceBundle> res = new ArrayList<ResourceBundle>();
-        for (Entry<String, C10NBundleBinder> entry : bundleBinders.entrySet()) {
-            C10NBundleBinder binder = entry.getValue();
-            if (binder.getBoundInterfaces().isEmpty()
-                    || binder.getBoundInterfaces().contains(c10nInterface)) {
-                res.add(ResourceBundle.getBundle(entry.getKey(), locale,
-                        new EncodedResourceControl("UTF-8")));
+        for (C10NBundleBinderEntry entry : bundleBinders.values()) {
+            if (entry.getBinder().getBoundInterfaces().isEmpty()
+                    || entry.getBinder().getBoundInterfaces().contains(c10nInterface)) {
+                res.add(ResourceBundle.getBundle(entry.getBaseName(), locale,
+                        new EncodedResourceControl(entry.getCharsetName())));
             }
         }
         return res;
@@ -471,6 +474,30 @@ public abstract class C10NConfigBase {
 
     String getUntranslatedMessageString(Class<?> c10nInterface, Method method, Object[] methodArgs) {
         return untranslatedMessageHandler.render(c10nInterface, method, methodArgs);
+    }
+
+    protected static class C10NBundleBinderEntry {
+        private final String baseName;
+        private final String charsetName;
+        private final C10NBundleBinder binder;
+
+        public C10NBundleBinderEntry(String baseName, String charsetName, C10NBundleBinder binder) {
+            this.baseName = baseName;
+            this.charsetName = charsetName;
+            this.binder = binder;
+        }
+
+        public String getBaseName() {
+            return baseName;
+        }
+
+        public String getCharsetName() {
+            return charsetName;
+        }
+
+        public C10NBundleBinder getBinder() {
+            return binder;
+        }
     }
 
     protected static class C10NAnnotationBinder {
