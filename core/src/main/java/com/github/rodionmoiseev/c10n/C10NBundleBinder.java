@@ -23,7 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class C10NBundleBinder {
+    private final String charsetName;
     private final List<Class<?>> boundInterfaces = new ArrayList<Class<?>>();
+
+    public C10NBundleBinder(String charsetName) {
+        this.charsetName = charsetName;
+    }
+
+    public String getCharsetName() {
+        return charsetName;
+    }
 
     public void to(Class<?> c10nInterface) {
         boundInterfaces.add(c10nInterface);

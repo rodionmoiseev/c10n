@@ -106,6 +106,21 @@ public class ResourceBundleBindingTest {
         assertThat(labels.argGreeting("C10N"), is("Hello, C10N!"));
     }
 
+    @Test
+    public void multiLanguageBundleBinding_withCharset() {
+        C10N.configure(new C10NConfigBase() {
+            @Override
+            public void configure() {
+                bindBundle("com.github.rodionmoiseev.c10n.testBundles.TestEUCJPBundle", "EUC-JP");
+            }
+        });
+        ExtLabels labels = C10N.get(ExtLabels.class);
+
+        Locale.setDefault(Locale.JAPANESE);
+        assertThat(labels.greeting(), is("こんにちは世界!"));
+        assertThat(labels.argGreeting("C10N"), is("こんにちはC10N!"));
+    }
+
     interface Labels {
 
         String greeting();

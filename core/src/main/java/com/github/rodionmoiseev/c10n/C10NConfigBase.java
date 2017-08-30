@@ -368,7 +368,11 @@ public abstract class C10NConfigBase {
     }
 
     protected C10NBundleBinder bindBundle(String baseName) {
-        C10NBundleBinder binder = new C10NBundleBinder();
+        return bindBundle(baseName, "UTF-8");
+    }
+
+    protected C10NBundleBinder bindBundle(String baseName, String charsetName) {
+        C10NBundleBinder binder = new C10NBundleBinder(charsetName);
         bundleBinders.put(baseName, binder);
         return binder;
     }
@@ -380,7 +384,7 @@ public abstract class C10NConfigBase {
             if (binder.getBoundInterfaces().isEmpty()
                     || binder.getBoundInterfaces().contains(c10nInterface)) {
                 res.add(ResourceBundle.getBundle(entry.getKey(), locale,
-                        new EncodedResourceControl("UTF-8")));
+                        new EncodedResourceControl(binder.getCharsetName())));
             }
         }
         return res;
