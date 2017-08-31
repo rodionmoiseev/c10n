@@ -7,7 +7,10 @@ Important: c10n now works only with Java8 and above!
 * Feature: New plugin system (#31 rodionmoiseev)
 * Feature: Retrieve all message mappings with special C10NMessage return type (#29 rodionmoiseev)
 
-* Enhancement: Integration with Travis CI (sakamotodesu)
+* Enhancement: Allow to set input encoding for message bundles (#41 dbenninger rodionmoiseev)
+* Enhancement: Allow to access locale from CustomMessageFormatter (#38 rodionmoiseev lelmarir)
+* Enhancement: Allow setting a classloader per C10N instance to avoid concurrency issues (#37 rodionmoiseev mredaelli)
+* Enhancement: Integration with Travis CI (#35 sakamotodesu)
 * Enhancement: Upgraded reflections library 0.9.8 -> 0.9.10
 * Enhancement: Migrate binary/source levels to Java8 (#28 rodionmoiseev)
 * Enhancement: Add locale or Spanish languages (es) to default annotations (#27 kevinrobayna)
