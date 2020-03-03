@@ -29,7 +29,6 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         com.github.rodionmoiseev.c10n.annotations.AllTests.class,
         com.github.rodionmoiseev.c10n.formatters.AllTests.class,
-        com.github.rodionmoiseev.c10n.guice.AllTests.class,
         com.github.rodionmoiseev.c10n.resources.AllTests.class,
         com.github.rodionmoiseev.c10n.share.AllTests.class,
         AnnotationBindingConfigurationErrorTest.class,
