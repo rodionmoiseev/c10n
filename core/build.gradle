@@ -24,11 +24,11 @@ configurations {
 }
 
 dependencies {
-    guice group: "org.reflections", name: "reflections", version: "0.9.10"
-    guice group: 'com.google.inject', name: 'guice', version: '3.0'
-    guice group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'
+    guice group: "org.reflections", name: "reflections", version: "0.9.11"
+    guice group: 'com.google.inject', name: 'guice', version: '4.2.0'
+    guice group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.2.0'
 
-    testCompile group: 'commons-io', name: 'commons-io', version: '2.4'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.6'
 }
 
 eclipse.classpath.plusConfigurations += configurations.guice
