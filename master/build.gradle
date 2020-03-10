@@ -46,7 +46,7 @@ subprojects {
     compileTestJava.options.encoding = 'UTF-8'
     javadoc.options.encoding = 'UTF-8'
 
-    version = '1.3'
+    version = '1.4-SNAPSHOT'
     archivesBaseName = 'c10n'
     group = 'com.github.rodionmoiseev.c10n'
 
