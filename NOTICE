@@ -1,5 +1,16 @@
-Apache Cosmopolitan
-Copyright 2012 The Apache Software Foundation
+Cosmopolitan - C10N
+Copyright 2012 Rodion Moiseev (https://github.com/rodionmoiseev)
 
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
+This software is licensed under the Apache License, Version 2.0 (the "License").
+
+Portions of this software contain and use the following 3rd party software
+
+----
+Reflections 2004 (https://github.com/ronmamo/reflections)
+Licensed under WTFPL License
+----
+
+----
+Guice, Google (https://github.com/google/guice)
+Licensed under Apache License 2.0
+----
