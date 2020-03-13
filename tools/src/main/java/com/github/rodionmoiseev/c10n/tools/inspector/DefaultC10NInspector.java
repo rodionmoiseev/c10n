@@ -23,7 +23,6 @@ import com.github.rodionmoiseev.c10n.ConfiguredC10NModule;
 import com.github.rodionmoiseev.c10n.share.utils.C10NBundleKey;
 import com.github.rodionmoiseev.c10n.share.utils.ReflectionUtils;
 import com.github.rodionmoiseev.c10n.tools.search.C10NInterfaceSearch;
-import com.google.common.collect.Lists;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -53,7 +52,7 @@ class DefaultC10NInspector implements C10NInspector {
 
     @Override
     public List<C10NUnit> inspect(String... packagePrefixes) {
-        List<C10NUnit> res = Lists.newArrayList();
+        List<C10NUnit> res = new ArrayList<>();
 
         @SuppressWarnings("deprecation")
         C10NMsgFactory c10NMsgFactory = C10N.createMsgFactory(configuredC10NModule);
@@ -64,7 +63,7 @@ class DefaultC10NInspector implements C10NInspector {
                     configuredC10NModule.getAnnotationBindings(c10nInterface).entrySet();
 
 
-            List<C10NUnit> unitsForInterface = Lists.newArrayList();
+            List<C10NUnit> unitsForInterface = new ArrayList<>();
 
             for (Method method : c10nInterface.getDeclaredMethods()) {
                 String keyAnnotationValue = ReflectionUtils.getKeyAnnotationValue(method);

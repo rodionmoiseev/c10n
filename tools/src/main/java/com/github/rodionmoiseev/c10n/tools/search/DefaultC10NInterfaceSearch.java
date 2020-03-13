@@ -16,9 +16,6 @@
 
 package com.github.rodionmoiseev.c10n.tools.search;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
@@ -28,6 +25,8 @@ import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class DefaultC10NInterfaceSearch implements C10NInterfaceSearch {
     @Override
@@ -40,15 +39,10 @@ class DefaultC10NInterfaceSearch implements C10NInterfaceSearch {
 
 
     private Set<URL> getPackageURLs(String... packagePrefixes) {
-        Iterable<URL> packages = Iterables.concat(Iterables.transform(
-                Arrays.asList(packagePrefixes), new Function<String, Set<URL>>() {
-            @Override
-            public Set<URL> apply(String prefix) {
-                return ClasspathHelper.forPackage(prefix);
-            }
-        }));
-
-        return Sets.newHashSet(packages);
+        Stream<URL> urls = Arrays.stream(
+                packagePrefixes).map((prefix) -> ClasspathHelper.forPackage(prefix).stream()
+        ).reduce(Stream.empty(), Stream::concat);
+        return urls.collect(Collectors.toSet());
     }
 
     private FilterBuilder getPackageInputFilter(String... packagePrefixes) {

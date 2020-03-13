@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <resourceExtensions>
+      <entry name=".+\.(properties|xml|html|dtd|tld)" />
+      <entry name=".+\.(gif|png|jpeg|jpg)" />
+    </resourceExtensions>
+    <wildcardResourcePatterns>
+      <entry name="!?*.java" />
+      <entry name="!?*.groovy" />
+    </wildcardResourcePatterns>
+    <bytecodeTargetLevel>
+      <module name="c10n.core.guice" target="11" />
+      <module name="c10n.core.main" target="11" />
+      <module name="c10n.core.test" target="11" />
+      <module name="c10n.loggingPlugin.main" target="11" />
+      <module name="c10n.loggingPlugin.test" target="11" />
+      <module name="c10n.tools.main" target="11" />
+      <module name="c10n.tools.test" target="11" />
+      <module name="core_guice" target="11" />
+      <module name="core_main" target="11" />
+      <module name="core_test" target="11" />
+      <module name="loggingPlugin_main" target="11" />
+      <module name="loggingPlugin_test" target="11" />
+      <module name="tools_main" target="11" />
+      <module name="tools_test" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

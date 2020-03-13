@@ -40,7 +40,7 @@ public class C10NCustomClassLoaderTest {
             msg.get(MyMessages.class);
             fail("Expected to throw class loading exception");
         } catch (Exception e) {
-            assertThat(e.getMessage(), containsString("MyMessages is not visible from class loader"));
+            assertThat(e.getMessage(), containsString("MyMessages referenced from a method is not visible from class loader"));
         }
     }
 

@@ -21,18 +21,11 @@ configurations {
 }
 
 dependencies {
-    guice group: "org.reflections", name: "reflections", version: "0.9.11"
+    guice group: "org.reflections", name: "reflections", version: "0.9.12"
     guice group: 'com.google.inject', name: 'guice', version: '4.2.0'
     guice group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.2.0'
 
     testCompile group: 'commons-io', name: 'commons-io', version: '2.6'
-}
-
-eclipse.classpath.plusConfigurations += configurations.guice
-
-idea.module {
-    sourceDirs += file("src/ext/guice/java")
-    scopes.COMPILE.plus += [configurations.guice]
 }
 
 sourceSets {

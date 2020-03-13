@@ -33,7 +33,11 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TestRule;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -105,8 +109,7 @@ public class C10NTest {
     public void cannotGetMessagesWhenConfigureHasNotBeenCalled() throws Throwable {
         thrown.expect(exceptionClassWithName(C10NException.class.getName()));
         thrown.expectMessage("C10N.configure()");
-        URLClassLoader cl = (URLClassLoader) C10N.class.getClassLoader();
-        Class<?> c10nClass = new URLClassLoader(cl.getURLs(), null).loadClass(C10N.class.getName());
+        Class<?> c10nClass = freshClassLoader().loadClass(C10N.class.getName());
         try {
             c10nClass.getMethod("get", new Class<?>[]{Class.class}).invoke(null, Messages.class);
         } catch (InvocationTargetException e) {
@@ -145,5 +148,23 @@ public class C10NTest {
         @En("english")
         @Ja("japanese")
         String text();
+    }
+
+    private static ClassLoader freshClassLoader() {
+        String pathSeparator = System
+                .getProperty("path.separator");
+        String[] classPathEntries = System
+                .getProperty("java.class.path")
+                .split(pathSeparator);
+        URL[] urls = Arrays.stream(classPathEntries).map(C10NTest::toFileURL).toArray(URL[]::new);
+        return new URLClassLoader(urls, null);
+    }
+
+    private static URL toFileURL(String path) {
+        try {
+            return Paths.get(path).toUri().toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Could not express " + path + " as URL.", e);
+        }
     }
 }

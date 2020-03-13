@@ -17,9 +17,9 @@
 package com.github.rodionmoiseev.c10n.tools.inspector;
 
 import com.github.rodionmoiseev.c10n.share.utils.C10NBundleKey;
-import com.google.common.collect.Maps;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +36,7 @@ public final class C10NUnit {
     private final Class<?> declaringInterface;
     private final Method declaringMethod;
     private final C10NBundleKey key;
-    private final Map<Locale, C10NTranslations> translations = Maps.newHashMap();
+    private final Map<Locale, C10NTranslations> translations = new HashMap<>();
 
     C10NUnit(Class<?> declaringInterface, Method declaringMethod, C10NBundleKey key, Set<Locale> initLocales) {
         assertNotNull(declaringInterface, "declaringInterface");

@@ -16,14 +16,8 @@
 
 package com.github.rodionmoiseev.c10n.tools.inspector;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import java.lang.annotation.Annotation;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author rodion
@@ -31,8 +25,8 @@ import java.util.Set;
  */
 public final class C10NTranslations {
     private String value = null;
-    private final Set<ResourceBundle> bundles = Sets.newHashSet();
-    private final Set<Annotation> annotations = Sets.newHashSet();
+    private final Set<ResourceBundle> bundles = new HashSet<>();
+    private final Set<Annotation> annotations = new HashSet<>();
 
     /**
      * <p>Get the actual translated value.
@@ -41,7 +35,6 @@ public final class C10NTranslations {
      * than one of {@link String}, {@link CharSequence} or one of primitive
      * types. However, the behaviour can be customised by providing a custom
      * {@link DefaultDummyInstanceProvider} (see {@link com.github.rodionmoiseev.c10n.tools.C10NTools}.
-     *
      *
      * @return the actual translated value, or <code>null</code> if not available
      * @see DummyInstanceProvider
@@ -92,7 +85,7 @@ public final class C10NTranslations {
     }
 
     private static Set<Map<String, String>> bundlesToMaps(Set<ResourceBundle> bundles) {
-        Set<Map<String, String>> res = Sets.newHashSet();
+        Set<Map<String, String>> res = new HashSet<>();
         for (ResourceBundle bundle : bundles) {
             res.add(bundleToMap(bundle));
         }
@@ -100,7 +93,7 @@ public final class C10NTranslations {
     }
 
     private static Map<String, String> bundleToMap(ResourceBundle bundle) {
-        Map<String, String> res = Maps.newHashMap();
+        Map<String, String> res = new HashMap<>();
         Enumeration<String> keys = bundle.getKeys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();

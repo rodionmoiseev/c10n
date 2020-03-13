@@ -18,20 +18,6 @@ buildscript {
     repositories {
         mavenCentral()
     }
-    dependencies {
-        classpath 'com.github.rodionmoiseev.gradle.plugins:idea-utils:0.2'
-    }
-}
-
-apply plugin: 'idea-utils'
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
-}
-
-allprojects {
-    apply plugin: 'eclipse'
-    apply plugin: 'idea'
 }
 
 subprojects {
@@ -43,11 +29,11 @@ subprojects {
     compileTestJava.options.encoding = 'UTF-8'
     javadoc.options.encoding = 'UTF-8'
 
-    version = '1.4-SNAPSHOT'
+    version = '2.0-SNAPSHOT'
     archivesBaseName = 'c10n'
     group = 'com.github.rodionmoiseev.c10n'
 
-    sourceCompatibility = '1.8'
+    sourceCompatibility = '11'
     [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
     [compileJava, compileTestJava]*.options*.compilerArgs = ['-parameters']
     //[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:all']
@@ -64,7 +50,7 @@ subprojects {
     dependencies {
         testCompile group: 'junit', name: 'junit', version: '4.11'
         testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
-        testCompile 'org.mockito:mockito-core:2.0.31-beta'
+        testCompile 'org.mockito:mockito-core:3.3.0'
         testCompile 'com.google.guava:guava:18.0'
     }
 
@@ -176,17 +162,4 @@ subprojects {
     test.exclude '**/AllTests.class'
 
     sourceSets.main.compileClasspath += configurations.provided
-    eclipse.classpath.plusConfigurations += configurations.provided
-    idea.module.scopes.PROVIDED.plus += [configurations.provided]
-}
-
-idea.project {
-    vcs {
-        vcs = 'Git'
-        directory = '$PROJECT_DIR$/..'
-    }
-    copyright {
-        name = 'Apache 2.0'
-        license = file("${project.projectDir}/license-preamble.txt")
-    }
 }

@@ -21,7 +21,6 @@ import com.github.rodionmoiseev.c10n.ConfiguredC10NModule;
 import com.github.rodionmoiseev.c10n.tools.inspector.C10NInspector;
 import com.github.rodionmoiseev.c10n.tools.inspector.DummyInstanceProvider;
 import com.github.rodionmoiseev.c10n.tools.inspector.InspectorModule;
-import com.google.common.collect.Sets;
 
 import java.util.Locale;
 import java.util.Set;
@@ -64,7 +63,6 @@ import static com.github.rodionmoiseev.c10n.share.utils.Preconditions.assertNotN
  * {@link String}, {@link CharSequence} or one of the primitive types.
  * </li>
  * </ol>
- *
  *
  * @author rodion
  * @since 1.1
@@ -110,7 +108,7 @@ public final class C10NTools {
          */
         public C10NInspectorBuilder checkLocales(Locale... locales) {
             assertNotNull(locales, "locales");
-            this.localesToCheck = Sets.newHashSet(locales);
+            this.localesToCheck = Set.of(locales);
             return this;
         }
 

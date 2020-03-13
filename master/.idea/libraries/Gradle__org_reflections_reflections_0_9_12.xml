@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.reflections:reflections:0.9.12">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.reflections/reflections/0.9.12/1c9d44c563eebe9b8a3afebd29ed5c4646db800c/reflections-0.9.12.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.reflections/reflections/0.9.12/bce0f060e07c97ee9a04f6bdc4fd940adc4debcb/reflections-0.9.12-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
