@@ -1,5 +1,5 @@
 language: java
-jdk: openjdk8
+jdk: openjdk11
 script:
 - "./master/gradlew -b ./master/build.gradle test --stacktrace --console plain"
 cache:
