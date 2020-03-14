@@ -3,16 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/c10n.iml" filepath="$PROJECT_DIR$/.idea/modules/c10n.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/966647005/c10n.core.iml" filepath="$PROJECT_DIR$/.idea/modules/966647005/c10n.core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/966647005/c10n.core.guice.iml" filepath="$PROJECT_DIR$/.idea/modules/966647005/c10n.core.guice.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/966647005/c10n.core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/966647005/c10n.core.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/966647005/c10n.core.test.iml" filepath="$PROJECT_DIR$/.idea/modules/966647005/c10n.core.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1380528172/c10n.loggingPlugin.iml" filepath="$PROJECT_DIR$/.idea/modules/-1380528172/c10n.loggingPlugin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1380528172/c10n.loggingPlugin.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1380528172/c10n.loggingPlugin.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1380528172/c10n.loggingPlugin.test.iml" filepath="$PROJECT_DIR$/.idea/modules/-1380528172/c10n.loggingPlugin.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-83016611/c10n.tools.iml" filepath="$PROJECT_DIR$/.idea/modules/-83016611/c10n.tools.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-83016611/c10n.tools.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-83016611/c10n.tools.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-83016611/c10n.tools.test.iml" filepath="$PROJECT_DIR$/.idea/modules/-83016611/c10n.tools.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1027135055/c10n.core.iml" filepath="$PROJECT_DIR$/.idea/modules/-1027135055/c10n.core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/2098508160/c10n.loggingPlugin.iml" filepath="$PROJECT_DIR$/.idea/modules/2098508160/c10n.loggingPlugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1760718327/c10n.tools.iml" filepath="$PROJECT_DIR$/.idea/modules/-1760718327/c10n.tools.iml" />
     </modules>
   </component>
 </project>
