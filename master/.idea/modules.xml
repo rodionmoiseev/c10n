@@ -3,9 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/c10n.iml" filepath="$PROJECT_DIR$/.idea/modules/c10n.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1027135055/c10n.core.iml" filepath="$PROJECT_DIR$/.idea/modules/-1027135055/c10n.core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/2098508160/c10n.loggingPlugin.iml" filepath="$PROJECT_DIR$/.idea/modules/2098508160/c10n.loggingPlugin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1760718327/c10n.tools.iml" filepath="$PROJECT_DIR$/.idea/modules/-1760718327/c10n.tools.iml" />
     </modules>
   </component>
 </project>
