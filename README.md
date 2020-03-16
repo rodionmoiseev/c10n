@@ -98,3 +98,15 @@ Download the latest 1.3 release from the [download section][C10NDownload].
   [C10NContributing]: https://github.com/rodionmoiseev/c10n/wiki/Contributing "C10N Wiki: Contributing"
   [C10NScalaIntegration]: https://github.com/rodionmoiseev/c10n/wiki/Scala-Integration "C10N Wiki: Scala Integration"
   [C10NPlayIntegration]: https://github.com/rodionmoiseev/c10n/wiki/Play-Framework-2.0-Integration "C10N Wiki: Play Framework 2.0 Integration"
+  
+Dependencies and Compatibility
+------------------------------
+
+Major project dependencies are listed below:
+
+| C10N Version | Java        | Gradle | Guice (for guice-plugin users) |
+|--------------|-------------|--------|------------------------|
+| >= 2.0       | OpenJDK 11  | 6.x    | 4.x                    |
+| 1.3          | OracleJDK 8 | 2.x    | 4.x                    |
+| 1.2          | OracleJDK 6 | 2.x    | 3.x                    |
+| < 1.2        | OracleJDK 6 | 1.x    | 3.x                    |
